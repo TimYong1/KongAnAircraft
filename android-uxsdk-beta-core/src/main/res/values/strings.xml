@@ -1,0 +1,213 @@
+<!--
+  ~ Copyright (c) 2018-2020 DJI
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  ~
+  -->
+
+<resources  xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="uxsdk_app_name">DJIUXSDK Beta</string>
+    <string name="uxsdk_app_yes">是</string>
+    <string name="uxsdk_app_no">否</string>
+    <string name="uxsdk_app_ok">好</string>
+    <string name="uxsdk_app_save">保存</string>
+    <string name="uxsdk_app_cancel">取消</string>
+    <string name="uxsdk_error">错误</string>
+    <string name="uxsdk_alert">警告</string>
+    <string name="uxsdk_tips">提示</string>
+    <string name="uxsdk_success">成功</string>
+    <string name="uxsdk_enable">可用</string>
+    <string name="uxsdk_disable">不可用</string>
+
+    <string name="uxsdk_user_login_widget_logout">退出登录</string>
+    <string name="uxsdk_user_login_widget_login">登录</string>
+    <string name="uxsdk_user_login_widget_refresh">刷新</string>
+    <string name="uxsdk_user_login_widget_token">登录失效</string>
+    <string name="uxsdk_user_login_widget_not_logged_in">未登录</string>
+    <string name="uxsdk_user_login_widget_logged_in_authorized">已登录并授权解锁飞行区</string>
+    <string name="uxsdk_user_login_widget_logged_in_not_authorized">已登录但未授权解锁飞行区.</string>
+
+    <string name="uxsdk_string_default_value">N/A</string>
+
+    <string name="uxsdk_battery_percent">%1$d%%</string>
+    <string name="uxsdk_battery_voltage_unit">%.2f V</string>
+
+    <string name="uxsdk_gps_rtk_enabled">R</string>
+
+    <string name="uxsdk_home_location_letter">H</string>
+
+
+    <!-- Telemetry widgets -->
+    <string name="uxsdk_unit_meters">m</string>
+    <string name="uxsdk_unit_feet">ft</string>
+    <string name="uxsdk_value_meters">%1$s m</string>
+    <string name="uxsdk_value_feet">%1$s ft</string>
+    <string name="uxsdk_unit_meter_per_second">m/s</string>
+    <string name="uxsdk_unit_km_per_hr">km/h</string>
+    <string name="uxsdk_unit_mile_per_hr">mph</string>
+    <string name="uxsdk_altitude_title">H</string>
+    <string name="uxsdk_agl_title">H AGL</string>
+    <string name="uxsdk_amsl_altitude_title">H AMSL</string>
+    <string name="uxsdk_distance_home_title">D</string>
+    <string name="uxsdk_distance_rc_title">DRC</string>
+    <string name="uxsdk_vps_title">VPS</string>
+    <string name="uxsdk_horizontal_velocity_title">H.S.</string>
+    <string name="uxsdk_vertical_velocity_title">V.S.</string>
+
+    <string name="uxsdk_video_time_hours">%1$02d:%2$02d:%3$02d</string>
+    <string name="uxsdk_video_time">%1$02d:%2$02d</string>
+
+    <!-- picture format -->
+    <string name="uxsdk_camera_picture_format_raw">RAW</string>
+    <string name="uxsdk_camera_picture_format_jpeg">JPEG</string>
+    <string name="uxsdk_camera_picture_format_jpegraw">JPEG+RAW</string>
+    <string name="uxsdk_camera_picture_format_tiff">TIFF</string>
+    <string name="uxsdk_camera_picture_format_radiometic_jpeg">Radiometric JPEG</string>
+    <string name="uxsdk_camera_picture_format_low_tiff">TIFF Linear Low</string>
+    <string name="uxsdk_camera_picture_format_high_tiff">TIFF Linear High</string>
+    <string name="uxsdk_camera_picture_format_jr">J+R</string>
+
+    <string name="uxsdk_message_air_sense_warning_title">Another aircraft is nearby. Fly with caution.</string>
+    <string name="uxsdk_message_air_sense_warning_content">Another aircraft is too close, please descend to a safer altitude.</string>
+    <string name="uxsdk_message_air_sense_dangerous_content">Another aircraft is dangerously close, please descend to a safer altitude.</string>
+    <string name="uxsdk_air_sense_terms_content">Please make sure you have read and understood the DJI AirSense Warnings.</string>
+    <string name="uxsdk_air_sense_never_show">Don\'t show again</string>
+
+    <string name="uxsdk_visual_radar_avoidance_disabled_message_post">Obstacle Avoidance Disabled. Fly with caution.</string>
+
+    <string name="uxsdk_ei_title">EI</string>
+
+    <string name="uxsdk_max_flight_height_limit">Max Flight Altitude: %1$s</string>
+
+    <!-- System Status List -->
+    <string name="uxsdk_list_item_flight_mode_title">飞行模式</string>
+    <string name="uxsdk_list_item_aircraft_battery_temp">飞机电池温度</string>
+    <string name="uxsdk_list_item_radio_quality">无线信道质量</string>
+    <string name="uxsdk_celsius_unit">%1$.1f°C</string>
+    <string name="uxsdk_fahrenheit_unit">%1$.1f°F</string>
+    <string name="uxsdk_kelvins_unit">%1$.1fK</string>
+    <string name="uxsdk_list_item_travel_mode">旅行模式</string>
+    <string name="uxsdk_enter_travel_mode_success">飞机将自动收回起落架并进入飞行模式.</string>
+    <string name="uxsdk_enter_travel_mode_failed">无法进入旅行模式. %1$s</string>
+    <string name="uxsdk_exit_travel_mode_failed">无法退出旅行模式. %1$s</string>
+    <string name="uxsdk_travel_mode_enter">输入</string>
+    <string name="uxsdk_travel_mode_exit">退出</string>
+    <string name="uxsdk_travel_mode_enter_confirmation">飞机将进入旅行模式，以方便运输。 将飞机放在平坦，坚硬的表面上，然后卸下云台。 如果飞机未进入旅行模式，请手动调整起落架.</string>
+
+    <string name="uxsdk_list_item_rc_battery">遥控器电池</string>
+    <string name="uxsdk_rc_battery_percent">%1$d%%</string>
+
+    <string name="uxsdk_list_item_rc_stick_mode">操纵杆模式</string>
+    <string name="uxsdk_rc_stick_mode_1">模式1</string>
+    <string name="uxsdk_rc_stick_mode_2">模式2</string>
+    <string name="uxsdk_rc_stick_mode_3">模式3</string>
+    <string name="uxsdk_rc_stick_mode_custom">自定义</string>
+
+    <string name="uxsdk_list_item_sd_card">SD卡剩余容量</string>
+    <string name="uxsdk_list_item_format_button">格式</string>
+    <string name="uxsdk_list_item_emmc">eMMC剩余容量</string>
+
+    <string name="uxsdk_storage_status_not_supported">不支持</string>
+    <string name="uxsdk_storage_status_usb_connected">USB连接</string>
+    <string name="uxsdk_storage_status_missing">未插入</string>
+    <string name="uxsdk_storage_status_full">满的</string>
+    <string name="uxsdk_storage_status_slow">慢的, %1$s</string>
+    <string name="uxsdk_storage_status_write_protect">写入保护</string>
+    <string name="uxsdk_storage_status_not_formatted">未格式化</string>
+    <string name="uxsdk_storage_status_formatting">正在格式化&#8230;</string>
+    <string name="uxsdk_storage_status_invalid">无效的</string>
+    <string name="uxsdk_storage_status_busy">繁忙</string>
+    <string name="uxsdk_storage_status_unknown_error">未知错误</string>
+    <string name="uxsdk_storage_status_initial">初始化中</string>
+    <string name="uxsdk_storage_status_recover_file">修复视频文件</string>
+    <string name="uxsdk_storage_status_write_slow">写入速度慢</string>
+    <string name="uxsdk_storage_status_formatting_recommended">格式推荐</string>
+    <string name="uxsdk_storage_status_needs_formatting">需要格式化</string>
+    <string name="uxsdk_storage_status_remaining_space_mb">%1$d MB</string>
+    <string name="uxsdk_storage_status_remaining_space_gb">%1$.2f GB</string>
+    <string name="uxsdk_storage_status_file_indices">无文件索引</string>
+    <string name="uxsdk_sd_card_format_confirmation">确定要格式化SD卡吗?</string>
+    <string name="uxsdk_sd_card_format_complete">SD卡格式化完成.</string>
+    <string name="uxsdk_sd_card_dialog_title">SD卡格式</string>
+    <string name="uxsdk_sd_card_format_error">格式化SD卡时出错. %1$s</string>
+
+    <string name="uxsdk_emmc_dialog_title">eMMC存储格式</string>
+    <string name="uxsdk_emmc_format_error">格式化内部存储器（eMMC）时出错. %1$s</string>
+    <string name="uxsdk_emmc_format_confirmation">确实要格式化内部存储器（eMMC）吗？</string>
+    <string name="uxsdk_emmc_format_complete">内部存储器（eMMC）格式化已完成.</string>
+
+    <string name="uxsdk_list_item_max_flight_distance">最大飞行距离</string>
+    <string name="uxsdk_list_item_max_flight_altitude">最大飞行高度</string>
+    <string name="uxsdk_limit_required_error">设置失败。飞行高度超过最大限制（400英尺/120米）</string>
+    <string name="uxsdk_limit_high_notice">更改最高高度设置可能违反当地法律法规（FAA规定了400英尺/120米的飞行限制）。\n您应对更改这些设置后的飞机运行负全部责任。\nDJI及其附属公司不承担任何损害赔偿责任，无论是合同、侵权行为（包括疏忽），或任何其他法律或衡平法理论。.</string>
+    <string name="uxsdk_list_item_value_out_of_range">设置失败。请 输入范围内的数字.</string>
+    <string name="uxsdk_limit_return_home_warning">故障保护高度不能超过最大飞行高度。故障保护高度将设置为 %1$d ft / %2$d m.</string>
+
+    <string name="uxsdk_list_item_max_return_to_home_altitude">返航到home高度</string>
+    <string name="uxsdk_rth_error_dialog_message">返航高度不能超过最大飞行高度.</string>
+    <string name="uxsdk_list_rth_dialog_title">返航高度</string>
+    <string name="uxsdk_rth_success_dialog_message">返航高度已改变，请注意飞行安全</string>
+
+    <string name="uxsdk_novice_mode_altitude_meters">30m</string>
+    <string name="uxsdk_novice_mode_altitude_feet">100ft</string>
+    <string name="uxsdk_novice_mode_distance_meters">30m</string>
+    <string name="uxsdk_novice_mode_distance_feet">100ft</string>
+    <string name="uxsdk_altitude_range_meters">(%1$d~%2$dm)</string>
+    <string name="uxsdk_altitude_range_feet">≈ (%1$d~%2$dft)</string>
+
+    <string name="uxsdk_system_status_disabled">禁用</string>
+    <string name="uxsdk_system_status_normal">正常</string>
+
+
+    <!-- System Status List -->
+    <string name="uxsdk_system_status_list_title">系统状态列表</string>
+    
+    <string name="uxsdk_list_item_overview_status">总体状态</string>
+
+    <string name="uxsdk_list_item_novice_mode">初学者模式</string>
+
+    <string name="uxsdk_novice_mode_disabled_message">当您关闭初学者模式时，飞行速度和灵敏度将大大提高。请小心飞行.</string>
+
+    <string name="uxsdk_novice_mode_enabled_message">初学者模式已启用。高度和距离都将限制在100英尺/30米.</string>
+
+    <string name="uxsdk_list_item_unit_mode">单元模式</string>
+    <string name="uxsdk_list_item_unit_mode_imperial">英制</string>
+    <string name="uxsdk_list_item_unit_mode_metric">公制</string>
+    <string name="uxsdk_dialog_unit_change_notice">英制单位模式设置成功。 现在，测量值将遵循英制单位制。 由于飞机支持公制单位，因此显示的值是近似转换.</string>
+    <string name="uxsdk_dialog_unit_change_example">示例：10m≈ 32英尺-34英尺</string>
+
+    <string name="uxsdk_list_item_ssd">SSD剩余容量</string>
+    <string name="uxsdk_ssd_not_found">未插入</string>
+    <string name="uxsdk_ssd_saving">正在保存</string>
+    <string name="uxsdk_ssd_formatting">正在格式化</string>
+    <string name="uxsdk_ssd_initializing">正在实例化</string>
+    <string name="uxsdk_ssd_error">错误</string>
+    <string name="uxsdk_ssd_full">满的</string>
+    <string name="uxsdk_ssd_poor_connection">连接不良</string>
+    <string name="uxsdk_ssd_switching_license">切换许可证</string>
+    <string name="uxsdk_ssd_formatting_required">需要格式化</string>
+    <string name="uxsdk_ssd_not_initialized">未初始化</string>
+    <string name="uxsdk_ssd_dialog_title">SSD存储格式</string>
+    <string name="uxsdk_ssd_format_error">格式化SSD时出错. %1$s</string>
+    <string name="uxsdk_ssd_format_confirmation">您确定要格式化固态硬盘吗?</string>
+    <string name="uxsdk_ssd_format_complete">SSD格式化完成.</string>
+
+    <string name="uxsdk_location_default">N/A, N/A</string>
+    <string name="uxsdk_location_coordinates">%1$s, %2$s</string>
+</resources>

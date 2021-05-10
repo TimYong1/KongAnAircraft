@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- 顶部状态栏 -->
+    <dji.ux.beta.core.panel.topbar.TopBarPanelWidget
+        android:id="@+id/panel_top_bar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/black"
+        android:paddingTop="@dimen/topbar_padding"
+        android:paddingBottom="@dimen/topbar_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="@dimen/top_bar_percent_height"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:uxsdk_itemsMarginRight="@dimen/uxsdk_spacing_normal"
+        app:uxsdk_itemsSpacing="@dimen/uxsdk_spacing_normal" />
+</androidx.constraintlayout.widget.ConstraintLayout>

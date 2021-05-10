@@ -1,0 +1,221 @@
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    lintOptions {
+        abortOnError = false
+    }
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+    useLibrary 'org.apache.http.legacy'
+    defaultConfig {
+        applicationId "com.tourcoo.aircraftmanager"
+        minSdkVersion 21
+        targetSdkVersion 29
+        multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
+        versionCode 1
+        versionName "1.0.1"
+        ndk {
+            // On x86 devices that run Android API 23 or above, if the application is targeted with API 23 or
+            // above, FFmpeg lib might lead to runtime crashes or warnings.
+            abiFilters 'armeabi-v7a', 'x86', 'arm64-v8a'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dexOptions {
+        javaMaxHeapSize "3g"
+    }
+    lintOptions{
+        abortOnError false
+    }
+    packagingOptions{
+        doNotStrip "*/*/libdjivideo.so"
+        doNotStrip "*/*/libSDKRelativeJNI.so"
+        doNotStrip "*/*/libFlyForbid.so"
+        doNotStrip "*/*/libduml_vision_bokeh.so"
+        doNotStrip "*/*/libyuv2.so"
+        doNotStrip "*/*/libGroudStation.so"
+        doNotStrip "*/*/libFRCorkscrew.so"
+        doNotStrip "*/*/libUpgradeVerify.so"
+        doNotStrip "*/*/libFR.so"
+        doNotStrip "*/*/libDJIFlySafeCore.so"
+        doNotStrip "*/*/libdjifs_jni.so"
+        doNotStrip "*/*/libsfjni.so"
+        doNotStrip "*/*/libDJICommonJNI.so"
+        doNotStrip "*/*/libDJICSDKCommon.so"
+        doNotStrip "*/*/libDJIUpgradeCore.so"
+        doNotStrip "*/*/libDJIUpgradeJNI.so"
+        doNotStrip "*/*/libDJIWaypointV2Core.so"
+        doNotStrip "*/*/libDJIMOP.so"
+        doNotStrip "*/*/libDJISDKLOGJNI.so"
+
+        pickFirst 'lib/*/libstlport_shared.so'
+        pickFirst 'lib/*/libRoadLineRebuildAPI.so'
+        pickFirst 'lib/*/libGNaviUtils.so'
+        pickFirst 'lib/*/libGNaviMapex.so'
+        pickFirst 'lib/*/libGNaviData.so'
+        pickFirst 'lib/*/libGNaviMap.so'
+        pickFirst 'lib/*/libGNaviSearch.so'
+        exclude 'META-INF/proguard/okhttp3.pro'
+        exclude 'META-INF/rxjava.properties'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    signingConfigs {
+        debug {
+            keyAlias 'emi'
+            keyPassword 'android'
+            storeFile file('../key/android_key_release.jks')
+            storePassword 'android'
+        }
+        release {
+            keyAlias 'emi'
+            keyPassword 'android'
+            storeFile file('../key/android_key_release.jks')
+            storePassword 'android'
+        }
+    }
+
+
+}
+
+dependencies {
+
+    implementation ('com.dji:dji-sdk:4.14.1', {
+        /**
+         * Comment the "library-anti-distortion" if your app needs Anti Distortion for Mavic 2 Pro
+         * and Mavic 2 Zoom.
+         * Comment the "fly-safe-database" if you don't need a smaller apk for release. When
+         * uncommented, we will download it when DJISDKManager.getInstance().registerApp
+         * is called, and it won't register success without fly-safe-database.
+         * Both will greatly reduce the size of the APK.
+         */
+        exclude module: 'library-anti-distortion'
+        exclude module: 'fly-safe-database'
+
+        /**
+         * Uncomment the following line to exclude Amap from the app.
+         * Note that Google Play Store does not allow APKs that include this library.
+         */
+        // exclude group: 'com.amap.api'
+    })
+    compileOnly ('com.dji:dji-sdk-provided:4.14.1')
+    implementation('com.dji:dji-uxsdk:4.14', {
+        /**
+         * Uncomment the "library-anti-distortion" if your app does not need Anti Distortion for Mavic 2 Pro and Mavic 2 Zoom.
+         * Uncomment the "fly-safe-database" if you need database for release, or we will download it when DJISDKManager.getInstance().registerApp
+         * is called.
+         * Both will greatly reduce the size of the APK.
+         */
+        exclude module: 'library-anti-distortion'
+        exclude module: 'fly-safe-database'
+        exclude group: 'com.dji', module: 'dji-sdk'
+        /**
+         * Uncomment the following line to exclude amap from the app.
+         * Note that Google Play Store does not allow APKs that include this library.
+         */
+        // exclude group: 'com.amap.api'
+    })
+
+
+    // UXSDK dependencies
+    implementation 'androidx.annotation:annotation:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.core:core:1.3.2'
+    implementation "androidx.core:core-ktx:1.3.2"
+
+    // UXSDK map dependencies: Only include dependencies for map providers that are used in your app
+    // Amap: Do not include if publishing to Google Play Store
+    implementation 'com.amap.api:3dmap:7.8.0'
+    implementation 'com.amap.api:search:7.7.0'
+    implementation 'com.amap.api:location:5.2.0'
+    // HERE maps
+    implementation files('libs/HERE-sdk-3.15.0.aar')
+    // Mapbox
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.2.0'
+    // Google maps
+    implementation 'com.google.android.gms:play-services-base:16.0.0'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.android.gms:play-services-places:16.0.0'
+
+    // SDK dependencies
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // Sample app dependencies
+    implementation 'com.jakewharton:butterknife:10.0.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
+
+    // UXSDK Modules
+    implementation project(path: ':android-uxsdk-beta-cameracore')
+    implementation project(path: ':android-uxsdk-beta-accessory')
+    implementation project(path: ':android-uxsdk-beta-map')
+    implementation project(path: ':android-uxsdk-beta-training')
+    implementation project(path: ':android-uxsdk-beta-visualcamera')
+    implementation project(path: ':android-uxsdk-beta-flight')
+
+
+    //---------------------------------以下是项目本身业务所需要的的依赖--------------------
+    implementation 'androidx.cardview:cardview:1.0.0'
+    debugImplementation "com.simple:spiderman:1.1.7"
+    releaseImplementation "com.simple:spiderman-no-op:1.1.5"
+    implementation("com.squareup.okhttp3:okhttp:4.7.2")
+    implementation 'com.tencent:mmkv-static:1.2.7'
+    debugImplementation 'com.apkfuns.logutils:library:1.7.5'
+    releaseImplementation 'com.apkfuns.logutils:logutils-no-op:1.7.5'
+    implementation 'com.apkfuns.log2file:log2file:1.3.1'
+
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    //retrofit+rxjava 网络请求及数据解析相关
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.6'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.1'
+    //3.12.x是支持Android 4.4的
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.2'
+    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
+    //处理rxjava内存泄漏-生命周期绑定
+    implementation 'com.trello.rxlifecycle3:rxlifecycle-components:3.0.0'
+
+    //下拉刷新库注意刷新头SmartRefreshHeader版本最好对应尤其头版本不要低于SmartRefreshLayout版本
+    implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0'
+    //多状态布局
+    implementation 'com.kingja.loadsir:loadsir:1.3.8'
+//滑动返回Activity-类全面屏手势效果
+    implementation 'com.github.ParfoisMeng:SlideBack:1.0.7'
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.49-androidx'
+
+    //call_kit、call_lib、im_kit、im_lib的版本号码必须一致
+    implementation 'cn.rongcloud.sdk:call_lib:4.0.0'
+    implementation 'cn.rongcloud.sdk:im_kit:4.0.0'
+    implementation 'cn.rongcloud.sdk:im_lib:4.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    implementation "androidx.lifecycle:lifecycle-livedata:2.2.0"
+    //    leakCanary for debug
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
+    // NEW: LeakCanary for releases!
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-release:2.6'
+    // Optional: detect retained objects. This helps but is not required.
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-object-watcher-android:2.6'
+}
+repositories {
+    mavenCentral()
+}

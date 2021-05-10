@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <color name="colorPrimary">#242d34</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorLightBackground">#FFFFFF</color>
+    <color name="background_blue">#242d34</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="gray_4">#444444</color>
+    <color name="dark_theme_background">#303030</color>
+    <color name="light_gray">#B3FFFFFF</color>
+    <color name="dark_gray">#80000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="gray_45">#727272</color>
+    <color name="light_gray_50">#F7F9FA</color>
+    <color name="light_gray_300">#BABDBF</color>
+
+    <color name="color_000000">#000000</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <color name="medium_blue">#298080</color>
+
+    <!--普通有灰色背景的用这个-->
+    <color name="colorBackground">#f8f8f8</color>
+    <color name="colorTextBlack">#333333</color>
+    <color name="colorTextBlackLight">#636363</color>
+    <color name="colorTextGray">#666666</color>
+    <color name="colorTextLittleGray">#CCCCCC</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorWhitePressed">#DCDCDC</color>
+    <color name="colorBlackTitle">#333333</color>
+    <color name="colorGraySmallText">#A2A2A2</color>
+
+    <color name="blue5087FF">#5087FF</color>
+    <color name="blue629BFF">#629BFF</color>
+    <color name="blueEFF3FF">#EFF3FF</color>
+    <color name="blue4989E5">#4989E5</color>
+    <color name="blue7EADFF">#7EADFF</color>
+
+    <color name="grayF7F5F6">#F7F5F6</color>
+    <color name="gray444444">#444444</color>
+    <color name="grayF5F5F5">#F5F5F5</color>
+    <color name="grayEEEEEE">#EEEEEE</color>
+    <color name="grayF6F6F6">#F6F6F6</color>
+    <color name="grayE0E0E0">#E0E0E0</color>
+    <color name="grayA2A2A2">#A2A2A2</color>
+    <color name="grayCCCCCC">#CCCCCC</color>
+    <color name="grayUserInfo">#C0C2C4</color>
+
+    <color name="grayAAAAAA">#AAAAAA</color>
+
+
+
+    <color name="black_half">#77000000</color>
+    <color name="black_light">#4C000000</color>
+    <color name="black_medium">#64000000</color>
+    <color name="black_transparent">#b2000000</color>
+    <color name="blue">#20A3F6</color>
+    <color name="blue_40_percent">#6620A3F6</color>
+    <color name="blue_highlight">#ff1fa3f6</color>
+    <color name="blue_light">#ff00d8ff</color>
+    <color name="blue_sea">#3f00aeff</color>
+    <color name="centerpoint_blue">#3da2f8</color>
+    <color name="centerpoint_green">#58d65c</color>
+    <color name="centerpoint_red">#f14443</color>
+    <color name="centerpoint_yellow">#fbc600</color>
+    <color name="custom_unlock_enabled">#00ff00</color>
+    <color name="custom_unlock_not_sent">#008000</color>
+</resources>

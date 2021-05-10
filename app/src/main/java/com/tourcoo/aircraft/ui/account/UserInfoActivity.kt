@@ -1,0 +1,120 @@
+package com.tourcoo.aircraft.ui.account
+
+import android.app.Activity
+import android.os.Bundle
+import android.view.View
+import com.apkfuns.logutils.LogUtils
+import com.tourcoo.account.AccountHelper
+import com.tourcoo.account.UserInfo
+import com.tourcoo.aircraftmanager.R
+import com.tourcoo.entity.BaseResult
+import com.tourcoo.retrofit.BaseLoadingObserver
+import com.tourcoo.retrofit.BaseObserver
+import com.tourcoo.retrofit.RequestConfig
+import com.tourcoo.retrofit.repository.ApiRepository
+import com.tourcoo.util.StringUtil
+import com.tourcoo.util.ToastUtil
+import com.trello.rxlifecycle3.android.ActivityEvent
+import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
+import kotlinx.android.synthetic.main.activity_login_new.*
+import kotlinx.android.synthetic.main.activity_my_info.*
+
+/**
+ *@description : 我的页面
+ *@company :途酷科技
+ * @author :JenkinsZhou
+ * @date 2021年04月20日14:04
+ * @Email: 971613168@qq.com
+ */
+class UserInfoActivity : RxAppCompatActivity() {
+    private var mContext: Activity? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_my_info)
+        findViewById<View>(R.id.ivBack).setOnClickListener { finish() }
+        mContext = this
+        tvLogout.setOnClickListener {
+            requestLogout()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideNavigation()
+        requestUserInfo()
+    }
+
+    private fun showUserInfo() {
+        if (!AccountHelper.getInstance().isLogin) {
+            return
+        }
+        val user = AccountHelper.getInstance().userInfo
+        if (user == null) {
+            etUserName.setText("-")
+            etGender.setText("-")
+            etUserPhone.setText("-")
+        } else {
+            etUserName.setText(StringUtil.getNotNullValueLine(user.username))
+            etGender.setText(StringUtil.getNotNullValueLine(""))
+            etPhone.setText(StringUtil.getNotNullValueLine(user.phone))
+        }
+
+    }
+
+
+    private fun requestUserInfo() {
+        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseResult<UserInfo?>?>() {
+            override fun onRequestSuccess(entity: BaseResult<UserInfo?>?) {
+                if (entity == null) {
+                    return
+                }
+                if (entity.status == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
+                    AccountHelper.getInstance().userInfo = entity.data
+                    showUserInfo()
+                } else {
+                    ToastUtil.showNormal(entity.message)
+                }
+            }
+
+            override fun onRequestError(throwable: Throwable) {
+                super.onRequestError(throwable)
+                LogUtils.tag(TAG).i(TAG + "onRequestError=" + throwable.toString())
+            }
+
+
+        })
+    }
+
+    private fun requestLogout() {
+        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any?>?>() {
+            override fun onRequestSuccess(entity: BaseResult<Any?>?) {
+                if (entity == null) {
+                    return
+                }
+                if (entity.status == RequestConfig.RESPONSE_CODE_SUCCESS) {
+                    AccountHelper.getInstance().logoutAndSkipLogin()
+                    LogUtils.w(TAG + "已退出登录")
+                } else {
+                    ToastUtil.showNormal(entity.message)
+                }
+            }
+
+            override fun onRequestError(throwable: Throwable) {
+                super.onRequestError(throwable)
+                LogUtils.tag(TAG).i("onRequestError=$throwable")
+            }
+        })
+    }
+
+    private fun hideNavigation() {
+        /**
+         * 隐藏虚拟按键，并且全屏
+         */
+        val decorView: View = mContext!!.window.decorView
+        decorView.systemUiVisibility = 0
+        val uiOptions = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+        decorView.systemUiVisibility = uiOptions
+    }
+}
