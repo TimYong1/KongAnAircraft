@@ -35,7 +35,7 @@ public class FlyPhotoActivity extends RxAppCompatActivity {
         // 开始得到Fragment 的事务处理
         // Fragment 事务处理
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        AircraftPhotoFragment aircraftPhotoFragment = new AircraftPhotoFragment();
+        AircraftPhotoFragmentNew aircraftPhotoFragment = new AircraftPhotoFragmentNew();
         // fragment_id 是布局中给fragment 占位置的控
         fragmentTransaction.add(R.id.flContainer, aircraftPhotoFragment);
         // 提交事务

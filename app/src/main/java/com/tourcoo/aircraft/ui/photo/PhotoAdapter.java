@@ -5,7 +5,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
 
 import com.apkfuns.logutils.LogUtils;
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
@@ -25,24 +24,24 @@ import dji.sdk.media.MediaFile;
  * @date 2021年04月08日15:52
  * @Email: 971613168@qq.com
  */
-public class PhotoAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup, BaseViewHolder> {
+public class PhotoAdapter extends BaseMultiItemQuickAdapter<MediaFileGroupOld, BaseViewHolder> {
     public static final String TAG = "PhotoAdapter";
     private boolean isScrolling = false;
 
-    public PhotoAdapter(List<MediaFileGroup> data) {
+    public PhotoAdapter(List<MediaFileGroupOld> data) {
         super(data);
         addItemType(0, R.layout.item_photo);
         addItemType(1, R.layout.item_photo_title);
     }
 
     @Override
-    protected void convert(@NonNull BaseViewHolder helper, MediaFileGroup item) {
+    protected void convert(@NonNull BaseViewHolder helper, MediaFileGroupOld item) {
 
 
         switch (item.getItemType()) {
             case 0:
                 ImageView ivPhoto = helper.getView(R.id.ivPhoto);
-                if (item.getMediaFile() == null) {
+                if (item.getMediaFile() == null || isScrolling) {
                     LogUtils.e("已被拦截");
                     return;
                 }

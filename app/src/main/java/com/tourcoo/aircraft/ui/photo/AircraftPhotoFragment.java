@@ -31,10 +31,12 @@ import com.trello.rxlifecycle3.components.support.RxFragment;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
@@ -48,7 +50,7 @@ import dji.sdk.media.MediaManager;
 
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_SETTLING;
-import static com.tourcoo.aircraft.ui.photo.LiveDataConstant.liveData;
+import static com.tourcoo.aircraft.ui.photo.LiveDataConstantOld.liveData;
 import static com.tourcoo.aircraft.ui.photo.PhotoPreviewActivity.EXTRA_CREATE_TIME;
 import static com.tourcoo.aircraft.ui.photo.PhotoPreviewActivity.REQUEST_CODE_PREVIEW;
 
@@ -64,6 +66,7 @@ public class AircraftPhotoFragment extends RxFragment {
     private boolean mIsFirstShow;
     private Activity mContext;
     private View contentView;
+    private static boolean isDateOrder = true;
     private RecyclerView mCommonRecyclerView;
     private PhotoAdapter photoAdapter;
     private Handler mHandler;
@@ -75,6 +78,7 @@ public class AircraftPhotoFragment extends RxFragment {
     private FetchMediaTask.Callback mediaTaskCallback;
     private boolean needRefresh = true;
     private List<FetchMediaTask> mediaTaskList = new ArrayList<>();
+    private List<CommonCallbacks.CompletionCallback> completionCallbackList = new ArrayList<>();
 
     @Override
     public void onAttach(Context context) {
@@ -88,7 +92,6 @@ public class AircraftPhotoFragment extends RxFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         contentView = inflater.inflate(R.layout.layout_recyclerview, container, false);
         mCommonRecyclerView = contentView.findViewById(R.id.mCommonRecyclerView);
-
         return contentView;
     }
 
@@ -128,7 +131,6 @@ public class AircraftPhotoFragment extends RxFragment {
                             photoAdapter.setScrolling(false);
                             break;
                         case SCROLL_STATE_SETTLING:
-                            photoAdapter.setScrolling(true);
                             photoAdapter.setScrolling(true);
                             break;
                     }
@@ -175,7 +177,8 @@ public class AircraftPhotoFragment extends RxFragment {
             };
         }
         mediaManager.addUpdateFileListStateListener(stateListener);
-        camera.enterPlayback(new CommonCallbacks.CompletionCallback() {
+
+        CommonCallbacks.CompletionCallback taskCallback = new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError djiError) {
                 if (djiError != null) {
@@ -205,7 +208,9 @@ public class AircraftPhotoFragment extends RxFragment {
                 });
 
             }
-        });
+        };
+        completionCallbackList.add(taskCallback);
+        camera.enterPlayback(taskCallback);
         if (mediaTaskCallback == null) {
             mediaTaskCallback = (mediaFile, fetchMediaTaskContent, djiError) -> {
                 LogUtils.i("执行了7");
@@ -227,7 +232,7 @@ public class AircraftPhotoFragment extends RxFragment {
     }
 
 
-    private void showMediaFileList(List<MediaFileGroup> mediaFiles) {
+    private void showMediaFileList(List<MediaFileGroupOld> mediaFiles) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -267,21 +272,24 @@ public class AircraftPhotoFragment extends RxFragment {
                 mediaManager.removeFileListStateCallback(stateListener);
             }
             if (taskScheduler != null) {
+                taskScheduler.suspend(null);
                 taskScheduler.removeAllTasks();
-//                taskScheduler.destroy();
             }
             mediaManager.exitMediaDownloading();
-            if (photoAdapter != null && photoAdapter.getData() != null) {
-                List<MediaFileGroup> fileGroupList = photoAdapter.getData();
-                MediaFileGroup fileGroup;
+            if (photoAdapter != null) {
+                photoAdapter.getData();
+                List<MediaFileGroupOld> fileGroupList = photoAdapter.getData();
+                MediaFileGroupOld fileGroup;
                 MediaFile mediaFile;
                 //正确 可删除多个
-                Iterator<MediaFileGroup> iterator = fileGroupList.iterator();
+                Iterator<MediaFileGroupOld> iterator = fileGroupList.iterator();
                 while (iterator.hasNext()) {
                     fileGroup = iterator.next();
                     if (fileGroup != null && fileGroup.getMediaFile() != null) {
                         mediaFile = fileGroup.getMediaFile();
                         mediaFile.stopFetchingFileData(null);
+                        mediaFile.resetThumbnail(null);
+                        mediaFile.resetPreview(null);
                         mediaFile = null;
                     }
                     iterator.remove();
@@ -298,9 +306,14 @@ public class AircraftPhotoFragment extends RxFragment {
                 }
             }
             taskScheduler = null;
-            mediaTaskCallback=null;
+            mediaTaskCallback = null;
             mediaManager = null;
-            camera.exitPlayback(null);
+            camera.exitPlayback(new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+
+                }
+            });
             CameraHelper.getInstance().setCameraModePhotoSingle();
         }
     }
@@ -318,7 +331,7 @@ public class AircraftPhotoFragment extends RxFragment {
         super.onDestroy();
     }
 
-    private void getThumbnails(List<MediaFileGroup> mediaFiles) {
+    private void getThumbnails(List<MediaFileGroupOld> mediaFiles) {
         LogUtils.i("执行了8");
         if (mediaFiles == null || mediaFiles.isEmpty()) {
             ToastUtil.showNormal("当前没有相册或无人机断开连接");
@@ -329,13 +342,13 @@ public class AircraftPhotoFragment extends RxFragment {
             return;
         }
         int size = mediaFiles.size();
-        MediaFileGroup mediaFileGroup;
+        MediaFileGroupOld mediaFileGroupOld;
         for (int i = 0; i < size; i++) {
-            mediaFileGroup = photoAdapter.getData().get(i);
-            if (mediaFileGroup == null || mediaFileGroup.getMediaFile() == null) {
+            mediaFileGroupOld = photoAdapter.getData().get(i);
+            if (mediaFileGroupOld == null || mediaFileGroupOld.getMediaFile() == null) {
                 continue;
             }
-            FetchMediaTask fetchMediaTask = new FetchMediaTask(mediaFileGroup.getMediaFile(), FetchMediaTaskContent.THUMBNAIL, mediaTaskCallback);
+            FetchMediaTask fetchMediaTask = new FetchMediaTask(mediaFileGroupOld.getMediaFile(), FetchMediaTaskContent.THUMBNAIL, mediaTaskCallback);
             if (taskScheduler != null) {
                 mediaTaskList.add(fetchMediaTask);
                 taskScheduler.moveTaskToEnd(fetchMediaTask);
@@ -385,26 +398,27 @@ public class AircraftPhotoFragment extends RxFragment {
     }
 
 
-    private List<MediaFileGroup> createMediaGroupFileList(Map<String, List<MediaFile>> listMap) {
-        List<MediaFileGroup> mediaFileGroupList = new ArrayList<>();
+    private List<MediaFileGroupOld> createMediaGroupFileList(Map<String, List<MediaFile>> listMap) {
+        List<MediaFileGroupOld> mediaFileGroupOldList = new ArrayList<>();
         String date;
-        MediaFileGroup mediaFileGroup;
+        MediaFileGroupOld mediaFileGroupOld;
         List<MediaFile> mediaFileList;
-        for (Map.Entry<String, List<MediaFile>> stringListEntry : listMap.entrySet()) {
+        Map<String, List<MediaFile>> sortMap = sortMapByKey(listMap);
+        for (Map.Entry<String, List<MediaFile>> stringListEntry : sortMap.entrySet()) {
             date = stringListEntry.getKey();
-            mediaFileGroup = new MediaFileGroup();
-            mediaFileGroup.setTitle(date);
+            mediaFileGroupOld = new MediaFileGroupOld();
+            mediaFileGroupOld.setTitle(date);
             mediaFileList = stringListEntry.getValue();
-            mediaFileGroupList.add(mediaFileGroup);
+            mediaFileGroupOldList.add(mediaFileGroupOld);
             int size = mediaFileList.size();
             for (int i = 0; i < size; i++) {
-                mediaFileGroup = new MediaFileGroup();
-                mediaFileGroup.setMediaFile(mediaFileList.get(i));
-                mediaFileGroup.setPosition(i);
-                mediaFileGroupList.add(mediaFileGroup);
+                mediaFileGroupOld = new MediaFileGroupOld();
+                mediaFileGroupOld.setMediaFile(mediaFileList.get(i));
+                mediaFileGroupOld.setPosition(i);
+                mediaFileGroupOldList.add(mediaFileGroupOld);
             }
         }
-        return mediaFileGroupList;
+        return mediaFileGroupOldList;
     }
 
     private void skipPhotoPreview(int position) {
@@ -412,7 +426,7 @@ public class AircraftPhotoFragment extends RxFragment {
             ToastUtil.showNormal("当前状态无法预览或预览图不存在");
             return;
         }
-        MediaFileGroup photoGroup = photoAdapter.getData().get(position);
+        MediaFileGroupOld photoGroup = photoAdapter.getData().get(position);
         if (photoGroup == null || photoGroup.getMediaFile() == null) {
             return;
         }
@@ -421,28 +435,6 @@ public class AircraftPhotoFragment extends RxFragment {
         intent.putExtra(EXTRA_CREATE_TIME, photoGroup.getMediaFile().getTimeCreated());
         startActivityForResult(intent, REQUEST_CODE_PREVIEW);
     }
-
-  /*  private void showImagePreview(MediaFile mediaFile){
-        final  FetchMediaTask task = new FetchMediaTask(mediaFile, FetchMediaTaskContent.PREVIEW, new FetchMediaTask.Callback() {
-            @Override
-            public void onUpdate(MediaFile mediaFile, FetchMediaTaskContent fetchMediaTaskContent, DJIError djiError) {
-                    if(djiError != null){
-                        ToastUtil.showFailed("照片获取失败");
-                        return;
-                    }
-                    if(mediaFile.getPreview() == null){
-                        ToastUtil.showFailed("未获取到预览");
-                        return;
-                    }
-                    final Bitmap previewBitMap = mediaFile.getPreview();
-                    runUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                        }
-                    });
-            }
-        });
-    }*/
 
 
     /**
@@ -477,6 +469,35 @@ public class AircraftPhotoFragment extends RxFragment {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * 使用 Map按key(日期)进行排序
+     *
+     * @param map
+     * @return
+     */
+    public Map<String, List<MediaFile>> sortMapByKey(Map<String, List<MediaFile>> map) {
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
+
+        Map<String, List<MediaFile>> sortMap = new TreeMap<>(
+                new MapKeyComparator());
+
+        sortMap.putAll(map);
+
+        return sortMap;
+    }
+
+    static class MapKeyComparator implements Comparator<String> {
+
+        @Override
+        public int compare(String str1, String str2) {
+            Date date1 = DateUtil.stringParseToDate(str1);
+            Date date2 = DateUtil.stringParseToDate(str2);
+            return isDateOrder ? date2.compareTo(date1) : date1.compareTo(date2);
         }
     }
 }

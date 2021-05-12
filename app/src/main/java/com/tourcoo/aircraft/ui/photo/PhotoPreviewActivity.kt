@@ -11,14 +11,13 @@ import com.apkfuns.logutils.LogUtils
 import com.github.chrisbanes.photoview.PhotoView
 import com.tourcoo.aircraft.product.AircraftUtil
 import com.tourcoo.aircraft.product.ProductManager
-import com.tourcoo.aircraft.ui.photo.LiveDataConstant.liveData
+import com.tourcoo.aircraft.ui.photo.LiveDataConstantOld.liveData
 import com.tourcoo.aircraftmanager.R
 import com.tourcoo.util.DateUtil
 import com.tourcoo.util.GlideManager
 import com.tourcoo.util.StringUtil
 import com.tourcoo.util.ToastUtil
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
-import dji.common.camera.SettingsDefinitions
 import dji.common.error.DJIError
 import dji.common.util.CommonCallbacks
 import dji.sdk.camera.Camera
@@ -50,6 +49,8 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
     private var mediaCreateTime: Long? = null
     private var stateListener: FileListStateListener? = null
     private var mFileListState: FileListState? = null
+    private val previewMediaList: MutableList<MediaFile> = ArrayList()
+    private val previewTaskList: MutableList<FetchMediaTask> = ArrayList()
 
     companion object {
         const val EXTRA_MEDIA_POSITION = "EXTRA_MEDIA_POSITION"
@@ -73,7 +74,7 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
         liveData?.observe(this, object : Observer<MutableList<MediaFile>?> {
             override fun onChanged(it: MutableList<MediaFile>?) {
                 mediaList.clear()
-                if(it==null){
+                if (it == null) {
                     return
                 }
                 mediaList.addAll(it)
@@ -109,7 +110,7 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
                     }
 
                     override fun onPageSelected(position: Int) {
-                        LogUtils.i(TAG+"执行了2")
+                        LogUtils.i(TAG + "执行了2")
                         showImagePreview(mediaList[position], itemViewList.get(position))
                     }
 
@@ -119,7 +120,7 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
 
                 })
                 vpPhoto.adapter = adapter
-                LogUtils.i(TAG+"执行了adapter")
+                LogUtils.i(TAG + "执行了adapter")
             }
 
         }
@@ -130,7 +131,7 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
         super.onResume()
         hideNavigation()
 //        initMediaManager1()
-        LogUtils.i(TAG+"执行了position=$position")
+        LogUtils.i(TAG + "执行了position=$position")
 
     }
 
@@ -144,6 +145,7 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
                 ToastUtil.showFailedDebug("照片获取失败" + djiError.description, "照片获取失败")
                 return@Callback
             }
+            previewMediaList.add(mediaFile)
             if (mediaFileOk.preview == null) {
                 ToastUtil.showFailed("未获取到预览")
                 return@Callback
@@ -154,7 +156,7 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
             showTitle(time)
             val previewBitMap = mediaFile.preview
             runOnUiThread {
-                GlideManager.loadImgAuto(previewBitMap, imageView, R.drawable.ic_image_default)
+                GlideManager.loadImgAuto(previewBitMap, imageView)
                 val isPhoto = mediaFileOk.mediaType == MediaFile.MediaType.JPEG || mediaFileOk.mediaType == MediaFile.MediaType.RAW_DNG
                 setViewGone(ivPlayVideo, !isPhoto)
                 if (!isPhoto) {
@@ -162,14 +164,19 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
                         ToastUtil.showNormal("点击了")
                     }
                 }
+                mediaFile.resetPreview(null)
+                mediaFile.resetThumbnail(null)
             }
-        })
+        }
+
+        )
         if (mediaManager != null) {
             mediaManager!!.scheduler.resume {
                 if (it == null) {
                     mediaManager!!.scheduler.moveTaskToNext(task)
+                    previewTaskList.add(task)
                 } else {
-                    ToastUtil.showNormalCondition("调度器启动失败"+it.description,"调度器启动失败")
+                    ToastUtil.showNormalCondition("调度器启动失败" + it.description, "调度器启动失败")
                 }
             }
         } else {
@@ -205,46 +212,6 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
     }
 
 
-    /*  private void showImagePreview(MediaFile mediaFile){
-        final  FetchMediaTask task = new FetchMediaTask(mediaFile, FetchMediaTaskContent.PREVIEW, new FetchMediaTask.Callback() {
-            @Override
-            public void onUpdate(MediaFile mediaFile, FetchMediaTaskContent fetchMediaTaskContent, DJIError djiError) {
-                    if(djiError != null){
-                        ToastUtil.showFailed("照片获取失败");
-                        return;
-                    }
-                    if(mediaFile.getPreview() == null){
-                        ToastUtil.showFailed("未获取到预览");
-                        return;
-                    }
-                    final Bitmap previewBitMap = mediaFile.getPreview();
-                    runUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                        }
-                    });
-            }
-        });
-    }*/
-    /**
-     * 根据时间排序（其他排序如根据id排序也类似）
-     *
-     * @param list
-     */
-    private fun listSort(list: List<MediaFile>) {
-        //用Collections这个工具类传list进来排序
-        Collections.sort(list, Comparator { o1, o2 ->
-            if (o1 != null && o2 != null) {
-                return@Comparator if (o1.timeCreated < o2.timeCreated) {
-                    //小的放前面
-                    1
-                } else {
-                    -1
-                }
-            }
-            0
-        })
-    }
 
     private fun unsetMediaManager() {
         val camera = getCamera() ?: return
@@ -253,6 +220,13 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
             if (stateListener != null) {
                 mediaManager!!.removeFileListStateCallback(stateListener!!)
             }
+            val iterator = previewMediaList.iterator()
+            var mediaFile: MediaFile?
+            while (iterator.hasNext()) {
+                mediaFile = iterator.next()
+                mediaFile = null
+            }
+            mediaManager!!.scheduler?.suspend(null)
             mediaManager!!.scheduler?.removeAllTasks()
             mediaManager!!.exitMediaDownloading()
             camera.exitPlayback(object : CommonCallbacks.CompletionCallback<DJIError?> {
@@ -261,7 +235,12 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
                 }
 
             })
-//            CameraHelper.getInstance().setCameraModePhotoSingle()
+            val it = previewTaskList.iterator()
+            var task: FetchMediaTask?
+            while (it.hasNext()) {
+                task = it.next()
+                task = null
+            }
         }
     }
 
@@ -287,58 +266,6 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
         return -1
     }
 
-    private fun initMediaManager1() {
-        if (ProductManager.getProductInstance() == null) {
-            return
-        }
-        val camera = getCamera() ?: return
-        if (!camera.isMediaDownloadModeSupported) {
-            return
-        }
-        mediaManager = camera.mediaManager
-        if (mediaManager == null) {
-            return
-        }
-        if (stateListener == null) {
-            stateListener = FileListStateListener { fileListState -> mFileListState = fileListState }
-        }
-        mediaManager!!.addUpdateFileListStateListener(stateListener!!)
-        camera.enterPlayback(object : CommonCallbacks.CompletionCallback<DJIError?> {
-            override fun onResult(djiError: DJIError?) {
-                if (djiError != null) {
-                    return
-                }
-                if (mFileListState == FileListState.SYNCING || mFileListState == FileListState.DELETING) {
-                    ToastUtil.showWarning("媒体设备正忙")
-                    return
-                }
-                mediaManager!!.refreshFileListOfStorageLocation(SettingsDefinitions.StorageLocation.INTERNAL_STORAGE, object : CommonCallbacks.CompletionCallback<DJIError?> {
-                    override fun onResult(djiError: DJIError?) {
-                        if (djiError != null) {
-                            LogUtils.i("执行了6：$djiError")
-                            return
-                        }
-                        if (mFileListState == FileListState.INCOMPLETE) {
-                            LogUtils.i("执行了10：$djiError")
-                            return
-                        }
-                        val fileList = mediaManager!!.internalStorageFileListSnapshot
-                        if (fileList != null) {
-                            listSort(fileList)
-                            mediaList.addAll(fileList)
-                            position = findMediaPosition(mediaList)
-                            LogUtils.i("找到了媒体文件对应位置：$position")
-                            initAdapter()
-                            showCurrentItem()
-                        } else {
-                            LogUtils.i("执行了9")
-                        }
-                    }
-                })
-            }
-        })
-
-    }
 
 
     private fun showCurrentItem() {
@@ -357,6 +284,7 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
         }
         val camera = getCamera() ?: return
         if (!camera.isMediaDownloadModeSupported) {
+            ToastUtil.showWarning("当前机型不支持下载模式")
             return
         }
         mediaManager = camera.mediaManager

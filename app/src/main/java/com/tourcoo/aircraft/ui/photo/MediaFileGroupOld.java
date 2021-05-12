@@ -13,7 +13,7 @@ import dji.sdk.media.MediaFile;
  * @date 2021年04月15日14:23
  * @Email: 971613168@qq.com
  */
-public class MediaFileGroup implements MultiItemEntity, Serializable {
+public class MediaFileGroupOld implements MultiItemEntity, Serializable {
     private String title;
     private MediaFile mediaFile;
     private int position;

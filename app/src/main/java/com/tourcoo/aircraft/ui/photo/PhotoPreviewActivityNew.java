@@ -1,0 +1,288 @@
+package com.tourcoo.aircraft.ui.photo;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
+import androidx.viewpager.widget.ViewPager;
+
+import com.apkfuns.logutils.LogUtils;
+import com.github.chrisbanes.photoview.PhotoView;
+import com.tourcoo.aircraft.product.ProductManager;
+import com.tourcoo.aircraftmanager.R;
+import com.tourcoo.util.DateUtil;
+import com.tourcoo.util.GlideManager;
+import com.tourcoo.util.StringUtil;
+import com.tourcoo.util.ToastUtil;
+import com.tourcoo.view.ViewPagerFixed;
+import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import dji.common.error.DJIError;
+import dji.common.util.CommonCallbacks;
+import dji.sdk.camera.Camera;
+import dji.sdk.media.FetchMediaTask;
+import dji.sdk.media.FetchMediaTaskContent;
+import dji.sdk.media.MediaFile;
+import dji.sdk.media.MediaManager;
+import dji.ux.beta.core.extension.ViewExtensions;
+
+
+/**
+ * @author :JenkinsZhou
+ * @description :
+ * @company :途酷科技
+ * @date 2021年05月12日15:13
+ * @Email: 971613168@qq.com
+ */
+public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View.OnClickListener {
+    private ViewPagerFixed viewPagerFixed;
+    private TextView tvPhotoTime;
+    private Long mediaCreateTime;
+    private MediaManager mediaManager;
+    public static final String TAG = "PhotoPreviewActivityNew";
+    private PhotoPreViewAdapter preViewAdapter;
+    private ArrayList<View> mViewList = new ArrayList<>();
+    private List<MediaFile> mediaFileList;
+    private ArrayList<PhotoView> photoViewArrayList = new ArrayList<>();
+    public static final String EXTRA_CREATE_TIME = "EXTRA_CREATE_TIME";
+    public static final String EXTRA_IMAGE_COUNT = "EXTRA_IMAGE_COUNT";
+    private List<FetchMediaTask> mediaTaskList = new ArrayList<>();
+    private List<MediaFile> previewMediaFileList = new ArrayList<>();
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_photo_preview);
+        initView();
+        loadImage();
+        initMediaManager();
+        initData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hideNavigation();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.ivBack:
+                finish();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void initView() {
+        findViewById(R.id.ivBack).setOnClickListener(this);
+        viewPagerFixed = findViewById(R.id.vpPhoto);
+        tvPhotoTime = findViewById(R.id.tvPhotoTime);
+        getIntent().getLongExtra(EXTRA_CREATE_TIME, -1);
+    }
+
+
+    private void hideNavigation() {
+        /**
+         * 隐藏虚拟按键，并且全屏
+         */
+        View decorView = this.getWindow().getDecorView();
+        decorView.setSystemUiVisibility(0);
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
+
+    private void initAdapter() {
+        if (null == preViewAdapter) {
+            if (mediaFileList == null) {
+                mediaFileList = new ArrayList<>(mViewList.size());
+            }
+            viewPagerFixed.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    showImagePreview(mediaFileList.get(position), mViewList.get(position));
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
+            preViewAdapter = new PhotoPreViewAdapter(mViewList, mediaFileList);
+            viewPagerFixed.setAdapter(preViewAdapter);
+
+        }
+    }
+
+    private void loadImage() {
+        LiveDataConstantNew.liveMediaDataList.observe(this, new Observer<List<MediaFile>>() {
+            @Override
+            public void onChanged(List<MediaFile> mediaFiles) {
+                LogUtils.i(TAG + "执行了1");
+                mediaFileList.clear();
+                if (mediaFiles == null) {
+                    return;
+                }
+                mediaFileList.addAll(mediaFiles);
+                int position = findMediaPosition(mediaFileList);
+                if (position < 0) {
+                    ToastUtil.showFailedDebug("未获取到预览");
+                    return;
+                }
+                viewPagerFixed.setCurrentItem(position);
+                LogUtils.i(TAG + "执行了2");
+                showImagePreview(mediaFileList.get(position), mViewList.get(position));
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        release();
+        super.onDestroy();
+    }
+
+    private void release() {
+      /*  if(liveGroupData != null){
+            liveGroupData.
+        }
+        liveGroupData = null;*/
+    }
+
+    private void initData() {
+        Intent intent = getIntent();
+        if (intent == null) {
+            finish();
+            ToastUtil.showWarning("未获取到图片信息");
+            return;
+        }
+        int size = intent.getIntExtra(EXTRA_IMAGE_COUNT, -1);
+        mediaCreateTime = getIntent().getLongExtra(EXTRA_CREATE_TIME, -1);
+        View parentView;
+        PhotoView imageView;
+        for (int i = 0; i < size; i++) {
+            parentView = LayoutInflater.from(this).inflate(R.layout.item_photo_preview, null);
+            mViewList.add(parentView);
+            imageView = parentView.findViewById(R.id.photoPreview);
+            photoViewArrayList.add(imageView);
+        }
+        initAdapter();
+    }
+
+
+    private int findMediaPosition(List<MediaFile> list) {
+        if (list == null || list.isEmpty() || mediaCreateTime == null || mediaCreateTime <= 0) {
+            LogUtils.e(TAG + "mediaCreateTime=" + mediaCreateTime);
+            return -1;
+        }
+        int size = list.size();
+        MediaFile mediaFile;
+        for (int i = 0; i < size; i++) {
+            mediaFile = list.get(i);
+            if (mediaFile.getTimeCreated() == mediaCreateTime) {
+                LogUtils.i("找到了媒体文件对应位置=" + i);
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void showImagePreview(MediaFile mediaFile, View parentView) {
+        if (mediaFile == null) {
+            ToastUtil.showWarning("当前预览图为空");
+            return;
+        }
+        FetchMediaTask task = new FetchMediaTask(mediaFile, FetchMediaTaskContent.PREVIEW, new FetchMediaTask.Callback() {
+            @Override
+            public void onUpdate(MediaFile mediaFile, FetchMediaTaskContent fetchMediaTaskContent, DJIError djiError) {
+                if (djiError != null) {
+                    ToastUtil.showFailedDebug("照片获取失败" + djiError.getDescription(), "照片获取失败");
+                    return;
+                }
+                previewMediaFileList.add(mediaFile);
+                if (mediaFile.getPreview() == null) {
+                    ToastUtil.showFailed("未获取到预览照片");
+                    return;
+                }
+                showImageInfo(mediaFile, parentView);
+            }
+        });
+        mediaTaskList.add(task);
+        if (mediaManager != null) {
+            mediaManager.getScheduler().resume(new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+                    if(djiError !=null){
+                        ToastUtil.showWarning("预览失败");
+                    }
+                    mediaManager.getScheduler().moveTaskToNext(task);
+                }
+            });
+        } else {
+            ToastUtil.showNormal("当前无法访问相册");
+        }
+
+    }
+
+    private void showImageInfo(MediaFile mediaFile, View parentView) {
+        String time = DateUtil.parseDateString("yyyy-MM-dd-HH:mm:ss", mediaFile.getTimeCreated());
+        PhotoView photoView = parentView.findViewById(R.id.photoPreview);
+        ImageView ivPlayVideo = parentView.findViewById(R.id.ivPlayVideo);
+        LogUtils.i(TAG + "执行了3");
+        boolean isPhoto = mediaFile.getMediaType() == MediaFile.MediaType.JPEG || mediaFile.getMediaType() == MediaFile.MediaType.RAW_DNG;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setViewGone(ivPlayVideo, !isPhoto);
+                tvPhotoTime.setText(StringUtil.getNotNullValueLine(time));
+                GlideManager.loadImgAuto(mediaFile.getPreview(), photoView);
+                ivPlayVideo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ToastUtil.showSuccess("点击了");
+                    }
+                });
+            }
+        });
+
+    }
+
+    private void setViewGone(View view, boolean visible) {
+        if (view == null) {
+            return;
+        }
+        if (visible) {
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    private void initMediaManager() {
+        if (ProductManager.getProductInstance() == null) {
+            return;
+        }
+        Camera camera = ProductManager.getProductInstance().getCamera();
+        if (!camera.isMediaDownloadModeSupported()) {
+            ToastUtil.showWarning("当前机型不支持下载模式");
+            return;
+        }
+        mediaManager = camera.getMediaManager();
+    }
+}

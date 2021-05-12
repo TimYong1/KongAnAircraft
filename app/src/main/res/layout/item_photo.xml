@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/ic_image_default"
+        android:src="@drawable/ic_aircraft_default"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -13,6 +13,7 @@ import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
 import dji.common.product.Model;
 import dji.common.util.CommonCallbacks;
+import dji.sdk.camera.Camera;
 
 /**
  * @author :JenkinsZhou
@@ -120,13 +121,7 @@ public class CameraHelper {
         if (!AircraftUtil.isCameraModuleAvailable()) {
             return;
         }
-        CommonCallbacks.CompletionCallback completionCallback = new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError djiError) {
-                LogUtils.i(TAG + djiError);
-            }
-        };
-        setCameraModePhotoSingle(completionCallback);
+        setCameraModePhotoSingle(null);
     }
 
 
@@ -136,5 +131,13 @@ public class CameraHelper {
 
     private boolean isSpecialAircraft() {
         return AircraftUtil.isMatchModel(Model.MAVIC_AIR_2);
+    }
+
+
+    public Camera getCamera() {
+        if (!AircraftUtil.isCameraModuleAvailable()) {
+            return null;
+        }
+        return AircraftUtil.getAircraftInstance().getCamera();
     }
 }

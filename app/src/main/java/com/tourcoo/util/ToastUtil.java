@@ -418,6 +418,13 @@ public final class ToastUtil {
         }
     }
 
+    public static void showWarningCondition(CharSequence debugContent,CharSequence content ) {
+        if (AppConfig.DEBUG_BODE) {
+            showWarning(debugContent);
+        }else {
+            showWarning(content);
+        }
+    }
 
 
     public static void showNormal(int stringResource) {

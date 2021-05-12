@@ -186,6 +186,8 @@ public class GlideManager {
         loadCircleImgCenterCrop(obj, iv, drawable != null ? drawable : sCirclePlaceholderDrawable);
     }
 
+
+
     public static void loadCircleImgCenterAuto(Object obj, ImageView iv, int placeholderResource) {
         Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
         loadCircleImgAuto(obj, iv, drawable != null ? drawable : sCirclePlaceholderDrawable);
