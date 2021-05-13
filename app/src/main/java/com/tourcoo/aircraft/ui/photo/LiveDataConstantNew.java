@@ -17,5 +17,5 @@ import dji.sdk.media.MediaFile;
  * @Email: 971613168@qq.com
  */
 public class LiveDataConstantNew {
-    static MutableLiveData<List<MediaFile>> liveMediaDataList = new MutableLiveData<>();
+    static SingleLiveEvent<List<MediaFile>> liveMediaDataList = new SingleLiveEvent<>();
 }

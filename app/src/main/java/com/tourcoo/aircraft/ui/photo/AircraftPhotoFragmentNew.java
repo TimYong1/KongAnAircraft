@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,8 @@ import dji.sdk.media.MediaManager;
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_SETTLING;
 import static com.tourcoo.aircraft.ui.photo.LiveDataConstantNew.liveMediaDataList;
+import static com.tourcoo.aircraft.ui.photo.MediaTemp.bitmapCacheMap;
+import static com.tourcoo.aircraft.ui.photo.MediaTemp.previewMediaFileList;
 import static com.tourcoo.aircraft.ui.photo.PhotoPreviewActivityNew.EXTRA_CREATE_TIME;
 import static com.tourcoo.aircraft.ui.photo.PhotoPreviewActivityNew.EXTRA_IMAGE_COUNT;
 import static dji.common.camera.SettingsDefinitions.StorageLocation.UNKNOWN;
@@ -73,7 +76,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     private View contentView;
     private RecyclerView mCommonRecyclerView;
     private Handler mHandler;
-
+    private MediaEntity mediaEntity;
     private MediaManager mediaManager;
     private FetchMediaTaskScheduler taskScheduler;
     private MediaManager.FileListState mFileListState;
@@ -241,8 +244,6 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                     completionCallbackList.add(completionCallback);
                     taskScheduler.resume(completionCallback);
                 }
-
-
             }
         });
     }
@@ -428,6 +429,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
             mediaTaskList.clear();
             mediaTaskList = null;
         }
+
         Camera camera = CameraHelper.getInstance().getCamera();
         if (camera != null) {
             CommonCallbacks.CompletionCallback<DJIError> exitPlayCallback = new CommonCallbacks.CompletionCallback() {
@@ -442,6 +444,25 @@ public class AircraftPhotoFragmentNew extends RxFragment {
             mCompletionCallback = null;
         }
         unSetCallback();
+        if (bitmapCacheMap != null) {
+            for (Map.Entry<Long, Bitmap> longBitmapEntry : bitmapCacheMap.entrySet()) {
+                if (longBitmapEntry.getValue() != null) {
+                    longBitmapEntry.getValue().recycle();
+                }
+            }
+            bitmapCacheMap.clear();
+            if(previewMediaFileList != null){
+                for (MediaFile mediaFile : previewMediaFileList) {
+                    if(mediaFile != null){
+                        mediaFile.resetPreview(null);
+                        mediaFile.resetThumbnail(null);
+                        mediaFile.stopFetchingFileData(null);
+                    }
+                }
+                mediaFiles.clear();
+            }
+
+        }
     }
 
     private void unSetCallback() {
@@ -483,7 +504,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     private void loadAdapter() {
         if (groupAdapter == null) {
             groupAdapter = new GroupImageAdapter(new ArrayList<>());
-            int spanCount = 5;
+            int spanCount = 6;
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), spanCount);
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
@@ -534,7 +555,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
         List<MediaFileGroup> groupList = groupAdapter.getData();
         int size = groupList.size();
         MediaFileGroup mediaFileGroup;
-        MediaEntity mediaEntity;
+
         MediaFile mediaFile;
         FetchMediaTask mediaTask;
         FetchMediaTask.Callback fetchMediaCallback;
@@ -549,7 +570,12 @@ public class AircraftPhotoFragmentNew extends RxFragment {
             LogUtils.i(TAG + "当前索引为=" + index);
             if (index >= 0) {
                 //说明当前有缓存bitmap 直接显示
-                groupAdapter.notifyDataSetChanged();
+                mCommonRecyclerView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        groupAdapter.notifyDataSetChanged();
+                    }
+                });
                 LogUtils.i(TAG + "当前有缓存bitmap 直接显示");
                 continue;
             }
@@ -561,12 +587,13 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                         runUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                LogUtils.i(TAG + "执行了notifyDataSetChanged");
                                 groupAdapter.notifyDataSetChanged();
                             }
                         });
-
                         if (mediaFile != null && mediaFile.getThumbnail() != null) {
                             LogUtils.i(TAG + "添加缓存");
+                            mediaEntity.setThumbnail(mediaFile.getThumbnail());
                             groupAdapter.getBitmapCacheMap().put(mediaFile.getTimeCreated(), mediaFile.getThumbnail());
                         }
                     }
@@ -611,5 +638,6 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                 break;
         }
     }
+
 
 }

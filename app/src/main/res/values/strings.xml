@@ -28,6 +28,8 @@
     <string name="exception_class_cast">类型转换错误</string>
     <string name="exception_other_error">其它错误</string>
     <string name="loading">加载中...</string>
+    <string name="sync_file_title">同步文件标题</string>
+
     <string name="cancel">取消</string>
     <string name="load_more_load_end">没有更多数据</string>
     <string name="load_more_load_failed">加载失败,请点我重试</string>

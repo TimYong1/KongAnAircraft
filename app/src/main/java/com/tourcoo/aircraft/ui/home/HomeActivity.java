@@ -487,7 +487,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private void doLoginDJAccount() {
         Boolean isLoginDj = SpUtil.INSTANCE.getBoolean(PREF_KEY_IS_LOGIN_DJ_ACCOUNT);
         if (isLoginDj != null && !isLoginDj) {
-//            loginAccount();
+            loginAccount();
         }
 
     }
@@ -507,7 +507,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                     @Override
                     public void onFailure(DJIError error) {
                         if (error != null) {
-                            ToastUtil.showFailedDebug(error.toString());
+                            ToastUtil.showWarningCondition(error.toString(),"登录已取消");
                         }
 
                     }

@@ -140,31 +140,6 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         finish()
     }
 
-    /* private void testSocket() {
-        webSocketManager.setSocketIOCallBack(new WebSocketCallBack() {
-            @Override
-            public void onOpen() {
-                LogUtils.i("WebSocket : onOpen" + webSocketManager.getStatus());
-
-            }
-
-            @Override
-            public void onMessage(String text) {
-                LogUtils.i("WebSocket : onMessage" + text);
-            }
-
-            @Override
-            public void onClosed() {
-                LogUtils.w("WebSocket : onClosed");
-            }
-
-            @Override
-            public void onConnectError(Throwable throwable) {
-                LogUtils.e("WebSocket : onConnectError" + throwable.toString());
-            }
-        });
-        webSocketManager.connect();
-    }*/
     private fun requestLogin(user: String, pass: String) {
         ApiRepository.getInstance().requestAppLogin(user, pass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<TokenInfo?>?>() {
 

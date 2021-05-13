@@ -32,8 +32,8 @@ import static com.tourcoo.constant.MediaConstant.MEDIA_TYPE_GROUP_TITLE;
  * @Email: 971613168@qq.com
  */
 public class GroupImageAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup, BaseViewHolder> {
-    private ArrayMap<Long, Bitmap> bitmapCacheMap = new ArrayMap<>();
     private boolean isScrolling = false;
+
     public GroupImageAdapter(List<MediaFileGroup> data) {
         super(data);
         addItemType(MEDIA_TYPE_GROUP_TITLE, R.layout.item_photo_title);
@@ -51,7 +51,7 @@ public class GroupImageAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup,
             case MEDIA_TYPE_GROUP_CONTENT:
                 //缩略图展示
                 ImageView ivPhoto = helper.getView(R.id.ivPhoto);
-                if (ivPhoto == null ) {
+                if (ivPhoto == null) {
                     LogUtils.e(TAG + "已被拦截");
                     return;
                 }
@@ -60,8 +60,6 @@ public class GroupImageAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup,
                 if (mediaEntity != null) {
                     mediaFile = mediaEntity.getMedia();
                     if (mediaFile != null) {
-                        int index = bitmapCacheMap.indexOfKey(mediaFile.getTimeCreated());
-                        LogUtils.i(TAG + "当前索引为=" + index);
                         GlideManager.loadImgCenterCrop(mediaFile.getThumbnail(), ivPhoto, R.drawable.ic_aircraft_default);
                         boolean isPhoto = mediaFile.getMediaType() == MediaFile.MediaType.JPEG || mediaFile.getMediaType() == MediaFile.MediaType.RAW_DNG;
                         if (!isPhoto) {
@@ -91,12 +89,9 @@ public class GroupImageAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup,
     }
 
     public ArrayMap<Long, Bitmap> getBitmapCacheMap() {
-        return bitmapCacheMap;
+        return MediaTemp.bitmapCacheMap;
     }
 
-    public void setBitmapCacheMap(ArrayMap<Long, Bitmap> bitmapCacheMap) {
-        this.bitmapCacheMap = bitmapCacheMap;
-    }
 
     public boolean isScrolling() {
         return isScrolling;

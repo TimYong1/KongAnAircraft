@@ -2,6 +2,7 @@ package com.tourcoo.aircraft.ui.photo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import com.apkfuns.logutils.LogUtils;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.tourcoo.aircraft.product.ProductManager;
 import com.tourcoo.aircraftmanager.R;
+import com.tourcoo.entity.media.MediaFileGroup;
 import com.tourcoo.util.DateUtil;
 import com.tourcoo.util.GlideManager;
 import com.tourcoo.util.StringUtil;
@@ -55,7 +57,7 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
     public static final String EXTRA_CREATE_TIME = "EXTRA_CREATE_TIME";
     public static final String EXTRA_IMAGE_COUNT = "EXTRA_IMAGE_COUNT";
     private List<FetchMediaTask> mediaTaskList = new ArrayList<>();
-    private List<MediaFile> previewMediaFileList = new ArrayList<>();
+    private boolean isFront =true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,6 +73,13 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
     protected void onResume() {
         super.onResume();
         hideNavigation();
+        isFront = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isFront = false;
     }
 
     @Override
@@ -121,7 +130,7 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
 
                 @Override
                 public void onPageScrollStateChanged(int state) {
-
+                    tvPhotoTime.setText(getString(R.string.loading));
                 }
             });
             preViewAdapter = new PhotoPreViewAdapter(mViewList, mediaFileList);
@@ -134,11 +143,15 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
         LiveDataConstantNew.liveMediaDataList.observe(this, new Observer<List<MediaFile>>() {
             @Override
             public void onChanged(List<MediaFile> mediaFiles) {
-                LogUtils.i(TAG + "执行了1");
-                mediaFileList.clear();
+                if (!isFront) {
+                    LogUtils.w(TAG + "当前不在前台运行 需要拦截" );
+                    return;
+                }
                 if (mediaFiles == null) {
                     return;
                 }
+                LogUtils.i(TAG + "执行了1=" + mediaFiles.size());
+                mediaFileList.clear();
                 mediaFileList.addAll(mediaFiles);
                 int position = findMediaPosition(mediaFileList);
                 if (position < 0) {
@@ -146,8 +159,13 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
                     return;
                 }
                 viewPagerFixed.setCurrentItem(position);
-                LogUtils.i(TAG + "执行了2");
-                showImagePreview(mediaFileList.get(position), mViewList.get(position));
+                LogUtils.i(TAG + "执行了2=" + mediaFileList.size());
+                try {
+                    showImagePreview(mediaFileList.get(position), mViewList.get(position));
+                }catch (IndexOutOfBoundsException e){
+                    LogUtils.e(TAG+e.toString());
+                }
+
             }
         });
     }
@@ -215,7 +233,9 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
                     ToastUtil.showFailedDebug("照片获取失败" + djiError.getDescription(), "照片获取失败");
                     return;
                 }
-                previewMediaFileList.add(mediaFile);
+                if (MediaTemp.previewMediaFileList == null) {
+                    MediaTemp.previewMediaFileList = new ArrayList<>();
+                }
                 if (mediaFile.getPreview() == null) {
                     ToastUtil.showFailed("未获取到预览照片");
                     return;
@@ -228,14 +248,15 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
             mediaManager.getScheduler().resume(new CommonCallbacks.CompletionCallback() {
                 @Override
                 public void onResult(DJIError djiError) {
-                    if(djiError !=null){
+                    if (djiError != null) {
                         ToastUtil.showWarning("预览失败");
                     }
                     mediaManager.getScheduler().moveTaskToNext(task);
                 }
             });
         } else {
-            ToastUtil.showNormal("当前无法访问相册");
+            ToastUtil.showNormal("当前无法访问相册或无人机未连接");
+            tvPhotoTime.setText("相册预览");
         }
 
     }
@@ -255,7 +276,8 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
                 ivPlayVideo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ToastUtil.showSuccess("点击了");
+                        ToastUtil.showSuccess("正在开发");
+                        skipVideoPlay(mediaFile);
                     }
                 });
             }
@@ -284,5 +306,21 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
             return;
         }
         mediaManager = camera.getMediaManager();
+    }
+
+    private void skipVideoPlay(MediaFile mediaFile) {
+        if (mediaFile == null) {
+            ToastUtil.showWarning("未获取到当前视频");
+            return;
+        }
+        if (MediaTemp.previewMediaFileList == null) {
+            MediaTemp.previewMediaFileList = new ArrayList<>();
+        }
+        MediaTemp.previewMediaFileList.clear();
+        MediaTemp.previewMediaFileList.addAll(mediaFileList);
+        Intent intent = new Intent();
+        intent.setClass(this, PlayVideoActivity.class);
+        intent.putExtra(EXTRA_CREATE_TIME, mediaFile.getTimeCreated());
+        startActivityForResult(intent, 3000);
     }
 }

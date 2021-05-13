@@ -87,7 +87,7 @@ public class CameraHelper {
      * 停止录制
      */
     public void stopRecord(CommonCallbacks.CompletionCallback completionCallback) {
-        if (AircraftUtil.isCameraModuleAvailable()) {
+        if (!AircraftUtil.isCameraModuleAvailable()) {
             ToastUtil.showNormal("无人机未连接或相机不可用");
             return;
         }

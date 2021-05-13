@@ -1,8 +1,11 @@
 package com.tourcoo.account;
 
+import android.content.Intent;
 import android.text.TextUtils;
 
 import com.apkfuns.logutils.LogUtils;
+import com.tourcoo.aircraft.ui.account.LoginNewActivity;
+import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.util.SpUtil;
 import com.tourcoo.util.StackUtil;
 
@@ -147,9 +150,9 @@ public class AccountHelper {
 
     public void skipLogin() {
         StackUtil.getInstance().popAll();
-//        Intent intent = new Intent(AircraftApplication.getContext(), LoginNewActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        FlyApplication.getContext().startActivity(intent);
+        Intent intent = new Intent(AircraftApplication.getContext(), LoginNewActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        AircraftApplication.getContext().startActivity(intent);
     }
 
     public boolean isLogin() {

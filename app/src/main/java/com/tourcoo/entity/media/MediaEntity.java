@@ -17,6 +17,7 @@ public class MediaEntity {
     private float durationInSeconds;
     private String dateCreated;
     private MediaFile media;
+    private Bitmap thumbnail;
     public int getMediaType() {
         return mediaType;
     }
@@ -57,5 +58,11 @@ public class MediaEntity {
         this.media = media;
     }
 
+    public Bitmap getThumbnail() {
+        return thumbnail;
+    }
 
+    public void setThumbnail(Bitmap thumbnail) {
+        this.thumbnail = thumbnail;
+    }
 }

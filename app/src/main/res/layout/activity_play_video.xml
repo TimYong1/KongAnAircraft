@@ -3,12 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <com.tourcoo.view.ViewPagerFixed
-        android:id="@+id/vpPhoto"
+    <com.tourcoo.aircraft.widget.camera.BaseCameraView
+        android:id="@+id/cameraLiveView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/dp_5"
+        android:layout_marginRight="@dimen/dp_5" />
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_40"
@@ -25,15 +25,23 @@
             android:src="@drawable/ic_arrow_left" />
 
         <TextView
-            android:id="@+id/tvPhotoTime"
+            android:id="@+id/tvVideoPlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="加载中..."
+            android:text="视频预览"
             android:textColor="@color/white"
             android:textSize="@dimen/dp_16" />
 
     </RelativeLayout>
 
 
+    <ImageView
+        android:id="@+id/ivPlayVideo"
+        android:layout_width="@dimen/dp_50"
+        android:layout_height="@dimen/dp_50"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_fpv_speaker_play"
+        android:visibility="visible"
+       />
 </FrameLayout>

@@ -141,6 +141,11 @@
             android:theme="@style/FullTheme"
             tools:ignore="LockedOrientationActivity"
             />
+        <activity android:name="com.tourcoo.aircraft.ui.photo.PlayVideoActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/FullTheme"
+            tools:ignore="LockedOrientationActivity"
+            />
 
         <activity
             android:name="com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity"
