@@ -61,9 +61,8 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestAppLogin(params).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseResult<String>> requestStreamUrl() {
-        Map<String, Object> params = new HashMap<>(2);
-        params.put("droneId", "123");
+    public Observable<BaseResult<String>> requestStreamUrl(Map<String, Object> params) {
+        LogUtils.tag("提交到服务器的数据").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestStreamUrl(params).retryWhen(new RetryWhen()));
     }
 

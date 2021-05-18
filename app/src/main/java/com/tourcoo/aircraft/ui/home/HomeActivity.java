@@ -150,7 +150,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         ThreadManager.getDefault().execute(new Runnable() {
             @Override
             public void run() {
-                if (!true) {
+                if (!AircraftUtil.isAircraftConnected()) {
                     return;
                 }
                 DeviceInfo deviceInfo = new DeviceInfo();
@@ -377,6 +377,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 if (baseProduct.getModel() != null) {
                     tvAirCraftName.setText(baseProduct.getModel().name());
                 }
+                getSnNumberAndUpload();
             }
             ivConnectStatus.setImageResource(R.drawable.shape_circle_green);
         });

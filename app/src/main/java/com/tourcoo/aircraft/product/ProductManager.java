@@ -53,10 +53,13 @@ public class ProductManager {
     private boolean hasRegister;
     private static boolean isAppStarted = false;
     private IRongReceivedCallListener iRongReceivedCallListener;
+
     private ProductManager() {
         initListener();
     }
+
     private static BaseProduct product;
+
     private static class Holder {
         private final static ProductManager instance = new ProductManager();
     }
@@ -79,57 +82,57 @@ public class ProductManager {
             ThreadManager.getCache().execute(new Runnable() {
                 @Override
                 public void run() {
-                        registrationCallback = new DJISDKManager.SDKManagerCallback() {
-                            @Override
-                            public void onRegister(DJIError djiError) {
-                                isRegistrationInProgress.set(false);
-                                if (djiError == null) {
-                                    LogUtils.e(TAG + "激活受限");
-                                    return;
-                                }
-                                if (djiError == DJISDKError.REGISTRATION_SUCCESS) {
-                                    DJISDKManager.getInstance().startConnectionToProduct();
-                                    hasRegister = true;
-                                    LogUtils.i(TAG + "sdk注册成功");
-                                } else {
-                                    LogUtils.e(TAG + "sdk注册失败:" + djiError);
-                                    hasRegister = false;
-                                }
+                    registrationCallback = new DJISDKManager.SDKManagerCallback() {
+                        @Override
+                        public void onRegister(DJIError djiError) {
+                            isRegistrationInProgress.set(false);
+                            if (djiError == null) {
+                                LogUtils.e(TAG + "激活受限");
+                                return;
                             }
-
-                            @Override
-                            public void onProductDisconnect() {
-                                LogUtils.d(TAG + "onProductDisconnect");
+                            if (djiError == DJISDKError.REGISTRATION_SUCCESS) {
                                 DJISDKManager.getInstance().startConnectionToProduct();
-                                EventBus.getDefault().post(new CommonEvent(EVENT_AIRCRAFT_DISCONNECT));
+                                hasRegister = true;
+                                LogUtils.i(TAG + "sdk注册成功");
+                            } else {
+                                LogUtils.e(TAG + "sdk注册失败:" + djiError);
+                                hasRegister = false;
                             }
+                        }
 
-                            @Override
-                            public void onProductConnect(BaseProduct baseProduct) {
-                                LogUtils.i(TAG + "设备已连接连接");
-                                EventBus.getDefault().post(new CommonEvent(EVENT_AIRCRAFT_CONNECT));
-                            }
+                        @Override
+                        public void onProductDisconnect() {
+                            LogUtils.d(TAG + "onProductDisconnect");
+                            DJISDKManager.getInstance().startConnectionToProduct();
+                            EventBus.getDefault().post(new CommonEvent(EVENT_AIRCRAFT_DISCONNECT));
+                        }
 
-                            @Override
-                            public void onProductChanged(BaseProduct baseProduct) {
+                        @Override
+                        public void onProductConnect(BaseProduct baseProduct) {
+                            LogUtils.i(TAG + "设备已连接连接");
+                            EventBus.getDefault().post(new CommonEvent(EVENT_AIRCRAFT_CONNECT));
+                        }
 
-                            }
+                        @Override
+                        public void onProductChanged(BaseProduct baseProduct) {
 
-                            @Override
-                            public void onComponentChange(BaseProduct.ComponentKey componentKey, BaseComponent baseComponent, BaseComponent baseComponent1) {
+                        }
 
-                            }
+                        @Override
+                        public void onComponentChange(BaseProduct.ComponentKey componentKey, BaseComponent baseComponent, BaseComponent baseComponent1) {
 
-                            @Override
-                            public void onInitProcess(DJISDKInitEvent djisdkInitEvent, int i) {
+                        }
 
-                            }
+                        @Override
+                        public void onInitProcess(DJISDKInitEvent djisdkInitEvent, int i) {
 
-                            @Override
-                            public void onDatabaseDownloadProgress(long l, long l1) {
+                        }
 
-                            }
-                        };
+                        @Override
+                        public void onDatabaseDownloadProgress(long l, long l1) {
+
+                        }
+                    };
                     DJISDKManager.getInstance().registerApp(AircraftApplication.getContext(), registrationCallback);
                     LogUtils.i(TAG + "已执行注册");
                 }
@@ -140,7 +143,7 @@ public class ProductManager {
     public void release() {
         registrationCallback = null;
         isRegistrationInProgress.set(false);
-        product =null;
+        product = null;
         DJISDKManager.getInstance().destroy();
         RongCallClient.getInstance().unregisterVideoFrameObserver();
         iRongReceivedCallListener = null;
@@ -224,6 +227,8 @@ public class ProductManager {
         return product;
     }
 
-
+    public  static  boolean isAppStarted() {
+        return isAppStarted;
+    }
 
 }

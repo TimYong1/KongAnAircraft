@@ -39,6 +39,7 @@ import com.tourcoo.entity.BaseResult;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.flight.FlightRealTimeData;
 import com.tourcoo.entity.flight.LocateData;
+import com.tourcoo.entity.sn.DeviceInfo;
 import com.tourcoo.entity.socket.BaseSocketResult;
 import com.tourcoo.live.LiveStreamHelper;
 import com.tourcoo.retrofit.BaseLoadingObserver;
@@ -61,10 +62,14 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import dji.common.airlink.PhysicalSource;
 import dji.common.error.DJIError;
+import dji.common.util.CommonCallbacks;
 import dji.keysdk.KeyManager;
+import dji.sdk.products.Aircraft;
+import dji.sdk.sdkmanager.DJISDKManager;
 import dji.thirdparty.io.reactivex.android.schedulers.AndroidSchedulers;
 import dji.thirdparty.io.reactivex.disposables.CompositeDisposable;
 import dji.ux.beta.accessory.widget.rtk.RTKWidget;
@@ -130,6 +135,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
     private int phoneState = 0;
     private LocateData userLocate;
     private static final int PHONE_NO_CALL = 0;
+    private FlightRealTimeData mFlightRealTimeData;
     /**
      * 响铃中
      */
@@ -334,6 +340,9 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
+        if (!AccountHelper.getInstance().isLogin()) {
+            AccountHelper.getInstance().skipLogin();
+        }
         loadUiState();
         mapWidget.onResume();
         compositeDisposable = new CompositeDisposable();
@@ -446,6 +455,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void handleUploadStream(String url) {
+        LogUtils.i(TAG+"获取到的直播地址："+url);
         LiveStreamHelper.getInstance().startLiveShow(url);
         loadUiState();
 //        ivLive.setImageResource(R.drawable.ic_live_stop);
@@ -462,7 +472,8 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
                 ToastUtil.showWarning("当前无人机未连接或状态异常");
                 return;
             }
-            requestStreamUrlAndUpload();
+            //todo
+            doUploadLiveStream();
         }
     }
 
@@ -509,7 +520,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
             mHandler.removeCallbacksAndMessages(null);
             mHandler = null;
         }
-        if (PHONE_RING_UP == phoneState ||PHONE_ON ==phoneState ) {
+        if (PHONE_RING_UP == phoneState || PHONE_ON == phoneState) {
             phoneOff();
         }
         loadUiState();
@@ -520,8 +531,8 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
         RongCallClient.getInstance().setVoIPCallListener(null);
     }
 
-    private void requestStreamUrlAndUpload() {
-        ApiRepository.getInstance().requestStreamUrl().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<String>>("正在获取直播地址...") {
+    private void requestStreamUrlAndUpload(Map<String, Object> hashMap) {
+        ApiRepository.getInstance().requestStreamUrl(hashMap).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<String>>("正在获取直播地址...") {
             @Override
             public void onRequestSuccess(BaseResult<String> entity) {
                 if (entity == null) {
@@ -611,7 +622,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
 
                 @Override
                 public void onError(RongCallCommon.CallErrorCode callErrorCode) {
-                    ToastUtil.showNormalCondition(callErrorCode.toString(),"语音通话服务出了点小差");
+                    ToastUtil.showNormalCondition(callErrorCode.toString(), "语音通话服务出了点小差");
                 }
 
                 @Override
@@ -698,9 +709,9 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
         if (socketUploadEntity == null) {
             socketUploadEntity = new BaseSocketResult();
         }
-        FlightRealTimeData flightRealTimeData = FlightRealDataManager.getInstance().getRealTimeData();
-        flightRealTimeData.setUserLocateData(userLocate);
-        socketUploadEntity.setData(flightRealTimeData);
+        mFlightRealTimeData = FlightRealDataManager.getInstance().getRealTimeData();
+        mFlightRealTimeData.setUserLocateData(userLocate);
+        socketUploadEntity.setData(mFlightRealTimeData);
         socketUploadEntity.setMsgType(SOCKET_TYPE_REAL_TIME_DATA_FLIGHT);
         String result = gson.toJson(socketUploadEntity);
         LogUtils.i(TAG + result);
@@ -968,5 +979,60 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
             LiveStreamHelper.getInstance().stopLiveShow();
             loadUiState();
         }
+    }
+
+
+    private void doUploadLiveStream() {
+        Double lastLat = SpUtil.INSTANCE.getDouble(PREF_KEY_LAST_LOCATE_LAT);
+        Double lastLang = SpUtil.INSTANCE.getDouble(PREF_KEY_LAST_LOCATE_LANG);
+        ThreadManager.getDefault().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (!AircraftUtil.isAircraftConnected()) {
+                    return;
+                }
+                DeviceInfo deviceInfo = new DeviceInfo();
+                Aircraft aircraft = (Aircraft) DJISDKManager.getInstance().getProduct();
+                deviceInfo.type = aircraft.getModel().getDisplayName();
+                aircraft.getName(new CommonCallbacks.CompletionCallbackWith<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        System.out.println("getName  ：" + s);
+                        deviceInfo.name = s;
+                    }
+
+                    @Override
+                    public void onFailure(DJIError djiError) {
+                        ToastUtil.showWarning("未获取到设备信息 无法开启直播");
+                    }
+                });
+                aircraft.getRemoteController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        deviceInfo.remoteSn = s;
+                        deviceInfo.id = s;
+                        Map<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("droneId", deviceInfo.id);
+                        hashMap.put("userId", AccountHelper.getInstance().getUserId());
+                        hashMap.put("userLatitude", lastLat);
+                        hashMap.put("userLongitude", lastLang);
+                        if (mFlightRealTimeData != null && mFlightRealTimeData.getLocateData() != null) {
+                            hashMap.put("droneLatitude", mFlightRealTimeData.getLocateData().getLatitude());
+                            hashMap.put("droneLongitude", mFlightRealTimeData.getLocateData().getLongitude());
+                        } else {
+                            hashMap.put("droneLatitude", 0.0);
+                            hashMap.put("droneLongitude", 0.0);
+                        }
+                        requestStreamUrlAndUpload(hashMap);
+                    }
+
+                    @Override
+                    public void onFailure(DJIError djiError) {
+
+                    }
+                });
+            }
+        });
+
     }
 }
