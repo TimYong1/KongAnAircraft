@@ -79,6 +79,7 @@ public class BaseCameraView extends FrameLayout implements TextureView.SurfaceTe
         if (codecManager != null) {
             codecManager.cleanSurface();
             codecManager.destroyCodec();
+            codecManager.resetDecoder();
             codecManager = null;
         }
         return false;
