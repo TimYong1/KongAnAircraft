@@ -77,6 +77,7 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
                 if (it == null) {
                     return
                 }
+                LogUtils.e("执行了onChanged")
                 mediaList.addAll(it)
                 val position = findMediaPosition(it)
                 if (position < 0) {
@@ -296,4 +297,5 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
         }
         view.visibility = if (visible) View.VISIBLE else View.GONE
     }
+
 }

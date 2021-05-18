@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,6 +90,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     private GroupImageAdapter groupAdapter;
     private List<FetchMediaTask.Callback> mediaCallbackList = new ArrayList<>();
     public static final int REQUEST_CODE_PREVIEW = 1100;
+    private boolean isBackground = false;
     private final MediaManager.FileListStateListener mStateListener = new MediaManager.FileListStateListener() {
         @Override
         public void onFileListStateChange(MediaManager.FileListState fileListState) {
@@ -238,6 +238,10 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                     CommonCallbacks.CompletionCallback<DJIError> completionCallback = new CommonCallbacks.CompletionCallback<DJIError>() {
                         @Override
                         public void onResult(DJIError djiError) {
+                            if (isBackground) {
+                                LogUtils.e(TAG+"当前处于后台 需要拦截掉");
+                                return;
+                            }
                             getThumbnails();
                         }
                     };
@@ -331,6 +335,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     public void onResume() {
         super.onResume();
         hideNavigation();
+        isBackground = false;
         if (needRefresh) {
             loadAdapter();
             initMediaManager();
@@ -451,15 +456,17 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                 }
             }
             bitmapCacheMap.clear();
-            if(previewMediaFileList != null){
+            if (previewMediaFileList != null) {
                 for (MediaFile mediaFile : previewMediaFileList) {
-                    if(mediaFile != null){
+                    if (mediaFile != null) {
                         mediaFile.resetPreview(null);
                         mediaFile.resetThumbnail(null);
                         mediaFile.stopFetchingFileData(null);
                     }
                 }
-                mediaFiles.clear();
+                if (mediaFiles != null) {
+                    mediaFiles.clear();
+                }
             }
 
         }
@@ -579,6 +586,10 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                 LogUtils.i(TAG + "当前有缓存bitmap 直接显示");
                 continue;
             }
+            if (isBackground) {
+                LogUtils.e(TAG+"当前处于后台 需要拦截掉");
+                return;
+            }
             fetchMediaCallback = new FetchMediaTask.Callback() {
                 @Override
                 public void onUpdate(MediaFile mediaFile, FetchMediaTaskContent fetchMediaTaskContent, DJIError djiError) {
@@ -587,6 +598,11 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                         runUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                LogUtils.e(TAG+"当前处于后台 需要拦截掉");
+                                if (isBackground) {
+                                    LogUtils.e(TAG+"当前处于后台 需要拦截掉");
+                                    return;
+                                }
                                 LogUtils.i(TAG + "执行了notifyDataSetChanged");
                                 groupAdapter.notifyDataSetChanged();
                             }
@@ -639,5 +655,9 @@ public class AircraftPhotoFragmentNew extends RxFragment {
         }
     }
 
-
+    @Override
+    public void onPause() {
+        super.onPause();
+        isBackground = true;
+    }
 }

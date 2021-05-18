@@ -26,6 +26,7 @@ public class OnDJIUSBAttachedReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (!HomeActivity.isStarted()) {
+            ToastUtil.showSuccessDebug("重新启动");
             Intent startIntent = context.getPackageManager()
                     .getLaunchIntentForPackage(context.getPackageName());
             startIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT

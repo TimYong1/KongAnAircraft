@@ -76,7 +76,14 @@ dependencies {
          * uncommented, we will download it when DJISDKManager.getInstance().registerApp
          * is called, and it won't register success without fly-safe-database.
          * Both will greatly reduce the size of the APK.
-         */
+         * /**
+         * *如果你的应用程序需要mavic2pro的反失真，请评论“库反失真”
+         * *和Mavic 2 Zoom。
+         * *评论“飞行安全数据库”如果你不需要一个较小的apk发布。什么时候？
+         * *未注释，我们将在djiskmanager.getInstance（）.registerApp
+         * *调用，如果没有飞行安全数据库，它将不会注册成功。
+         * *两者都将大大减小APK的尺寸。
+         * */
         exclude module: 'library-anti-distortion'
         exclude module: 'fly-safe-database'
     })

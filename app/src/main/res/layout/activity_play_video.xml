@@ -44,4 +44,13 @@
         android:src="@drawable/ic_fpv_speaker_play"
         android:visibility="visible"
        />
+
+    <ImageView
+        android:id="@+id/ivPlayPause"
+        android:layout_width="@dimen/dp_50"
+        android:layout_height="@dimen/dp_50"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_fpv_speaker_pause"
+        android:visibility="gone"
+        />
 </FrameLayout>

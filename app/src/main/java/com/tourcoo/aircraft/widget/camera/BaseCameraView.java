@@ -20,7 +20,6 @@ import dji.sdk.codec.DJICodecManager;
  * This class is designed for showing the camera video feed from the camera.
  */
 public class BaseCameraView extends FrameLayout implements TextureView.SurfaceTextureListener {
-
     private VideoFeeder.VideoDataListener videoDataListener = null;
     private DJICodecManager codecManager = null;
 
