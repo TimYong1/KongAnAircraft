@@ -82,7 +82,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     public static final String TAG = "HomeActivity";
     private Activity mContext;
     private TextView tvConnectStatus, tvAirCraftName;
-    private static boolean isAppStarted = false;
+
     private ImageView ivConnectStatus, ivHandFly, ivFlyMap, ivFlyPhotoAlbum;
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.VIBRATE, // Gimbal rotation
@@ -137,7 +137,6 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             EventBus.getDefault().register(this);
         }
         initViewAndClick();
-        isAppStarted = true;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -514,8 +513,6 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 });
     }
 
-    public static boolean isStarted() {
-        return isAppStarted;
-    }
+
 
 }

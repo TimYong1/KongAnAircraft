@@ -51,6 +51,7 @@ public class ProductManager {
     private DJISDKManager.SDKManagerCallback registrationCallback;
     private final AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
     private boolean hasRegister;
+    private static boolean isAppStarted = false;
     private IRongReceivedCallListener iRongReceivedCallListener;
     private ProductManager() {
         initListener();
@@ -143,6 +144,7 @@ public class ProductManager {
         DJISDKManager.getInstance().destroy();
         RongCallClient.getInstance().unregisterVideoFrameObserver();
         iRongReceivedCallListener = null;
+        isAppStarted = false;
         RongCallClient.getInstance().setVoIPCallListener(null);
     }
 
@@ -152,6 +154,7 @@ public class ProductManager {
 
 
     private void initListener() {
+        isAppStarted = true;
         if (iRongReceivedCallListener == null) {
             iRongReceivedCallListener = new IRongReceivedCallListener() {
                 /**
