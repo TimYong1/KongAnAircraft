@@ -78,6 +78,7 @@ public class BaseCameraView extends FrameLayout implements TextureView.SurfaceTe
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         if (codecManager != null) {
             codecManager.cleanSurface();
+            codecManager.destroyCodec();
             codecManager = null;
         }
         return false;
@@ -87,4 +88,22 @@ public class BaseCameraView extends FrameLayout implements TextureView.SurfaceTe
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
     }
+
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        release();
+    }
+
+    private void release() {
+        if (codecManager != null) {
+            codecManager.resetDecoder();
+        }
+        if (videoDataListener != null) {
+            VideoFeeder.getInstance().getPrimaryVideoFeed().removeVideoDataListener(videoDataListener);
+        }
+    }
+
+
 }
