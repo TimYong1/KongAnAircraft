@@ -1,4 +1,4 @@
-package com.tourcoo.util;
+package com.tourcoo.lib;
 
 
 import java.security.KeyFactory;
@@ -27,18 +27,18 @@ public class RsaUtils {
     public static final String PUBLISH_KEY = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANL378k3RiZHWx5AfJqdH9xRNBmD9wGD2iRe41HdTNF8RUhNnHit5NpMNtGL0NPTSSpPjjI1kJfVorRvaQerUgkCAwEAAQ==";
     public static final String KEY = "MIIBUwIBADANBgkqhkiG9w0BAQEFAASCAT0wggE5AgEAAkEA0vfvyTdGJkdbHkB8mp0f3FE0GYP3AYPaJF7jUd1M0XxFSE2ceK3k2kw20YvQ09NJKk+OMjWQl9WitG9pB6tSCQIDAQABAkA2SimBrWC2/wvauBuYqjCFwLvYiRYqZKThUS3MZlebXJiLB+Ue/gUifAAKIg1avttUZsHBHrop4qfJCwAI0+YRAiEA+W3NK/RaXtnRqmoUUkb59zsZUBLpvZgQPfj1MhyHDz0CIQDYhsAhPJ3mgS64NbUZmGWuuNKp5coY2GIj/zYDMJp6vQIgUueLFXv/eZ1ekgz2Oi67MNCk5jeTF2BurZqNLR3MSmUCIFT3Q6uHMtsB9Eha4u7hS31tj1UWE+D+ADzp59MGnoftAiBeHT7gDMuqeJHPL4b+kC+gzV4FGTfhR9q3tTbklZkD2A==";
     public static final String KEY_ALGORITHM = "RSA/ECB/PKCS1Padding";
-
-    public static void main(String[] args) throws Exception {
+    /*public static void main(String[] args) throws Exception {
         System.out.println("\n");
-        RsaKeyPair keyPair = generateKeyPair();
+     *//*   RsaKeyPair keyPair = generateKeyPair();
         System.out.println("公钥：" + keyPair.getPublicKey());
         System.out.println("私钥：" + keyPair.getPrivateKey());
         System.out.println("\n");
         test1(keyPair);
         System.out.println("\n");
-        test2(keyPair);
+        test2(keyPair);*//*
         System.out.println("\n");
-    }
+        test3();
+    }*/
 
     /**
      * 公钥加密私钥解密
@@ -60,6 +60,7 @@ public class RsaUtils {
 
     /**
      * 私钥加密公钥解密
+     *
      * @throws Exception /
      */
     private static void test2(RsaKeyPair keyPair) throws Exception {
@@ -81,7 +82,7 @@ public class RsaUtils {
      * 公钥解密
      *
      * @param publicKeyText 公钥
-     * @param text 待解密的信息
+     * @param text          待解密的信息
      * @return /
      * @throws Exception /
      */
@@ -99,7 +100,7 @@ public class RsaUtils {
      * 私钥加密
      *
      * @param privateKeyText 私钥
-     * @param text 待加密的信息
+     * @param text           待加密的信息
      * @return /
      * @throws Exception /
      */
@@ -117,7 +118,7 @@ public class RsaUtils {
      * 私钥解密
      *
      * @param privateKeyText 私钥
-     * @param text 待解密的文本
+     * @param text           待解密的文本
      * @return /
      * @throws Exception /
      */
@@ -125,7 +126,7 @@ public class RsaUtils {
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec5 = new PKCS8EncodedKeySpec(Base64.decode(privateKeyText));
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec5);
-        Cipher cipher = Cipher.getInstance("RSA");
+        Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
         byte[] result = cipher.doFinal(Base64.decode(text));
         return new String(result);
@@ -135,7 +136,7 @@ public class RsaUtils {
      * 公钥加密
      *
      * @param publicKeyText 公钥
-     * @param text 待加密的文本
+     * @param text          待加密的文本
      * @return /
      */
     public static String encryptByPublicKey(String publicKeyText, String text) throws Exception {
@@ -186,6 +187,23 @@ public class RsaUtils {
         public String getPrivateKey() {
             return privateKey;
         }
+
+    }
+
+
+    public static void test3() {
+        String str = "cgrqG7qFQ+Qt3+1AmHhjI32ZOezI60h7UPI1NkzPuRzmBFe4IF8Oqg/XdubSxJZfRBns3tJTWcd78ptFpR+DXQ==";
+        try {
+            String result = decryptByPrivateKey(KEY, str);
+            System.out.println("result=" + result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        test3();
+
 
     }
 }

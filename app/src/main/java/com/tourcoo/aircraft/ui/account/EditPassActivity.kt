@@ -19,6 +19,7 @@ import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository
 import com.tourcoo.threadpool.ThreadManager
 import com.tourcoo.util.RsaUtils
+import com.tourcoo.util.RsaUtils.KEY
 import com.tourcoo.util.RsaUtils.PUBLISH_KEY
 import com.tourcoo.util.StringUtil
 import com.tourcoo.util.ToastUtil
@@ -79,6 +80,10 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
     private fun showUserInfo() {
+        if (AccountHelper.getInstance().userInfo == null || (!AccountHelper.getInstance().isLogin)) {
+            AccountHelper.getInstance().skipLogin()
+            return
+        }
         tvUserAccount.text = AccountHelper.getInstance().userInfo.username
     }
 
@@ -128,7 +133,7 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
             ToastUtil.showNormal("请输入确认密码")
             return
         }
-        if (etPassConfirm.text.toString() == (etUserPassNew.text.toString())) {
+        if (etPassConfirm.text.toString() != (etUserPassNew.text.toString())) {
             ToastUtil.showNormal("两次密码输入不一致")
             return
         }

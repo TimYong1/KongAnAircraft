@@ -111,6 +111,7 @@ dependencies {
         // exclude group: 'com.amap.api'
     })
     implementation files('libs/sun.misc.BASE64Decoder.jar')
+    implementation files('libs\\hutool-all-5.6.5.jar')
     compileOnly ('com.dji:dji-sdk-provided:4.14.1')
     implementation('com.dji:dji-uxsdk:4.14', {
         /**

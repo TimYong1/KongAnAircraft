@@ -20,6 +20,7 @@
  * SOFTWARE.
  *
  */
+include ':lib'
 
 include ':android-uxsdk-beta-core'
 include ':android-uxsdk-beta-cameracore'

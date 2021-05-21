@@ -79,7 +79,7 @@ public class ApiRepository extends BaseRepository {
         Map<String, Object> params = new HashMap<>(2);
         params.put("oldPass", oldPass);
         params.put("newPass", newPass);
-        LogUtils.tag("提交到服务器的数据").d(params);
+        LogUtils.tag("提交到服务器的数据").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestEditPass(params).retryWhen(new RetryWhen()));
     }
 
