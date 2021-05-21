@@ -110,6 +110,7 @@ dependencies {
          */
         // exclude group: 'com.amap.api'
     })
+    implementation files('libs/sun.misc.BASE64Decoder.jar')
     compileOnly ('com.dji:dji-sdk-provided:4.14.1')
     implementation('com.dji:dji-uxsdk:4.14', {
         /**
@@ -215,7 +216,14 @@ dependencies {
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-release:2.6'
     // Optional: detect retained objects. This helps but is not required.
     releaseImplementation 'com.squareup.leakcanary:leakcanary-object-watcher-android:2.6'
+    implementation 'io.github.youth5201314:banner:2.2.1'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+
 }
 repositories {
-    mavenCentral()
+    google()
+    jcenter()
+    mavenLocal()
+    maven { url "https://jitpack.io" }
+    maven {url  "https://dl.bintray.com/rongcloud/maven"}
 }

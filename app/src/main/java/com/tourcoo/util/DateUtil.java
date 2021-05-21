@@ -3,6 +3,7 @@ package com.tourcoo.util;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.Locale;
 
 /**
@@ -29,5 +30,22 @@ public class DateUtil {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         ParsePosition pos = new ParsePosition(0);
         return formatter.parse(strDate, pos);
+    }
+
+
+    public static String stringForTime(float timeSecond) {
+        if (timeSecond <= 0 || timeSecond >= 24 * 60 * 60 * 1000) {
+            return "00:00";
+        }
+        int seconds = (int) (timeSecond % 60);
+        int minutes = (int) ((timeSecond / 60) % 60);
+        int hours = (int) (timeSecond / 3600);
+        StringBuilder stringBuilder = new StringBuilder();
+        Formatter mFormatter = new Formatter(stringBuilder, Locale.getDefault());
+        if (hours > 0) {
+            return mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString();
+        } else {
+            return mFormatter.format("%02d:%02d", minutes, seconds).toString();
+        }
     }
 }

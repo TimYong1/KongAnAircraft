@@ -10,10 +10,15 @@
     android:padding="15dp">
 
 
-    <com.tourcoo.dialog.loading.PictureSpinView
+    <!--<com.tourcoo.dialog.loading.PictureSpinView
         android:layout_width="@dimen/dp_25"
-        android:layout_height="@dimen/dp_25" />
-
+        android:layout_height="@dimen/dp_25" />-->
+    <ProgressBar
+        android:layout_width="@dimen/dp_35"
+        android:layout_height="@dimen/dp_35"
+        android:layout_gravity="center"
+        android:indeterminateDrawable="@drawable/loading_fast"
+         />
     <TextView
         android:id="@+id/tvLoadingText"
         android:layout_width="wrap_content"

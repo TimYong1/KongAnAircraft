@@ -169,10 +169,10 @@ open class TelemetryPanelWidget @JvmOverloads constructor(
     private fun addWidgetsToPanel() {
         val widgetMargin = getDimension(R.dimen.uxsdk_telemetry_column_margin).toInt()
 
-        setPane(TelemetryPanelItem.AMSL_ALTITUDE, amslAltitudeWidgetPaneID, ViewAlignment.LEFT,
+     /*   setPane(TelemetryPanelItem.AMSL_ALTITUDE, amslAltitudeWidgetPaneID, ViewAlignment.LEFT,
                 createWidgetBlock = {
                     AMSLAltitudeWidget(context, widgetTheme = widgetTheme)
-                })
+                })*/
 
         setPane(TelemetryPanelItem.AGL_ALTITUDE, aglAltitudeWidgetPaneID, ViewAlignment.LEFT,
                 createWidgetBlock = {
@@ -184,10 +184,10 @@ open class TelemetryPanelWidget @JvmOverloads constructor(
                     HorizontalVelocityWidget(context, widgetTheme = widgetTheme)
                 }, leftMargin = widgetMargin, rightMargin = widgetMargin)
 
-        setPane(TelemetryPanelItem.DISTANCE_RC, distanceRCWidgetPaneID, ViewAlignment.LEFT,
+    /*    setPane(TelemetryPanelItem.DISTANCE_RC, distanceRCWidgetPaneID, ViewAlignment.LEFT,
                 createWidgetBlock = {
                     DistanceRCWidget(context, widgetTheme = widgetTheme)
-                }, leftMargin = widgetMargin)
+                }, leftMargin = widgetMargin)*/
 
         setPane(TelemetryPanelItem.DISTANCE_HOME, distanceHomeWidgetPaneID, ViewAlignment.LEFT,
                 createWidgetBlock = {
@@ -202,8 +202,8 @@ open class TelemetryPanelWidget @JvmOverloads constructor(
         setPane(TelemetryPanelItem.VPS, vpsWidgetPaneID, ViewAlignment.LEFT,
                 createWidgetBlock = {
                     VPSWidget(context, widgetTheme = widgetTheme)
-                }, leftMargin = widgetMargin)
-
+                },leftMargin = widgetMargin, rightMargin = widgetMargin)
+//        leftMargin = widgetMargin
         setPane(TelemetryPanelItem.LOCATION, locationWidgetPaneID, ViewAlignment.LEFT,
                 createWidgetBlock = {
                     LocationWidget(context, widgetTheme = widgetTheme)

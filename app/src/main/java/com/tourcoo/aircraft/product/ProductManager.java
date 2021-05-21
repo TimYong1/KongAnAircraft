@@ -53,7 +53,7 @@ public class ProductManager {
     private boolean hasRegister;
     private static boolean isAppStarted = false;
     private IRongReceivedCallListener iRongReceivedCallListener;
-
+    private String droneId;
     private ProductManager() {
         initListener();
     }
@@ -231,4 +231,11 @@ public class ProductManager {
         return isAppStarted;
     }
 
+    public String getDroneId() {
+        return droneId;
+    }
+
+    public void setDroneId(String droneId) {
+        this.droneId = droneId;
+    }
 }

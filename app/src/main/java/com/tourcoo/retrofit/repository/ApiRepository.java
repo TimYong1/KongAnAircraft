@@ -75,6 +75,14 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestUploadDroneData(params).retryWhen(new RetryWhen()));
     }
 
+    public Observable<BaseResult<Object>> requestEditPass(String oldPass,String newPass) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("oldPass", oldPass);
+        params.put("newPass", newPass);
+        LogUtils.tag("提交到服务器的数据").d(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestEditPass(params).retryWhen(new RetryWhen()));
+    }
+
 
     public Observable<BaseResult<UserInfo>> requestUserInfo( ) {
         return ThreadTransformer.switchSchedulers(getApiService().requestUserInfo().retryWhen(new RetryWhen()));

@@ -186,11 +186,11 @@
                     android:textSize="@dimen/sp_15" />
             </LinearLayout>
 
-            <View
+       <!--     <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_0_5"
                 android:layout_marginTop="@dimen/dp_margin_item_user_info"
-                android:background="#4E555C" />
+                android:background="#4E555C" />-->
 
         </LinearLayout>
 
@@ -255,6 +255,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:visibility="invisible"
                 android:paddingTop="@dimen/dp_margin_item_user_info"
                 android:paddingBottom="@dimen/dp_margin_item_user_info">
 
@@ -280,13 +281,14 @@
                     android:src="@mipmap/ic_arrow_right" />
             </LinearLayout>
 
-            <include layout="@layout/line_gray_dp_0_5" />
+           <!-- <include layout="@layout/line_gray_dp_0_5" />-->
 
             <LinearLayout
                 android:id="@+id/llPrivacyPolicy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:visibility="invisible"
                 android:paddingTop="@dimen/dp_margin_item_user_info"
                 android:paddingBottom="@dimen/dp_margin_item_user_info">
 
@@ -312,11 +314,12 @@
                     android:src="@mipmap/ic_arrow_right" />
             </LinearLayout>
 
-            <include layout="@layout/line_gray_dp_0_5" />
+          <!--  <include layout="@layout/line_gray_dp_0_5" />-->
 
 
             <LinearLayout
                 android:id="@+id/llAboutUs"
+                android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -345,7 +348,7 @@
                     android:src="@mipmap/ic_arrow_right" />
             </LinearLayout>
 
-            <include layout="@layout/line_gray_dp_0_5" />
+          <!--  <include layout="@layout/line_gray_dp_0_5" />-->
 
             <TextView
                 android:id="@+id/tvVersion"

@@ -19,6 +19,7 @@ public class TokenInfo {
     private String rongCloudToken;
     private String systemToken;
     private String userId;
+    private String userCode;
 
     public String getRongCloudToken() {
         return rongCloudToken;
@@ -42,5 +43,13 @@ public class TokenInfo {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
     }
 }

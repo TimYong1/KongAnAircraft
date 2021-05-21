@@ -83,13 +83,13 @@
     <string name="uxsdk_camera_picture_format_high_tiff">TIFF Linear High</string>
     <string name="uxsdk_camera_picture_format_jr">J+R</string>
 
-    <string name="uxsdk_message_air_sense_warning_title">Another aircraft is nearby. Fly with caution.</string>
-    <string name="uxsdk_message_air_sense_warning_content">Another aircraft is too close, please descend to a safer altitude.</string>
-    <string name="uxsdk_message_air_sense_dangerous_content">Another aircraft is dangerously close, please descend to a safer altitude.</string>
-    <string name="uxsdk_air_sense_terms_content">Please make sure you have read and understood the DJI AirSense Warnings.</string>
-    <string name="uxsdk_air_sense_never_show">Don\'t show again</string>
+    <string name="uxsdk_message_air_sense_warning_title">另一架飞机在附近。小心飞行.</string>
+    <string name="uxsdk_message_air_sense_warning_content">另一架飞机离得太近，请下降到安全的高度.</string>
+    <string name="uxsdk_message_air_sense_dangerous_content">另一架飞机危险接近，请下降到安全高度.</string>
+    <string name="uxsdk_air_sense_terms_content">请确保您已阅读并理解"大疆空中感应"警告.</string>
+    <string name="uxsdk_air_sense_never_show">不再显示</string>
 
-    <string name="uxsdk_visual_radar_avoidance_disabled_message_post">Obstacle Avoidance Disabled. Fly with caution.</string>
+    <string name="uxsdk_visual_radar_avoidance_disabled_message_post">障碍物回避禁用。小心飞行.</string>
 
     <string name="uxsdk_ei_title">EI</string>
 
@@ -186,7 +186,7 @@
 
     <string name="uxsdk_novice_mode_enabled_message">初学者模式已启用。高度和距离都将限制在100英尺/30米.</string>
 
-    <string name="uxsdk_list_item_unit_mode">单元模式</string>
+    <string name="uxsdk_list_item_unit_mode">单位制式</string>
     <string name="uxsdk_list_item_unit_mode_imperial">英制</string>
     <string name="uxsdk_list_item_unit_mode_metric">公制</string>
     <string name="uxsdk_dialog_unit_change_notice">英制单位模式设置成功。 现在，测量值将遵循英制单位制。 由于飞机支持公制单位，因此显示的值是近似转换.</string>

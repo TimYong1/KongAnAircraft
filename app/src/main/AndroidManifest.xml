@@ -31,9 +31,9 @@
         android:allowBackup="true"
         android:icon="@drawable/logo_app"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@drawable/logo_app"
         android:supportsRtl="true"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android:label">
@@ -124,30 +124,53 @@
             android:name="com.tourcoo.aircraft.ui.account.LoginNewActivity"
             android:screenOrientation="sensorLandscape"
             tools:ignore="LockedOrientationActivity" />
-<activity android:name="com.tourcoo.aircraft.ui.account.UserInfoActivity"
-    android:screenOrientation="sensorLandscape"
-    tools:ignore="LockedOrientationActivity"
-    />
-<activity android:name="com.tourcoo.aircraft.ui.photo.FlyPhotoActivity"
-    android:screenOrientation="sensorLandscape"
-    tools:ignore="LockedOrientationActivity"
-    />
-        <activity android:name="com.tourcoo.aircraft.ui.photo.PhotoPreviewActivity"
+        <activity
+            android:name="com.tourcoo.aircraft.ui.account.UserInfoActivity"
+            android:screenOrientation="sensorLandscape"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tourcoo.aircraft.ui.banner.BannerActivity"
+            android:screenOrientation="sensorLandscape"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tourcoo.aircraft.ui.photo.FlyPhotoActivity"
+            android:screenOrientation="sensorLandscape"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tourcoo.aircraft.ui.photo.PhotoPreviewActivity"
             android:screenOrientation="landscape"
             android:theme="@style/FullTheme"
-            tools:ignore="LockedOrientationActivity"
-            />
-        <activity android:name="com.tourcoo.aircraft.ui.photo.PhotoPreviewActivityNew"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tourcoo.aircraft.ui.photo.PhotoPreviewActivityNew"
             android:screenOrientation="landscape"
             android:theme="@style/FullTheme"
-            tools:ignore="LockedOrientationActivity"
-            />
-        <activity android:name="com.tourcoo.aircraft.ui.photo.PlayVideoActivity"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tourcoo.aircraft.ui.photo.PlayVideoActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/FullTheme"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity android:name="com.tourcoo.aircraft.ui.map.MapActivity"
             android:screenOrientation="landscape"
             android:theme="@style/FullTheme"
             tools:ignore="LockedOrientationActivity"
             />
 
+        <activity android:name="com.tourcoo.aircraft.ui.account.EditPassActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/FullTheme"
+            android:windowSoftInputMode="adjustPan"
+            tools:ignore="LockedOrientationActivity"
+
+            />
+
+        <activity
+            android:name="com.tourcoo.aircraft.ui.photo.PlayVideoActivityNew"
+            android:screenOrientation="landscape"
+            android:theme="@style/FullTheme"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name="com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity"
             android:screenOrientation="sensorLandscape"

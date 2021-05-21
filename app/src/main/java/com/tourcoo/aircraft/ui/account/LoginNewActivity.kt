@@ -145,11 +145,13 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
 
             override fun onRequestSuccess(entity: BaseResult<TokenInfo?>?) {
                 handleLoginSuccess(entity)
+                hideNavigation()
             }
 
             override fun onRequestError(throwable: Throwable) {
                 super.onRequestError(throwable)
                 LogUtils.tag(TAG).e("onRequestError=$throwable")
+                hideNavigation()
             }
 
 

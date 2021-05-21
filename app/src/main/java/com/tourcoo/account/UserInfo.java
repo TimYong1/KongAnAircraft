@@ -27,6 +27,9 @@ public class UserInfo {
     private String userId;
     private String username;
     private boolean voice;
+    private String email;
+    private String gender;
+    private String userCode;
 
     public String getCreateTime() {
         return createTime;
@@ -82,5 +85,29 @@ public class UserInfo {
 
     public void setVoice(boolean voice) {
         this.voice = voice;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
     }
 }

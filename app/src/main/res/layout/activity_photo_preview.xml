@@ -33,7 +33,15 @@
             android:textColor="@color/white"
             android:textSize="@dimen/dp_16" />
 
+
     </RelativeLayout>
 
+    <ProgressBar
+        android:id="@+id/pbLoading"
+        android:layout_width="@dimen/dp_45"
+        android:layout_height="@dimen/dp_62"
+        android:layout_gravity="center"
+        android:indeterminateDrawable="@drawable/loading"
+        android:visibility="visible" />
 
 </FrameLayout>

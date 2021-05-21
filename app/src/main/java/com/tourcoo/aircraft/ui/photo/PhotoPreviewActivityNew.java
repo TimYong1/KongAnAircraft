@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -17,7 +18,6 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.tourcoo.aircraft.product.ProductManager;
 import com.tourcoo.aircraft.widget.camera.CameraHelper;
 import com.tourcoo.aircraftmanager.R;
-import com.tourcoo.entity.media.MediaFileGroup;
 import com.tourcoo.util.DateUtil;
 import com.tourcoo.util.GlideManager;
 import com.tourcoo.util.StringUtil;
@@ -61,7 +61,8 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
     public static final String EXTRA_IMAGE_COUNT = "EXTRA_IMAGE_COUNT";
     private List<FetchMediaTask> mediaTaskList = new ArrayList<>();
     private boolean isFront = true;
-
+    private ProgressBar pbLoading;
+    private String currentTime ;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +101,8 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
         findViewById(R.id.ivBack).setOnClickListener(this);
         viewPagerFixed = findViewById(R.id.vpPhoto);
         tvPhotoTime = findViewById(R.id.tvPhotoTime);
-        viewPagerFixed.setOffscreenPageLimit(1);
+        pbLoading = findViewById(R.id.pbLoading);
+        viewPagerFixed.setOffscreenPageLimit(3);
         getIntent().getLongExtra(EXTRA_CREATE_TIME, -1);
     }
 
@@ -125,12 +127,14 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
             viewPagerFixed.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
                 }
 
                 @Override
                 public void onPageSelected(int position) {
+                    setViewGone(pbLoading,true);
                     if (position >= mediaFileList.size() || position >= mViewList.size()) {
-                        ToastUtil.showWarning("拦截了："+position+mediaFileList.size());
+                        ToastUtil.showWarningDebug("拦截了："+position+mediaFileList.size());
                         return;
                     }
                     showImagePreview(mediaFileList.get(position), mViewList.get(position));
@@ -138,7 +142,19 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
 
                 @Override
                 public void onPageScrollStateChanged(int state) {
-                    tvPhotoTime.setText(getString(R.string.loading));
+                    switch (state) {
+                        case 1:
+                            tvPhotoTime.setText(getString(R.string.loading));
+                            break;
+                        case 2:
+                            setViewGone(pbLoading,true);
+                            tvPhotoTime.setText(getString(R.string.loading));
+                            break;
+                        default:
+                            break;
+                    }
+//                    arg0 ==1的时辰默示正在滑动，arg0==2的时辰默示滑动完毕了，arg0==0的时辰默示什么都没做。
+
                 }
             });
             preViewAdapter = new PhotoPreViewAdapter(mViewList, mediaFileList);
@@ -234,6 +250,7 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
         FetchMediaTask task = new FetchMediaTask(mediaFile, FetchMediaTaskContent.PREVIEW, new FetchMediaTask.Callback() {
             @Override
             public void onUpdate(MediaFile mediaFile, FetchMediaTaskContent fetchMediaTaskContent, DJIError djiError) {
+                setViewGone(pbLoading,false);
                 if (djiError != null) {
                     ToastUtil.showFailedDebug("照片获取失败" + djiError.getDescription(), "照片获取失败");
                     return;
@@ -262,12 +279,13 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
         } else {
             ToastUtil.showNormal("当前无法访问相册或无人机未连接");
             tvPhotoTime.setText("相册预览");
+            setViewGone(pbLoading,false);
         }
 
     }
 
     private void showImageInfo(MediaFile mediaFile, View parentView) {
-        String time = DateUtil.parseDateString("yyyy-MM-dd-HH:mm:ss", mediaFile.getTimeCreated());
+        currentTime = DateUtil.parseDateString("yyyy-MM-dd-HH:mm:ss", mediaFile.getTimeCreated());
         PhotoView photoView = parentView.findViewById(R.id.photoPreview);
         ImageView ivPlayVideo = parentView.findViewById(R.id.ivPlayVideo);
         LogUtils.i(TAG + "执行了3");
@@ -276,7 +294,7 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
             @Override
             public void run() {
                 setViewGone(ivPlayVideo, !isPhoto);
-                tvPhotoTime.setText(StringUtil.getNotNullValueLine(time));
+                tvPhotoTime.setText(StringUtil.getNotNullValueLine(currentTime));
                 GlideManager.loadImgAuto(mediaFile.getPreview(), photoView);
                 ivPlayVideo.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -293,11 +311,17 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
         if (view == null) {
             return;
         }
-        if (visible) {
-            view.setVisibility(View.VISIBLE);
-        } else {
-            view.setVisibility(View.GONE);
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (visible) {
+                    view.setVisibility(View.VISIBLE);
+                } else {
+                    view.setVisibility(View.GONE);
+                }
+            }
+        });
+
     }
 
     private void initMediaManager() {
@@ -323,7 +347,7 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
         MediaTemp.previewMediaFileList.clear();
         MediaTemp.previewMediaFileList.addAll(mediaFileList);
         Intent intent = new Intent();
-        intent.setClass(this, PlayVideoActivity.class);
+        intent.setClass(this, PlayVideoActivityNew.class);
         intent.putExtra(EXTRA_CREATE_TIME, mediaFile.getTimeCreated());
         startActivityForResult(intent, 3000);
     }

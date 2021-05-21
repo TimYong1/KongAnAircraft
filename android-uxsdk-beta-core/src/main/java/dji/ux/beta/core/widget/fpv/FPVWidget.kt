@@ -108,7 +108,7 @@ open class FPVWidget @JvmOverloads constructor(
     }
 
     /**
-     * Whether the video feed source's camera name is visible on the video feed.
+     * 视频源的摄像机名称是否在视频源上可见
      */
     var isCameraSourceNameVisible = true
         set(value) {

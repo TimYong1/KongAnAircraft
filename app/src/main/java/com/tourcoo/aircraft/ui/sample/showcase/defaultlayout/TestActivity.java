@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ImageView;
@@ -31,6 +32,7 @@ import com.google.gson.GsonBuilder;
 import com.tourcoo.account.AccountHelper;
 import com.tourcoo.aircraft.FlightRealDataManager;
 import com.tourcoo.aircraft.product.AircraftUtil;
+import com.tourcoo.aircraft.product.ProductManager;
 import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.aircraft.widget.camera.CameraHelper;
 import com.tourcoo.aircraft.widget.gimble.GimHelper;
@@ -52,6 +54,7 @@ import com.tourcoo.timer.OnCountDownTimerListener;
 import com.tourcoo.timer.TimeTool;
 import com.tourcoo.util.LocateHelper;
 import com.tourcoo.util.SpUtil;
+import com.tourcoo.util.StringUtil;
 import com.tourcoo.util.ToastUtil;
 import com.tourcoo.util.VibratorPlayer;
 import com.trello.rxlifecycle3.android.ActivityEvent;
@@ -95,6 +98,8 @@ import static com.tourcoo.constant.CommandConstant.COMMAND_WEB_YUN_TAI_DOWN;
 import static com.tourcoo.constant.CommandConstant.COMMAND_WEB_YUN_TAI_LEFT;
 import static com.tourcoo.constant.CommandConstant.COMMAND_WEB_YUN_TAI_RIGHT;
 import static com.tourcoo.constant.CommandConstant.COMMAND_WEB_YUN_TAI_UP;
+import static com.tourcoo.constant.EventConstant.EVENT_AIRCRAFT_CONNECT;
+import static com.tourcoo.constant.EventConstant.EVENT_AIRCRAFT_DISCONNECT;
 import static com.tourcoo.constant.EventConstant.EVENT_PHONE_HANG_UP;
 import static com.tourcoo.constant.LocateConstant.PREF_KEY_LAST_LOCATE_LANG;
 import static com.tourcoo.constant.LocateConstant.PREF_KEY_LAST_LOCATE_LAT;
@@ -136,6 +141,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
     private LocateData userLocate;
     private static final int PHONE_NO_CALL = 0;
     private FlightRealTimeData mFlightRealTimeData;
+    private String mDroneId;
     /**
      * 响铃中
      */
@@ -157,6 +163,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_new);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
@@ -189,6 +196,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
         fpvInteractionWidget = findViewById(R.id.widget_fpv_interaction);
         mapWidget = findViewById(R.id.widget_map);
         fpvWidgetPrimary = findViewById(R.id.widget_fpv);
+        fpvWidgetPrimary.setCameraSourceNameVisible(false);
         ivLive = findViewById(R.id.ivLive);
         ivCall = findViewById(R.id.ivCall);
         ivCallClose = findViewById(R.id.ivCallClose);
@@ -209,30 +217,35 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
     private void handleMapClick(View view) {
-        if (view == fpvWidgetPrimary && !isMapMini) {
-            //reorder widgets
-            rootView.removeView(fpvWidgetPrimary);
-            rootView.addView(fpvWidgetPrimary, 0);
+        try {
+            if (view == fpvWidgetPrimary && !isMapMini) {
+                //reorder widgets
+                rootView.removeView(fpvWidgetPrimary);
+                rootView.addView(fpvWidgetPrimary, 0);
 
-            //resize widgets
-            resizeViews(fpvWidgetPrimary, mapWidget);
-            //enable interaction on FPV
-            fpvInteractionWidget.setInteractionEnabled(true);
-            //disable user login widget on map
+                //resize widgets
+                resizeViews(fpvWidgetPrimary, mapWidget);
+                //enable interaction on FPV
+                fpvInteractionWidget.setInteractionEnabled(true);
+                //disable user login widget on map
 //            userAccountLoginWidget.setVisibility(View.GONE);
-            isMapMini = true;
-        } else if (view == mapWidget && isMapMini) {
-            //reorder widgets
-            rootView.removeView(fpvWidgetPrimary);
-            rootView.addView(fpvWidgetPrimary, rootView.indexOfChild(mapWidget) + 1);
-            //resize widgets
-            resizeViews(mapWidget, fpvWidgetPrimary);
-            //disable interaction on FPV
-            fpvInteractionWidget.setInteractionEnabled(false);
-            //enable user login widget on map
+                isMapMini = true;
+            } else if (view == mapWidget && isMapMini) {
+                //reorder widgets
+                rootView.removeView(fpvWidgetPrimary);
+                rootView.addView(fpvWidgetPrimary, rootView.indexOfChild(mapWidget) + 1);
+                //resize widgets
+                resizeViews(mapWidget, fpvWidgetPrimary);
+                //disable interaction on FPV
+                fpvInteractionWidget.setInteractionEnabled(false);
+                //enable user login widget on map
 //            userAccountLoginWidget.setVisibility(View.VISIBLE);
-            isMapMini = false;
+                isMapMini = false;
+            }
+        } catch (Exception e) {
+            ToastUtil.showNormalDebug(e.toString());
         }
+
     }
 
     /**
@@ -318,6 +331,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onDestroy() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mapWidget.onDestroy();
         EventBus.getDefault().unregister(this);
         release();
@@ -343,6 +357,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
         if (!AccountHelper.getInstance().isLogin()) {
             AccountHelper.getInstance().skipLogin();
         }
+        hideNavigation();
         loadUiState();
         mapWidget.onResume();
         compositeDisposable = new CompositeDisposable();
@@ -455,7 +470,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void handleUploadStream(String url) {
-        LogUtils.i(TAG+"获取到的直播地址："+url);
+        LogUtils.i(TAG + "获取到的直播地址：" + url);
         LiveStreamHelper.getInstance().startLiveShow(url);
         loadUiState();
 //        ivLive.setImageResource(R.drawable.ic_live_stop);
@@ -676,20 +691,6 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
 
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void onMessageEvent(CommonEvent event) {
-        if (event == null) {
-            return;
-        }
-        switch (event.getAction()) {
-            case EVENT_PHONE_HANG_UP:
-                handleCallComing();
-                break;
-            default:
-                break;
-        }
-
-    }
 
     private void phoneOff() {
         // im未连接或者不在通话中，RongCallClient 和 RongCallSession 为空
@@ -711,7 +712,9 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
         }
         mFlightRealTimeData = FlightRealDataManager.getInstance().getRealTimeData();
         mFlightRealTimeData.setUserLocateData(userLocate);
+        mFlightRealTimeData.setDroneId(ProductManager.getInstance().getDroneId());
         socketUploadEntity.setData(mFlightRealTimeData);
+
         socketUploadEntity.setMsgType(SOCKET_TYPE_REAL_TIME_DATA_FLIGHT);
         String result = gson.toJson(socketUploadEntity);
         LogUtils.i(TAG + result);
@@ -1013,6 +1016,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
                         deviceInfo.id = s;
                         Map<String, Object> hashMap = new HashMap<>();
                         hashMap.put("droneId", deviceInfo.id);
+                        mDroneId = deviceInfo.id;
                         hashMap.put("userId", AccountHelper.getInstance().getUserId());
                         hashMap.put("userLatitude", lastLat);
                         hashMap.put("userLongitude", lastLang);
@@ -1033,6 +1037,29 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
                 });
             }
         });
+
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(CommonEvent event) {
+        if (event == null) {
+            return;
+        }
+        switch (StringUtil.getNotNullValue(event.getAction())) {
+            case EVENT_PHONE_HANG_UP:
+                handleCallComing();
+                break;
+            case EVENT_AIRCRAFT_CONNECT:
+                //todo无人机已连接
+                break;
+            case EVENT_AIRCRAFT_DISCONNECT:
+                LiveStreamHelper.getInstance().stopLiveShow();
+                loadUiState();
+                break;
+            default:
+                break;
+        }
 
     }
 }

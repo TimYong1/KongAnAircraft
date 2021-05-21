@@ -15,7 +15,7 @@ public class FlightRealTimeData {
     private AttitudeData attitudeData;
     private BatteryData batteryData;
     private LocateData userLocateData;
-
+    private String droneId;
     public LocateData getLocateData() {
         return locateData;
     }
@@ -46,5 +46,13 @@ public class FlightRealTimeData {
 
     public void setUserLocateData(LocateData userLocateData) {
         this.userLocateData = userLocateData;
+    }
+
+    public String getDroneId() {
+        return droneId;
+    }
+
+    public void setDroneId(String droneId) {
+        this.droneId = droneId;
     }
 }

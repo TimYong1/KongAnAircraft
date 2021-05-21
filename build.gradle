@@ -31,6 +31,7 @@ buildscript {
         mavenLocal()
         maven { url "https://jitpack.io" }
         maven {url  "https://dl.bintray.com/rongcloud/maven"}
+        maven { url "https://s01.oss.sonatype.org/content/groups/public" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.1'
@@ -48,6 +49,7 @@ allprojects {
         mavenLocal()
         maven { url "https://jitpack.io" }
         maven {url  "https://dl.bintray.com/rongcloud/maven"}
+        maven { url "https://s01.oss.sonatype.org/content/groups/public" }
     }
 }
 

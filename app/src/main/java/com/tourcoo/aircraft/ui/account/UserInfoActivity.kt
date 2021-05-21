@@ -1,11 +1,13 @@
 package com.tourcoo.aircraft.ui.account
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.apkfuns.logutils.LogUtils
 import com.tourcoo.account.AccountHelper
 import com.tourcoo.account.UserInfo
+import com.tourcoo.aircraft.ui.home.HomeActivity
 import com.tourcoo.aircraftmanager.R
 import com.tourcoo.entity.BaseResult
 import com.tourcoo.retrofit.BaseLoadingObserver
@@ -26,7 +28,7 @@ import kotlinx.android.synthetic.main.activity_my_info.*
  * @date 2021年04月20日14:04
  * @Email: 971613168@qq.com
  */
-class UserInfoActivity : RxAppCompatActivity() {
+class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
     private var mContext: Activity? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +38,9 @@ class UserInfoActivity : RxAppCompatActivity() {
         tvLogout.setOnClickListener {
             requestLogout()
         }
+        llEditPass.setOnClickListener(this)
+
+
     }
 
     override fun onResume() {
@@ -57,6 +62,7 @@ class UserInfoActivity : RxAppCompatActivity() {
             etUserName.setText(StringUtil.getNotNullValueLine(user.username))
             etGender.setText(StringUtil.getNotNullValueLine(""))
             etPhone.setText(StringUtil.getNotNullValueLine(user.phone))
+            etGender.setText(StringUtil.getNotNullValueLine(user.gender))
         }
 
     }
@@ -116,5 +122,27 @@ class UserInfoActivity : RxAppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_FULLSCREEN or
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
         decorView.systemUiVisibility = uiOptions
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.llEditPass -> {
+                skipEditPass()
+            }
+            else -> {
+            }
+        }
+    }
+
+
+    private fun skipEditPass() {
+        val intent = Intent()
+        if (!AccountHelper.getInstance().isLogin) {
+            AccountHelper.getInstance().skipLogin()
+        } else {
+            intent.setClass(mContext!!, EditPassActivity::class.java)
+        }
+        startActivity(intent)
+        finish()
     }
 }

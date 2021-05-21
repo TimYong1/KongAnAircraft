@@ -14,6 +14,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.tourcoo.aircraftmanager.R;
 import com.tourcoo.entity.media.MediaEntity;
 import com.tourcoo.entity.media.MediaFileGroup;
+import com.tourcoo.util.DateUtil;
 import com.tourcoo.util.GlideManager;
 import com.tourcoo.util.StringUtil;
 
@@ -63,7 +64,7 @@ public class GroupImageAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup,
                         GlideManager.loadImgCenterCrop(mediaFile.getThumbnail(), ivPhoto, R.drawable.ic_aircraft_default);
                         boolean isPhoto = mediaFile.getMediaType() == MediaFile.MediaType.JPEG || mediaFile.getMediaType() == MediaFile.MediaType.RAW_DNG;
                         if (!isPhoto) {
-                            helper.setText(R.id.tvVideoDuration, mediaFile.getDurationInSeconds() + "");
+                            helper.setText(R.id.tvVideoDuration, DateUtil.stringForTime(mediaFile.getDurationInSeconds()) + "");
                         }
                         helper.setGone(R.id.llVideo, !isPhoto);
                     } else {

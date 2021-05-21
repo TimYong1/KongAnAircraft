@@ -21,7 +21,7 @@
   ~
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <!-- RTK Widget -->
     <string name="uxsdk_rtk_panel_antenna_1">Antenna 1</string>
@@ -29,7 +29,7 @@
     <string name="uxsdk_rtk_panel_base_station">Base Station</string>
     <string name="uxsdk_rtk_panel_satellite_num">Satellites#</string>
     <string name="uxsdk_rtk_panel_gps_num">GPS:</string>
-    <string name="uxsdk_rtk_panel_beidou_num">BeiDou:</string>
+    <string name="uxsdk_rtk_panel_beidou_num">北斗:</string>
     <string name="uxsdk_rtk_panel_glonass_num">GLONASS:</string>
     <string name="uxsdk_rtk_panel_galileo_num">Galileo:</string>
 

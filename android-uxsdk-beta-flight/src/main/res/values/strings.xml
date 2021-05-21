@@ -21,36 +21,36 @@
   ~
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <!-- Take Off Widget -->
 
-    <string name="uxsdk_take_off_header">Take Off?</string>
-    <string name="uxsdk_take_off_message">Ensure that conditions are safe for takeoff. Aircraft will go to an altitude of %1$s and hover.</string>
-    <string name="uxsdk_take_off_atti_message">Positioning failed. The aircraft will automatically fly to %1$s above the ground. Do not take off in a narrow space or near crowd or buildings. Do not touch propellers.</string>
-    <string name="uxsdk_precision_takeoff">Precisely record takeoff point</string>
-    <string name="uxsdk_precision_takeoff_message">With Precision Takeoff Mode enabled, the aircraft will automatically ascend to %1$s. This allows the aircraft to return to home point more accurately with VPS images. Ensure there is sufficient ambient light and that the takeoff route isn\'t blocked by trees, power lines or other objects. Moving the sticks during takeoff may affect image acquisition. In an emergency, use the control sticks to throttle downward.</string>
-    <string name="uxsdk_take_off_action">Slide to Take Off</string>
+    <string name="uxsdk_take_off_header">起飞?</string>
+    <string name="uxsdk_take_off_message">确保起飞条件安全。飞机将飞到%1$s的高度并悬停.</string>
+    <string name="uxsdk_take_off_atti_message">定位失败。飞机将自动飞到地面以上%1$s处。不要在狭窄的空间或人群或建筑物附近起飞。不要碰螺旋桨.</string>
+    <string name="uxsdk_precision_takeoff">精确记录起飞点</string>
+    <string name="uxsdk_precision_takeoff_message">启用精确起飞模式后，飞机将自动上升到%1$s。这使得飞机能够通过VPS图像更准确地返回原点。确保有足够的环境光，起飞路线没有被树木、电线或其他物体阻挡。在起飞过程中移动木棒可能会影响图像采集。在紧急情况下，使用控制杆向下油门。</string>
+    <string name="uxsdk_take_off_action">侧滑起飞</string>
 
-    <string name="uxsdk_land_header">Land?</string>
-    <string name="uxsdk_land_message">Aircraft will land at its current location. Check landing area is clear.</string>
-    <string name="uxsdk_land_action">Slide to Land</string>
+    <string name="uxsdk_land_header">着陆?</string>
+    <string name="uxsdk_land_message">飞机将在当前位置着陆。检查着陆区是否安全。</string>
+    <string name="uxsdk_land_action">侧滑着陆</string>
 
-    <string name="uxsdk_land_confirmation_header">Continue Landing?</string>
-    <string name="uxsdk_land_confirmation_message">Aircraft has descended to %1$s.</string>
-    <string name="uxsdk_land_confirmation_message_in2">Aircraft is hovering low. Ensure the landing point is safe and push the stick downward to land.</string>
+    <string name="uxsdk_land_confirmation_header">继续着陆?</string>
+    <string name="uxsdk_land_confirmation_message">飞机已下降到 %1$s。</string>
+    <string name="uxsdk_land_confirmation_message_in2">飞机在低空盘旋。确保着陆点安全，并向下推动斗杆着陆。</string>
 
-    <string name="uxsdk_unsafe_to_land_header">Not suitable for landing.</string>
-    <string name="uxsdk_unsafe_to_land_message">Area is not suitable for landing. Please move to a safer location.</string>
-    <string name="uxsdk_unsafe_to_land_action">Slide to Force Landing</string>
+    <string name="uxsdk_unsafe_to_land_header">不适合着陆。</string>
+    <string name="uxsdk_unsafe_to_land_message">该区域不适合着陆。请移到安全的地方。</string>
+    <string name="uxsdk_unsafe_to_land_action">强制着陆</string>
 
     <!-- Return Home Widget -->
 
-    <string name="uxsdk_return_to_home_header">Return home and land?</string>
-    <string name="uxsdk_return_to_home_action">Slide to Return Home</string>
-    <string name="uxsdk_return_home_at_current_altitude">The distance between the aircraft and Home Point is less than 65.6 ft (20 m). The aircraft will return home at its current altitude if RTH is initiated.</string>
-    <string name="uxsdk_return_home_inner_desc">The aircraft is less than 20 m (65.6 ft) from the Home Point. The aircraft will land if Return to Home is initiated.</string>
-    <string name="uxsdk_return_home_near_nfz">Approaching a No-Fly Zone. Current RTH route may be distorted. Monitor the aircraft\'s flight path on the map or visually to ensure safety.</string>
-    <string name="uxsdk_return_home_wifi">Aircraft will head to home point and set RTH route. Use virtual joystick to adjust flight direction. Tap Cancel RTH button to stop RTH.</string>
-    <string name="uxsdk_return_home_below_desc">Aircraft will adjust its nose direction to face the home point, and its altitude to %1$s. Current aircraft altitude is %2$s. Press Return to Home button directly on your remote to cancel this procedure, or take over control sticks.</string>
+    <string name="uxsdk_return_to_home_header">返航并着陆?</string>
+    <string name="uxsdk_return_to_home_action">侧滑返航</string>
+    <string name="uxsdk_return_home_at_current_altitude">飞机与原点之间的距离小于65.6英尺（20米）。如果启动RTH，飞机将返回当前高度。</string>
+    <string name="uxsdk_return_home_inner_desc">飞机距离原点不到20米（65.6英尺）。如果开始返航，飞机将着陆。</string>
+    <string name="uxsdk_return_home_near_nfz">接近禁飞区。当前路径可能扭曲。在地图上或视觉上监视飞机的飞行路线，以确保安全。</string>
+    <string name="uxsdk_return_home_wifi">飞机将飞往原点并设置航路。使用虚拟操纵手柄调整飞行方向。点击取消RTH按钮停止RTH。</string>
+    <string name="uxsdk_return_home_below_desc">飞机将调整机头方向以面对原点，并调整高度到 %1$s.当前无人机高度为 %2$s。直接按遥控器上的“返回原点”按钮可取消此过程，或接管摇杆</string>
 </resources>

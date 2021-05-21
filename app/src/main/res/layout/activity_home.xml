@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dp_10"
+        android:layout_marginStart="@dimen/dp_25"
         android:layout_marginTop="@dimen/dp_20"
         android:src="@mipmap/logo_home"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -28,23 +28,23 @@
 
         <ImageView
             android:id="@+id/ivHandFly"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/dp_130"
+            android:layout_height="@dimen/dp_167"
             android:src="@mipmap/ic_fly_hand" />
 
         <ImageView
             android:id="@+id/ivFlyMap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_30"
+            android:layout_width="@dimen/dp_130"
+            android:layout_height="@dimen/dp_167"
+            android:layout_marginStart="@dimen/dp_50"
             android:layout_toEndOf="@id/ivHandFly"
             android:src="@mipmap/ic_fly_map" />
 
         <ImageView
             android:id="@+id/ivFlyPhotoAlbum"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_30"
+            android:layout_width="@dimen/dp_130"
+            android:layout_height="@dimen/dp_167"
+            android:layout_marginStart="@dimen/dp_50"
             android:layout_toEndOf="@id/ivFlyMap"
             android:src="@mipmap/ic_fly_photo" />
     </RelativeLayout>
@@ -54,7 +54,7 @@
         android:id="@+id/llMy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_35"
+        android:layout_marginTop="@dimen/dp_25"
         android:layout_marginEnd="@dimen/dp_35"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -109,7 +109,7 @@
             android:gravity="center"
             android:text="设备未连接"
             android:textColor="@color/white"
-            android:textSize="@dimen/sp_16" />
+            android:textSize="@dimen/sp_15" />
     </LinearLayout>
 
     <LinearLayout
@@ -144,6 +144,6 @@
             android:gravity="center"
             android:text="连接无人机"
             android:textColor="@color/white"
-            android:textSize="@dimen/sp_16" />
+            android:textSize="@dimen/sp_15" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

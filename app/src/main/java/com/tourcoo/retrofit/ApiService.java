@@ -42,6 +42,10 @@ public interface ApiService {
     @POST("/api/app/drone/uploadDroneData")
     Observable<BaseResult<Object>> requestUploadDroneData(@Body Map<String, Object> map);
 
+    @POST("/api/app/auth/updatePass")
+    Observable<BaseResult<Object>> requestEditPass(@Body Map<String, Object> map);
+
+
     @GET("/api/app/auth/info")
     Observable<BaseResult<UserInfo>> requestUserInfo();
 

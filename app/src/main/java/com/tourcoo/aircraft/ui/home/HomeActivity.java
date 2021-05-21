@@ -23,9 +23,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.apkfuns.logutils.LogUtils;
+import com.tourcoo.account.AccountHelper;
 import com.tourcoo.aircraft.product.AircraftUtil;
 import com.tourcoo.aircraft.product.ProductManager;
 import com.tourcoo.aircraft.ui.account.UserInfoActivity;
+import com.tourcoo.aircraft.ui.banner.BannerActivity;
+import com.tourcoo.aircraft.ui.map.MapActivity;
 import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.DefaultLayoutActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity;
@@ -115,13 +118,22 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 skipFlyControl();
                 break;
             case R.id.ivFlyMap:
-                ToastUtil.showNormal("敬请期待");
+                skipMap();
                 break;
             case R.id.ivFlyPhotoAlbum:
-                skipFlyPhoto();
+                ToastUtil.showNormal("正在开发");
+//                skipFlyPhoto();
                 break;
             case R.id.llMy:
                 skipUserInfo();
+                break;
+            case R.id.tvAirCraftName:
+                if(AircraftUtil.isAircraftConnected()){
+                    skipFlyControl();
+                }else {
+                    skipBanner();
+                }
+
                 break;
             default:
                 break;
@@ -142,7 +154,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             public void run() {
                 checkAndRequestPermissions();
             }
-        }, 5000);
+        }, 500);
 
     }
 
@@ -174,6 +186,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 //                System.out.println("遥控器序列号：" + s);
                         deviceInfo.remoteSn = s;
                         deviceInfo.id = s;
+                        ProductManager.getInstance().setDroneId(s);
                     }
 
                     @Override
@@ -209,6 +222,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private void requestHasUpload(DeviceInfo deviceInfo) {
         Map<String, Object> params = new HashMap<>(4);
         params.put("id", deviceInfo.id);
+        params.put("userCode", AccountHelper.getInstance().getUserCode());
         params.put("name", deviceInfo.name);
         params.put("productSn", deviceInfo.productSn);
         params.put("remoteSn", deviceInfo.remoteSn);
@@ -330,9 +344,15 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private void skipFlyControl() {
         Intent intent = new Intent();
         intent.setClass(mContext, TestActivity.class);
-//        intent.setClass(mContext, DefaultLayoutActivity.class);
         startActivity(intent);
     }
+
+    private void skipMap() {
+        Intent intent = new Intent();
+        intent.setClass(mContext, MapActivity.class);
+        startActivity(intent);
+    }
+
 
     private void skipUserInfo() {
         Intent intent = new Intent();
@@ -342,7 +362,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void skipFlyPhoto() {
-        if(!AircraftUtil.isAircraftConnected()||(!AircraftUtil.isMediaManagerAvailable())){
+        if (!AircraftUtil.isAircraftConnected() || (!AircraftUtil.isMediaManagerAvailable())) {
             ToastUtil.showNormal("当前飞行器未连接");
             return;
         }
@@ -361,6 +381,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         tvAirCraftName = findViewById(R.id.tvAirCraftName);
         ivHandFly.setOnClickListener(this);
         ivFlyMap.setOnClickListener(this);
+        tvAirCraftName.setOnClickListener(this);
         ivFlyPhotoAlbum.setOnClickListener(this);
         findViewById(R.id.llMy).setOnClickListener(this);
         findViewById(R.id.ivFlyMap).setOnClickListener(this);
@@ -380,6 +401,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 getSnNumberAndUpload();
             }
             ivConnectStatus.setImageResource(R.drawable.shape_circle_green);
+            hideNavigation();
         });
 
 
@@ -391,6 +413,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             public void run() {
                 tvConnectStatus.setText("未连接");
                 tvAirCraftName.setText("连接无人机");
+                hideNavigation();
                 ivConnectStatus.setImageResource(R.drawable.shape_circle_red);
             }
         });
@@ -444,12 +467,14 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void showUiByAircraftStatus() {
-
+        if (!AccountHelper.getInstance().isLogin()) {
+            AccountHelper.getInstance().skipLogin();
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(CommonEvent event) {
-        if(event == null){
+        if (event == null) {
             return;
         }
         switch (StringUtil.getNotNullValue(event.getAction())) {
@@ -501,19 +526,22 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                     @Override
                     public void onSuccess(final UserAccountState userAccountState) {
                         SpUtil.INSTANCE.put(PREF_KEY_IS_LOGIN_DJ_ACCOUNT, true);
-                        ToastUtil.showSuccess("飞行限制已解除");
+//                        ToastUtil.showSuccess("飞行限制已解除");
                     }
 
                     @Override
                     public void onFailure(DJIError error) {
                         if (error != null) {
-                            ToastUtil.showWarningCondition(error.toString(),"登录已取消");
+                            ToastUtil.showWarningCondition(error.toString(), "登录已取消");
                         }
 
                     }
                 });
     }
 
-
-
+    private void skipBanner() {
+        Intent intent = new Intent();
+        intent.setClass(mContext, BannerActivity.class);
+        startActivity(intent);
+    }
 }

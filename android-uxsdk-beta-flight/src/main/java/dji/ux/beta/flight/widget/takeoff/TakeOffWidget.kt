@@ -86,7 +86,7 @@ open class TakeOffWidget @JvmOverloads constructor(
     }
 
     /**
-     * The alpha of the image when the widget is disabled or pressed
+     * 禁用或按下小部件时图像的alpha
      */
     var disabledAlpha = 0.38f
 

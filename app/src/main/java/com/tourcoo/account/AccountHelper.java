@@ -14,6 +14,7 @@ import io.rong.imlib.RongIMClient;
 
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_RY_TOKEN;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_SYS_TOKEN;
+import static com.tourcoo.constant.AccountConstant.PREF_KEY_USER_CODE;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_USER_ID;
 import static com.tourcoo.retrofit.RequestConfig.SOCKET_URL_IP;
 
@@ -36,6 +37,7 @@ public class AccountHelper {
     private static String ryToken = "";
 
     private String userId = "";
+    private String userCode = "";
     private String socketUrl = "";
     private UserInfo userInfo;
 
@@ -86,11 +88,24 @@ public class AccountHelper {
         return userId;
     }
 
+    public String getUserCode() {
+        if (TextUtils.isEmpty(userCode)) {
+            userCode = SpUtil.INSTANCE.getString(PREF_KEY_USER_CODE);
+            if (null == userCode) {
+                userCode = "";
+            }
+            return userCode;
+        }
+        return userCode;
+    }
+
     public String getSocketUrl() {
         if (!AccountHelper.getInstance().isLogin()) {
             socketUrl = "";
         }
-        socketUrl = SOCKET_URL_IP + getUserId();
+//        socketUrl = SOCKET_URL_IP + getUserId();
+        //检察院要求传userCode
+        socketUrl = SOCKET_URL_IP + getUserCode();
         return socketUrl;
     }
 
@@ -118,6 +133,14 @@ public class AccountHelper {
         SpUtil.INSTANCE.put(PREF_KEY_USER_ID, id);
     }
 
+    private void setUserCode(String code) {
+        if (null == code) {
+            code = "";
+        }
+        userCode = code;
+        SpUtil.INSTANCE.put(PREF_KEY_USER_CODE, code);
+    }
+
     /**
      * 登录
      *
@@ -130,6 +153,7 @@ public class AccountHelper {
         setSysToken(token.getSystemToken());
         setRyToken(token.getRongCloudToken());
         setUserId(token.getUserId());
+        setUserCode(token.getUserCode());
     }
 
 
@@ -137,6 +161,7 @@ public class AccountHelper {
         setSysToken(null);
         setRyToken(null);
         setUserId(null);
+        setUserCode(null);
         try {
             if (RongIMClient.getInstance() != null) {
                 RongIMClient.getInstance().disconnect();
@@ -153,6 +178,7 @@ public class AccountHelper {
         Intent intent = new Intent(AircraftApplication.getContext(), LoginNewActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         AircraftApplication.getContext().startActivity(intent);
+
     }
 
     public boolean isLogin() {

@@ -6,7 +6,6 @@ import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.widget.FrameLayout;
 
@@ -16,10 +15,9 @@ import com.tourcoo.aircraftmanager.R;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 
-/**
- * This class is designed for showing the camera video feed from the camera.
- */
+
 public class BaseCameraView extends FrameLayout implements TextureView.SurfaceTextureListener {
+
     private VideoFeeder.VideoDataListener videoDataListener = null;
     private DJICodecManager codecManager = null;
 
@@ -36,10 +34,11 @@ public class BaseCameraView extends FrameLayout implements TextureView.SurfaceTe
 
         Log.v("TAG", "Start to test");
 
-        TextureView mVideoSurface = findViewById(R.id.texture_video_previewer_surface);
+        TextureView mVideoSurface = (TextureView) findViewById(R.id.texture_video_previewer_surface);
 
         if (null != mVideoSurface) {
             mVideoSurface.setSurfaceTextureListener(this);
+
             // This callback is for
 
             videoDataListener = new VideoFeeder.VideoDataListener() {
@@ -78,8 +77,6 @@ public class BaseCameraView extends FrameLayout implements TextureView.SurfaceTe
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         if (codecManager != null) {
             codecManager.cleanSurface();
-            codecManager.destroyCodec();
-            codecManager.resetDecoder();
             codecManager = null;
         }
         return false;
@@ -89,22 +86,4 @@ public class BaseCameraView extends FrameLayout implements TextureView.SurfaceTe
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
     }
-
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        release();
-    }
-
-    private void release() {
-        if (codecManager != null) {
-            codecManager.resetDecoder();
-        }
-        if (videoDataListener != null) {
-            VideoFeeder.getInstance().getPrimaryVideoFeed().removeVideoDataListener(videoDataListener);
-        }
-    }
-
-
 }
