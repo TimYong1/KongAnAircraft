@@ -22,7 +22,7 @@ import static com.tourcoo.aircraft.ui.photo.PhotoPreviewActivityNew.EXTRA_CREATE
  * @Email: 971613168@qq.com
  */
 public class PlayVideoActivityNew extends RxAppCompatActivity {
-    private float mediaCreateTime;
+    private long mediaCreateTime;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

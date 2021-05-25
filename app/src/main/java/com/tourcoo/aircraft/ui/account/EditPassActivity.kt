@@ -113,8 +113,8 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
             return
         }
         if (RequestConfig.RESPONSE_CODE_SUCCESS == entity.status) {
-            ToastUtil.showSuccess("修改成功")
-            finish()
+            ToastUtil.showSuccess("密码修改成功，请重新登录")
+            requestLogout()
         } else {
             ToastUtil.showNormal(entity.message)
         }
@@ -164,4 +164,26 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
     private fun moveCursor(et: EditText) {
         et.setSelection(et.text.length)
     }
+
+    private fun requestLogout() {
+        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any?>?>() {
+            override fun onRequestSuccess(entity: BaseResult<Any?>?) {
+                if (entity == null) {
+                    return
+                }
+                if (entity.status == RequestConfig.RESPONSE_CODE_SUCCESS) {
+                    AccountHelper.getInstance().logoutAndSkipLogin()
+                    LogUtils.w(TAG + "已退出登录")
+                } else {
+                    ToastUtil.showNormal(entity.message)
+                }
+            }
+
+            override fun onRequestError(throwable: Throwable) {
+                super.onRequestError(throwable)
+                LogUtils.tag(TAG).i("onRequestError=$throwable")
+            }
+        })
+    }
+
 }

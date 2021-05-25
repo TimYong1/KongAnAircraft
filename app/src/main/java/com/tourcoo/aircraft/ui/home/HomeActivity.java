@@ -30,6 +30,7 @@ import com.tourcoo.aircraft.ui.account.UserInfoActivity;
 import com.tourcoo.aircraft.ui.banner.BannerActivity;
 import com.tourcoo.aircraft.ui.map.MapActivity;
 import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
+import com.tourcoo.aircraft.ui.photo.MediaTestActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.DefaultLayoutActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity;
 import com.tourcoo.aircraftmanager.R;
@@ -121,8 +122,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 skipMap();
                 break;
             case R.id.ivFlyPhotoAlbum:
-                ToastUtil.showNormal("正在开发");
-//                skipFlyPhoto();
+//                ToastUtil.showNormal("正在开发");
+                skipFlyPhoto();
                 break;
             case R.id.llMy:
                 skipUserInfo();
@@ -368,6 +369,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         }
         Intent intent = new Intent();
         intent.setClass(mContext, FlyPhotoActivity.class);
+//        intent.setClass(mContext, MediaTestActivity.class);
         startActivity(intent);
     }
 

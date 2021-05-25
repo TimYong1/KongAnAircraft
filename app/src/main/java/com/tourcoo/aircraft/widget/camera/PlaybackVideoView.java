@@ -64,7 +64,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     private MediaFile.VideoPlaybackStatus mVideoPlaybackState;
     private MediaFile currentMedia;
     private float mVideoDuration;
-    private float mMediaCreateTime;
+    private long mMediaCreateTime;
     private Camera camera;
     private TimeTool timeTool;
     private boolean intercept = false;
@@ -73,7 +73,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     private LinearLayout llPlayControl;
     public static final String TAG = "PlaybackVideoView";
     private SeekBar bottomSeekProgress;
-     private Handler handler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+    private Handler handler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 
         @Override
         public boolean handleMessage(Message msg) {
@@ -125,7 +125,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     private void initUI(Context context) {
         setOrientation(HORIZONTAL);
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Service.LAYOUT_INFLATER_SERVICE);
-        layoutInflater.inflate(R.layout.media_play_back_layout,this,true);
+        layoutInflater.inflate(R.layout.media_play_back_layout, this, true);
         ivPlayVideo = findViewById(R.id.ivPlayVideo);
         textureView = findViewById(R.id.textureView);
         ivPlayPause = findViewById(R.id.ivPlayPause);
@@ -169,16 +169,25 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
         } else {
             if (null != ProductManager.getProductInstance().getCamera()
                     && ProductManager.getProductInstance().getCamera().isMediaDownloadModeSupported()) {
-                mediaManager = ProductManager.getProductInstance().getCamera().getMediaManager();
-                if (null != mediaManager) {
-                    if (mediaManager.isVideoPlaybackSupported()) {
-                        mediaManager.addMediaUpdatedVideoPlaybackStateListener(this);
-                    }
-                }
                 camera = ProductManager.getProductInstance().getCamera();
-                handler.sendMessage(handler.obtainMessage(SHOW_PROGRESS_DIALOG, null));
-                handler.sendMessageDelayed(handler.obtainMessage(FETCH_FILE_LIST, null),
-                        1000);
+                camera.enterPlayback(new CommonCallbacks.CompletionCallback() {
+                    @Override
+                    public void onResult(DJIError djiError) {
+                        if (djiError == null) {
+                            mediaManager = camera.getMediaManager();
+                            if (null != mediaManager) {
+                                if (mediaManager.isVideoPlaybackSupported()) {
+                                    mediaManager.addMediaUpdatedVideoPlaybackStateListener(PlaybackVideoView.this);
+                                }
+                            }
+                            handler.sendMessage(handler.obtainMessage(SHOW_PROGRESS_DIALOG, null));
+                            handler.sendMessageDelayed(handler.obtainMessage(FETCH_FILE_LIST, null),
+                                    1000);
+                        } else {
+                            ToastUtil.showWarning("访问相册失败");
+                        }
+                    }
+                });
 
             } else if (null != ProductManager.getProductInstance().getCamera()
                     && !ProductManager.getProductInstance().getCamera().isMediaDownloadModeSupported()) {
@@ -319,6 +328,11 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     }
 
     private void play() {
+        boolean isVideo = currentMedia.getMediaType() == MediaFile.MediaType.MOV || (currentMedia.getMediaType() == MediaFile.MediaType.MP4);
+        if (!isVideo) {
+            ToastUtil.showWarning("当前格式不支持");
+            return;
+        }
         mediaManager.playVideoMediaFile(currentMedia, new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError djiError) {
@@ -329,6 +343,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
                 }
             }
         });
+
     }
 
     private void loadMediaList(Camera camera) {
@@ -372,6 +387,8 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
         MediaFile mediaFile;
         for (int i = 0; i < mediaFiles.size(); i++) {
             mediaFile = mediaFiles.get(i);
+            String pattern = "yyyy-MM-dd-HH:mm:ss";
+            LogUtils.e(TAG + "正在寻找mMediaCreateTime=" + mMediaCreateTime + "---->" + mediaFile.getTimeCreated() + "<----" + DateUtil.parseDateString(pattern, mediaFile.getTimeCreated()) + "对应的视频");
             if (mediaFile != null && mMediaCreateTime == mediaFile.getTimeCreated()) {
                 return mediaFile;
             }
@@ -382,14 +399,14 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     private void loadVideoInfo(MediaFile mediaFile) {
         if (mediaFile != null) {
             mVideoDuration = mediaFile.getDurationInSeconds();
-            ToastUtil.showSuccess("当前视频时长："+mVideoDuration);
+            ToastUtil.showSuccess("当前视频日期：" + DateUtil.stringForTime(mediaFile.getTimeCreated()) + "");
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     tvTotalVideoTime.setText(DateUtil.stringForTime(mVideoDuration));
                 }
             });
-        }else {
+        } else {
             ToastUtil.showWarning("未找到对应媒体源");
         }
     }
@@ -518,13 +535,13 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
 
     private void release() {
         cancelDismissControlViewTimer();
-        if(handler != null){
+        if (handler != null) {
             handler.removeCallbacksAndMessages(null);
             handler = null;
         }
         if (timeTool != null) {
             timeTool.stop();
-            timeTool =null;
+            timeTool = null;
         }
         if (AircraftUtil.isCameraModuleAvailable() && ProductManager.getProductInstance().getCamera().isMediaDownloadModeSupported()) {
             mediaManager = ProductManager.getProductInstance().getCamera().getMediaManager();
@@ -536,7 +553,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
         }
     }
 
-    public void setMediaCreateTime(float time){
+    public void setMediaCreateTime(long time) {
         mMediaCreateTime = time;
     }
 }
