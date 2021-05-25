@@ -57,9 +57,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_20"
+                android:layout_marginStart="@dimen/dp_25"
                 android:layout_marginTop="@dimen/dp_10"
-                android:layout_marginEnd="@dimen/dp_20"
+                android:layout_marginEnd="@dimen/dp_25"
                 android:layout_marginBottom="@dimen/dp_5"
                 android:orientation="horizontal">
 
@@ -96,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="@dimen/dp_18"
-                    android:layout_weight="0.3"
+                    android:layout_weight="0.45"
                     android:text="原密码"
                     android:textColor="@color/white"
                     android:textSize="@dimen/sp_15" />
@@ -156,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="@dimen/dp_18"
-                    android:layout_weight="0.3"
+                    android:layout_weight="0.45"
                     android:text="新密码"
                     android:textColor="@color/white"
                     android:textSize="@dimen/sp_15" />
@@ -170,7 +170,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:digits="@string/register_name_digits"
-                    android:hint="请输入密码"
+                    android:hint="请输入新密码"
                     android:maxLength="25"
                     android:maxLines="1"
                     android:textColor="@color/white"
@@ -216,7 +216,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="@dimen/dp_18"
-                    android:layout_weight="0.3"
+                    android:layout_weight="0.45"
                     android:text="确认密码"
                     android:textColor="@color/white"
                     android:textSize="@dimen/sp_15" />

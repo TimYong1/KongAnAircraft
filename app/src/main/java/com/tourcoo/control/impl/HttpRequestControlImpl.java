@@ -77,6 +77,7 @@ public class HttpRequestControlImpl implements HttpRequestControl {
     @Override
     public void httpRequestError(IHttpRequestControl httpRequestControl, Throwable e) {
         int reason = R.string.exception_other_error;
+        LogUtils.e(TAG+e.toString());
         if (!NetworkUtil.isConnected(AircraftApplication.getContext())) {
             reason = R.string.exception_network_not_connected;
         } else {

@@ -102,6 +102,9 @@ public class LiveStreamHelper {
         if (!isLiveStreamManagerOn()) {
             return;
         }
+        if (!isLiveShowOpen) {
+            return;
+        }
         DJISDKManager.getInstance().getLiveStreamManager().stopStream();
         isLiveShowOpen = false;
         ToastUtil.showNormal("直播已关闭");

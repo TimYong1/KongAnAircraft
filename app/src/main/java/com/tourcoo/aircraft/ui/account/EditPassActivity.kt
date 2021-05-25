@@ -114,6 +114,7 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
         }
         if (RequestConfig.RESPONSE_CODE_SUCCESS == entity.status) {
             ToastUtil.showSuccess("修改成功")
+            finish()
         } else {
             ToastUtil.showNormal(entity.message)
         }

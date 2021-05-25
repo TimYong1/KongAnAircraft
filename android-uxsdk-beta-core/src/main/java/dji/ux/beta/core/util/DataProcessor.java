@@ -97,7 +97,7 @@ public final class DataProcessor<T> {
      */
     @NonNull
     public Flowable<T> toFlowable() {
-        return processor.observeOn(SchedulerProvider.computation())
+        return processor.onBackpressureDrop().observeOn(SchedulerProvider.computation())
                 .onBackpressureLatest();
     }
 }
