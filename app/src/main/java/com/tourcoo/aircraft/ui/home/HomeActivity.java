@@ -224,8 +224,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         params.put("id", deviceInfo.id);
         params.put("userCode", AccountHelper.getInstance().getUserCode());
         params.put("name", deviceInfo.name);
-        params.put("productSn", deviceInfo.productSn);
-        params.put("remoteSn", deviceInfo.remoteSn);
+        params.put("productSn", StringUtil.getNotNullValue(deviceInfo.productSn));
+        params.put("remoteSn", StringUtil.getNotNullValue(deviceInfo.remoteSn));
         params.put("type", deviceInfo.type);
         ApiRepository.getInstance().requestUploadDroneData(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<Object>>() {
             @Override

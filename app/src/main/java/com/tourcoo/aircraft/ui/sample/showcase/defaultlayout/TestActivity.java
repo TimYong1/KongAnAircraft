@@ -186,7 +186,6 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
         });
         mapWidget.onCreate(savedInstanceState);
         initData();
-
     }
 
 
@@ -1012,8 +1011,8 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
                 aircraft.getRemoteController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
                     @Override
                     public void onSuccess(String s) {
-                        deviceInfo.remoteSn = s;
-                        deviceInfo.id = s;
+                        deviceInfo.remoteSn = StringUtil.getNotNullValue(s);
+                        deviceInfo.id = StringUtil.getNotNullValue(s);
                         Map<String, Object> hashMap = new HashMap<>();
                         hashMap.put("droneId", deviceInfo.id);
                         mDroneId = deviceInfo.id;
