@@ -36,6 +36,7 @@ import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.DefaultLayoutActivi
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity;
 import com.tourcoo.aircraftmanager.R;
 
+import com.tourcoo.config.AppConfig;
 import com.tourcoo.entity.BaseResult;
 import com.tourcoo.entity.event.AirCraftEvent;
 import com.tourcoo.entity.event.CommonEvent;
@@ -124,8 +125,12 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 skipMap();
                 break;
             case R.id.ivFlyPhotoAlbum:
-                ToastUtil.showNormal("正在开发");
-//                skipFlyPhoto();
+                if(AppConfig.DEBUG_BODE){
+                    skipFlyPhoto();
+                }else {
+                    ToastUtil.showNormal("正在开发");
+                }
+
                 break;
             case R.id.llMy:
                 skipUserInfo();
@@ -173,52 +178,17 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 aircraft.getName(new CommonCallbacks.CompletionCallbackWith<String>() {
                     @Override
                     public void onSuccess(String s) {
-                        System.out.println("getName  ：" + s);
                         deviceInfo.name = s;
+                        doUpload(aircraft,deviceInfo);
                     }
 
                     @Override
                     public void onFailure(DJIError djiError) {
-
+                            ToastUtil.showNormalCondition(djiError.getDescription(),"未获取到设备名称");
                     }
                 });
-                aircraft.getRemoteController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
-                    @Override
-                    public void onSuccess(String s) {
-//                System.out.println("遥控器序列号：" + s);
-                        deviceInfo.remoteSn = s;
-                        deviceInfo.id = s;
-                        ProductManager.getInstance().setDroneId(s);
-                    }
-
-                    @Override
-                    public void onFailure(DJIError djiError) {
-
-                    }
-                });
-                aircraft.getFlightController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
-                    @Override
-                    public void onSuccess(String s) {
-                        System.out.println("飞控序列号：" + s);
-                        deviceInfo.productSn = s;
-                    }
-
-                    @Override
-                    public void onFailure(DJIError djiError) {
-                    }
-                });
-
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        requestHasUpload(deviceInfo);
-                    }
-                }, 200);
             }
         });
-
-
     }
 
     private void requestHasUpload(DeviceInfo deviceInfo) {
@@ -561,5 +531,44 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 }
             }
         });
+    }
+
+    private void doUpload(Aircraft aircraft,DeviceInfo deviceInfo){
+        if(aircraft ==null){
+            return;
+        }
+        aircraft.getRemoteController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+            @Override
+            public void onSuccess(String s) {
+//                System.out.println("遥控器序列号：" + s);
+                deviceInfo.remoteSn = s;
+                deviceInfo.id = s;
+                ProductManager.getInstance().setDroneId(s);
+            }
+
+            @Override
+            public void onFailure(DJIError djiError) {
+
+            }
+        });
+        aircraft.getFlightController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+            @Override
+            public void onSuccess(String s) {
+                System.out.println("飞控序列号：" + s);
+                deviceInfo.productSn = s;
+            }
+
+            @Override
+            public void onFailure(DJIError djiError) {
+            }
+        });
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                requestHasUpload(deviceInfo);
+            }
+        }, 200);
     }
 }

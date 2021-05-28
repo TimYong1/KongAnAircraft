@@ -251,8 +251,8 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
                 takeOffWidget.setTakeOffListener(new TakeOffListener() {
                     @Override
                     public void onLandSuccess() {
-                        ToastUtil.showSuccess("已着陆");
-                        requestFlightRecord(null,DateUtil.parseDate("yyyy-MM-dd HH:mm:ss",new Date()),mFlightId);
+                        ToastUtil.showSuccess("无人机已着陆");
+                        requestFlightRecord(null, DateUtil.parseDate("yyyy-MM-dd HH:mm:ss", new Date()), mFlightId);
                     }
                 });
             }
@@ -1112,7 +1112,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
      */
     private void doUploadTakeOffRecord() {
         mFlightId = null;
-        requestFlightRecord(DateUtil.parseDate("yyyy-MM-dd HH:mm:ss",new Date()),null,mFlightId);
+        requestFlightRecord(DateUtil.parseDate("yyyy-MM-dd HH:mm:ss", new Date()), null, mFlightId);
     }
 
 
@@ -1121,7 +1121,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
         params.put("appUserId", AccountHelper.getInstance().getUserId());
         params.put("droneId", ProductManager.getInstance().getDroneId());
         if (mFlightRealTimeData != null && mFlightRealTimeData.getLocateData() != null) {
-            params.put("address", mFlightRealTimeData.getLocateData().getLongitude()+","+mFlightRealTimeData.getLocateData().getLatitude());
+            params.put("address", mFlightRealTimeData.getLocateData().getLongitude() + "," + mFlightRealTimeData.getLocateData().getLatitude());
         }
         if (takeOffTime != null) {
             params.put("takeTime", takeOffTime);
@@ -1129,6 +1129,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
         if (landTime != null) {
             params.put("landTime", landTime);
         }
+        ToastUtil.showNormalDebug("mFlightId=" + mFlightId);
         if (id != null) {
             params.put("id", id);
         }
@@ -1139,10 +1140,15 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
                 if (entity == null) {
                     return;
                 }
-                if (entity.status == RequestConfig.REQUEST_CODE_SUCCESS&&entity.data != null) {
-                    if(entity.data.getId() != null){
+                if (entity.status == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
+                    if (entity.data.getId() != null) {
                         mFlightId = entity.data.getId();
+                        ToastUtil.showSuccessDebug("成功获取飞行记录id=" + mFlightId);
+                    }else {
+                        ToastUtil.showWarningDebug(new Gson().toJson(entity));
                     }
+                }else {
+                    ToastUtil.showFailedDebug(new Gson().toJson(entity));
                 }
             }
         });

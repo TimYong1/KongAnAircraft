@@ -103,6 +103,7 @@ public class AccountHelper {
         if (!AccountHelper.getInstance().isLogin()) {
             socketUrl = "";
         }
+        //新空安 要求
 //        socketUrl = SOCKET_URL_IP + getUserId();
         //检察院要求传userCode
         socketUrl = SOCKET_URL_IP + getUserCode();

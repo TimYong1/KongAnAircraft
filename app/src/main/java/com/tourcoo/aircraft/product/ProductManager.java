@@ -1,6 +1,7 @@
 package com.tourcoo.aircraft.product;
 
 import android.content.Intent;
+import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
@@ -9,6 +10,7 @@ import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.threadpool.ThreadManager;
+import com.tourcoo.util.SpUtil;
 import com.tourcoo.util.StackUtil;
 import com.tourcoo.util.StringUtil;
 import com.tourcoo.util.ToastUtil;
@@ -55,6 +57,7 @@ public class ProductManager {
     private static boolean isAppStarted = false;
     private IRongReceivedCallListener iRongReceivedCallListener;
     private String droneId;
+
     private ProductManager() {
         initListener();
     }
@@ -228,15 +231,21 @@ public class ProductManager {
         return product;
     }
 
-    public  static  boolean isAppStarted() {
+    public static boolean isAppStarted() {
         return isAppStarted;
     }
 
     public String getDroneId() {
+        if (TextUtils.isEmpty(droneId)) {
+            return StringUtil.getNotNullValue(SpUtil.INSTANCE.getString("droneId"));
+        }
         return StringUtil.getNotNullValue(droneId);
     }
 
     public void setDroneId(String droneId) {
+        if (!TextUtils.isEmpty(droneId)) {
+            SpUtil.INSTANCE.put("droneId", droneId);
+        }
         this.droneId = droneId;
     }
 }

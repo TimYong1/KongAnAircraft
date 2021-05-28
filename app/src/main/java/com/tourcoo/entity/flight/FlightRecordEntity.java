@@ -12,10 +12,10 @@ public class FlightRecordEntity {
     private Long id;
 
     /** 飞手ID */
-    private Long appUserId;
+    private String appUserId;
 
     /** 设备ID */
-    private Long droneId;
+    private String droneId;
 
     /** 起飞时间 */
     private String takeTime;
@@ -37,19 +37,19 @@ public class FlightRecordEntity {
         this.id = id;
     }
 
-    public Long getAppUserId() {
+    public String getAppUserId() {
         return appUserId;
     }
 
-    public void setAppUserId(Long appUserId) {
+    public void setAppUserId(String appUserId) {
         this.appUserId = appUserId;
     }
 
-    public Long getDroneId() {
+    public String getDroneId() {
         return droneId;
     }
 
-    public void setDroneId(Long droneId) {
+    public void setDroneId(String droneId) {
         this.droneId = droneId;
     }
 
