@@ -48,4 +48,10 @@ public class DateUtil {
             return mFormatter.format("%02d:%02d", minutes, seconds).toString();
         }
     }
+
+
+    public static String parseDate(String pattern, Date date) {
+        SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.getDefault());
+        return format.format(date);
+    }
 }

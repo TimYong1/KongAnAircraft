@@ -68,9 +68,9 @@ public class BannerActivity extends RxAppCompatActivity {
         BannerBean bannerBean3 = new BannerBean();
         bannerBean3.setImageRes(R.drawable.mavic_air_two);
         bannerBean3.setDesc("mavic_air_2");
-        BannerBean bannerBea4 = new BannerBean();
+    /*    BannerBean bannerBea4 = new BannerBean();
         bannerBea4.setImageRes(R.drawable.mavic_two_enterprise_dual);
-        bannerBea4.setDesc("mavic_air_2_行业进阶版");
+        bannerBea4.setDesc("mavic_air_2_行业进阶版");*/
 
         BannerBean bannerBean5 = new BannerBean();
         bannerBean5.setImageRes(R.drawable.phantom_four_pro);
@@ -78,7 +78,7 @@ public class BannerActivity extends RxAppCompatActivity {
         imageIdArrayList.add(bannerBean1);
         imageIdArrayList.add(bannerBean2);
         imageIdArrayList.add(bannerBean3);
-        imageIdArrayList.add(bannerBea4);
+//        imageIdArrayList.add(bannerBea4);
         imageIdArrayList.add(bannerBean5);
     }
 

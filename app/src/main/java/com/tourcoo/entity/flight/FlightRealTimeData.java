@@ -5,7 +5,7 @@ import com.tourcoo.entity.battery.BatteryData;
 
 /**
  * @author :JenkinsZhou
- * @description : 无人机飞行数据
+ * @description : 无人机实时飞行数据
  * @company :途酷科技
  * @date 2021年03月16日14:00
  * @Email: 971613168@qq.com

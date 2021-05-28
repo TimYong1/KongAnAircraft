@@ -126,7 +126,7 @@ public abstract class WidgetModel {
         stopPendingKeysTimer();
 
         djiSdkModel.removeListener(this);
-
+        djiSdkModel.clearCallback();
         for (BaseModule module : moduleList) {
             module.cleanup();
         }

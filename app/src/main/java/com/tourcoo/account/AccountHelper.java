@@ -8,6 +8,7 @@ import com.tourcoo.aircraft.ui.account.LoginNewActivity;
 import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.util.SpUtil;
 import com.tourcoo.util.StackUtil;
+import com.tourcoo.util.StringUtil;
 
 
 import io.rong.imlib.RongIMClient;
@@ -40,7 +41,6 @@ public class AccountHelper {
     private String userCode = "";
     private String socketUrl = "";
     private UserInfo userInfo;
-
     private static class Holder {
         private static final AccountHelper instance = new AccountHelper();
     }
@@ -125,7 +125,7 @@ public class AccountHelper {
         SpUtil.INSTANCE.put(PREF_KEY_RY_TOKEN, token);
     }
 
-    private void setUserId(String id) {
+    public void setUserId(String id) {
         if (null == id) {
             id = "";
         }
@@ -190,6 +190,7 @@ public class AccountHelper {
         if (userInfo == null) {
             return;
         }
+        setUserId(StringUtil.getNotNullValue(userInfo.getUserId()));
         this.userInfo = userInfo;
     }
 

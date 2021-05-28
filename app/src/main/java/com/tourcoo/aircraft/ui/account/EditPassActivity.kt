@@ -173,7 +173,7 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
                 }
                 if (entity.status == RequestConfig.RESPONSE_CODE_SUCCESS) {
                     AccountHelper.getInstance().logoutAndSkipLogin()
-                    LogUtils.w(TAG + "已退出登录")
+                    LogUtils.w(TAG + "账号已退出")
                 } else {
                     ToastUtil.showNormal(entity.message)
                 }

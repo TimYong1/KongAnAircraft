@@ -4,6 +4,7 @@ package com.tourcoo.retrofit;
 import com.tourcoo.account.TokenInfo;
 import com.tourcoo.account.UserInfo;
 import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.flight.FlightRecordEntity;
 
 import java.util.Map;
 
@@ -27,11 +28,15 @@ public interface ApiService {
     @POST("/api/app/auth/login")
     Observable<BaseResult<TokenInfo>> requestAppLogin(@Body Map<String, Object> map);
 
-
+    /**
+     * 获取直播地址
+     * @param map
+     * @return
+     */
     @GET("/api/app/stream/getUrl")
     Observable<BaseResult<String>> requestStreamUrl(@QueryMap Map<String, Object> map);
 
-    @DELETE(" /api/app/auth/logout")
+    @DELETE("/api/app/auth/logout")
     Observable<BaseResult<Object>> requestLogout();
 
 
@@ -48,6 +53,10 @@ public interface ApiService {
 
     @GET("/api/app/auth/info")
     Observable<BaseResult<UserInfo>> requestUserInfo();
+
+    @POST("/api/flyRecord")
+    Observable<BaseResult<FlightRecordEntity>> requestFlyRecord(@Body Map<String, Object> map);
+
 
 
 }

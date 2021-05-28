@@ -19,5 +19,5 @@ import dji.sdk.media.MediaFile;
  */
 public class MediaTemp {
     static ArrayMap<Long, Bitmap> bitmapCacheMap = new ArrayMap<>();
-    static List<MediaFile> previewMediaFileList = new ArrayList<>();
+    public static List<MediaFile> previewMediaFileList = new ArrayList<>();
 }

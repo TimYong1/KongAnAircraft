@@ -10,6 +10,7 @@ import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.threadpool.ThreadManager;
 import com.tourcoo.util.StackUtil;
+import com.tourcoo.util.StringUtil;
 import com.tourcoo.util.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -232,7 +233,7 @@ public class ProductManager {
     }
 
     public String getDroneId() {
-        return droneId;
+        return StringUtil.getNotNullValue(droneId);
     }
 
     public void setDroneId(String droneId) {

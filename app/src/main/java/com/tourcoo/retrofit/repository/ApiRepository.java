@@ -5,6 +5,7 @@ import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.account.TokenInfo;
 import com.tourcoo.account.UserInfo;
 import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.flight.FlightRecordEntity;
 import com.tourcoo.retrofit.ApiService;
 import com.tourcoo.retrofit.RetrofitHelper;
 import com.tourcoo.retrofit.RetryWhen;
@@ -87,6 +88,21 @@ public class ApiRepository extends BaseRepository {
 
     public Observable<BaseResult<UserInfo>> requestUserInfo() {
         return ThreadTransformer.switchSchedulers(getApiService().requestUserInfo().retryWhen(new RetryWhen()));
+    }
+
+
+    public Observable<BaseResult<FlightRecordEntity>> requestFlyRecord(Map<String, Object> params) {
+        /*{
+            "address": "",
+                "appUserId": 0,
+                "droneId": 0,
+                "flightTime": "",
+                "id": 0,
+                "landTime": "",
+                "takeTime": ""
+        }*/
+        LogUtils.tag("提交到服务器的数据").i(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestFlyRecord(params).retryWhen(new RetryWhen()));
     }
 
 

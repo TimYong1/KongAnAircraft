@@ -26,10 +26,7 @@ package dji.ux.beta.flight.widget.takeoff
 import dji.common.flightcontroller.VisionLandingProtectionState
 import dji.common.product.Model
 import dji.common.remotecontroller.RCMode
-import dji.keysdk.DJIKey
-import dji.keysdk.FlightControllerKey
-import dji.keysdk.ProductKey
-import dji.keysdk.RemoteControllerKey
+import dji.keysdk.*
 import dji.thirdparty.io.reactivex.Completable
 import dji.thirdparty.io.reactivex.Flowable
 import dji.thirdparty.io.reactivex.Single
@@ -55,6 +52,7 @@ class TakeOffWidgetModel(djiSdkModel: DJISDKModel,
                          keyedStore: ObservableInMemoryKeyedStore,
                          private val preferencesManager: GlobalPreferencesInterface?
 ) : WidgetModel(djiSdkModel, keyedStore) {
+    private var aircraftAltitudeKey: DJIKey? = null
 
     //region Fields
     private val isFlyingDataProcessor: DataProcessor<Boolean> = DataProcessor.create(false)
@@ -69,11 +67,16 @@ class TakeOffWidgetModel(djiSdkModel: DJISDKModel,
     private val productModelProcessor: DataProcessor<Model> = DataProcessor.create(Model.UNKNOWN_AIRCRAFT)
     private val unitTypeProcessor: DataProcessor<UnitConversionUtil.UnitType> = DataProcessor.create(UnitConversionUtil.UnitType.METRIC)
     private val landingProtectionStateDataProcessor: DataProcessor<VisionLandingProtectionState> = DataProcessor.create(VisionLandingProtectionState.UNKNOWN)
-
     private val takeOffLandingStateDataProcessor: DataProcessor<TakeOffLandingState> =
             DataProcessor.create(TakeOffLandingState.DISCONNECTED)
     private val isInAttiModeDataProcessor: DataProcessor<Boolean> =
             DataProcessor.create(false)
+
+    private var takeOffListener: TakeOffListener? = null
+
+    //是否起飞
+    private var isFlying = false
+
     //endregion
 
     //region Data
@@ -118,6 +121,8 @@ class TakeOffWidgetModel(djiSdkModel: DJISDKModel,
 
     /**
      * Get the current height of the aircraft while waiting for landing confirmation
+     *
+     * 在等待着陆确认时获取飞机的当前高度
      */
     val landHeight: Height
         get() = getHeightFromValue(getLandHeight())
@@ -134,6 +139,7 @@ class TakeOffWidgetModel(djiSdkModel: DJISDKModel,
     //region Actions
     /**
      * Performs take off action
+     * 执行起飞动作
      */
     fun performTakeOffAction(): Completable {
         val takeoff: DJIKey = FlightControllerKey.create(FlightControllerKey.TAKE_OFF)
@@ -181,6 +187,9 @@ class TakeOffWidgetModel(djiSdkModel: DJISDKModel,
     /**
      * Performs the landing confirmation action. This allows aircraft to land when
      * landing confirmation is received.
+     * 执行着陆确认动作。这使得飞机在
+
+     *收到着陆确认。
      */
     fun performLandingConfirmationAction(): Completable {
         val forceAction: DJIKey = FlightControllerKey.create(FlightControllerKey.CONFIRM_LANDING)
@@ -235,15 +244,21 @@ class TakeOffWidgetModel(djiSdkModel: DJISDKModel,
             } else if (landingProtectionStateDataProcessor.value == VisionLandingProtectionState.NOT_SAFE_TO_LAND) {
                 takeOffLandingStateDataProcessor.onNext(TakeOffLandingState.UNSAFE_TO_LAND)
             } else {
+                //自动着陆状态
                 takeOffLandingStateDataProcessor.onNext(TakeOffLandingState.AUTO_LANDING)
             }
         } else if (isGoingHomeDataProcessor.value && !isAutoLandingDataProcessor.value) {
             takeOffLandingStateDataProcessor.onNext(TakeOffLandingState.RETURNING_TO_HOME)
         } else if (!areMotorsOnDataProcessor.value) {
             if (rcModeDataProcessor.value == RCMode.SLAVE) {
+                //如果电机还是在转 则说明
                 takeOffLandingStateDataProcessor.onNext(TakeOffLandingState.TAKE_OFF_DISABLED)
             } else {
                 takeOffLandingStateDataProcessor.onNext(TakeOffLandingState.READY_TO_TAKE_OFF)
+                if (takeOffListener != null && isFlying) {
+                    takeOffListener!!.onLandSuccess()
+                    isFlying = false
+                }
             }
         } else {
             if (rcModeDataProcessor.value == RCMode.SLAVE) {
@@ -285,16 +300,19 @@ class TakeOffWidgetModel(djiSdkModel: DJISDKModel,
     enum class TakeOffLandingState {
         /**
          * The aircraft is ready to take off
+         * 飞机准备起飞
          */
         READY_TO_TAKE_OFF,
 
         /**
          * The aircraft is currently flying and is ready to land
+         * 飞机目前正在飞行，准备降落
          */
         READY_TO_LAND,
 
         /**
          * The aircraft has started auto landing
+         * 飞机已开始自动着陆
          */
         AUTO_LANDING,
 
@@ -310,6 +328,8 @@ class TakeOffWidgetModel(djiSdkModel: DJISDKModel,
 
         /**
          * The aircraft has determined it is unsafe to land while auto landing is in progress
+         *
+         * 飞机已确定着陆时自动着陆是不安全的。
          */
         UNSAFE_TO_LAND,
 
@@ -343,4 +363,45 @@ class TakeOffWidgetModel(djiSdkModel: DJISDKModel,
     data class Height(val height: Float,
                       val unitType: UnitConversionUtil.UnitType)
     //endregion
+
+
+    /**
+     * 获取当前高度
+     */
+    private fun getCurrentHeight(): Float? {
+        if (KeyManager.getInstance() == null) {
+            return null
+        }
+        if (aircraftAltitudeKey == null) {
+            return null
+        }
+        val heightValue = KeyManager.getInstance().getValue(aircraftAltitudeKey!!) ?: return null
+        return transformValue(heightValue, aircraftAltitudeKey!!)
+    }
+
+
+    private fun transformValue(value: Any?, key: DJIKey): Float? {
+        return if (key == aircraftAltitudeKey) {
+            if (value != null) {
+                value as Float?
+            } else null
+        } else null
+    }
+
+
+    fun release() {
+        if (aircraftAltitudeKey != null) {
+            KeyManager.getInstance().removeKey(aircraftAltitudeKey)
+        }
+
+    }
+
+    fun setTakeOffListener(listener: TakeOffListener?) {
+        this.takeOffListener = listener
+    }
+
+    fun setIsFlying(value: Boolean) {
+        this.isFlying = value
+    }
+
 }

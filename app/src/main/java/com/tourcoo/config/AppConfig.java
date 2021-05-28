@@ -1,5 +1,6 @@
 package com.tourcoo.config;
 
+
 /**
  * @author :JenkinsZhou
  * @description :
@@ -8,5 +9,5 @@ package com.tourcoo.config;
  * @Email: 971613168@qq.com
  */
 public class AppConfig {
-    public static  boolean DEBUG_BODE = true;
+    public static  boolean DEBUG_BODE = false;
 }

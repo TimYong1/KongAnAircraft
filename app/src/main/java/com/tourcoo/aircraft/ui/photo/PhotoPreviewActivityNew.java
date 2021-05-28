@@ -295,7 +295,12 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
             public void run() {
                 setViewGone(ivPlayVideo, !isPhoto);
                 tvPhotoTime.setText(StringUtil.getNotNullValueLine(currentTime));
-                GlideManager.loadImgAuto(mediaFile.getPreview(), photoView);
+                try {
+                    GlideManager.loadImgAuto(mediaFile.getPreview(), photoView);
+                }catch (IllegalArgumentException e){
+                    LogUtils.e(TAG+e.toString());
+                }
+
                 ivPlayVideo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

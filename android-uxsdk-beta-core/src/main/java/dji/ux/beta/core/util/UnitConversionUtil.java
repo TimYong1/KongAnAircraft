@@ -204,6 +204,7 @@ public final class UnitConversionUtil {
 
         /**
          * The unit type is imperial
+         * 单位类型为英制
          */
         IMPERIAL("Imperial", 1);
 

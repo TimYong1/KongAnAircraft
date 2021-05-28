@@ -19,16 +19,25 @@ public class RequestConfig {
     /**
      * 测试环境
      */
-    public static final String SERVICE_IP = "192.168.0.3";
+   /* public static final String SERVICE_IP = "192.168.0.3";
     public static final String SERVICE_PORT = ":8001";
     public static final String BASE_URL = "http://" + SERVICE_IP + SERVICE_PORT + "/";
-    public static final String SOCKET_URL_IP = "ws://" + SERVICE_IP + SERVICE_PORT + "/webSocket/android:";
+    public static final String SOCKET_URL_IP = "ws://" + SERVICE_IP + SERVICE_PORT + "/webSocket/android:";*/
     /**
      * 线上环境
      */
-   /* public static final String BASE_URL = "https://dji.tklvyou.cn/";
+    /*public static final String BASE_URL = "https://dji.tklvyou.cn/";
     //    SERVICE_IP
     public static final String SOCKET_URL_IP = "wss://dji.tklvyou.cn/"+  "webapi/webSocket/android:";*/
+
+    /**
+     * 检察院线上
+     */
+    public static final String SERVICE_IP = "1.13.4.164";
+    //    SERVICE_IP
+    public static final String SERVICE_PORT = ":8000";
+    public static final String BASE_URL = "http://" + SERVICE_IP + SERVICE_PORT + "/";
+    public static final String SOCKET_URL_IP = "ws://" + SERVICE_IP + SERVICE_PORT + "/webSocket/android:";
 
 
 }

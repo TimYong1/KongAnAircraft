@@ -5,11 +5,9 @@ import android.app.Service;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +22,7 @@ import androidx.annotation.Nullable;
 import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.aircraft.product.AircraftUtil;
 import com.tourcoo.aircraft.product.ProductManager;
+import com.tourcoo.aircraft.ui.photo.MediaTemp;
 import com.tourcoo.aircraftmanager.R;
 import com.tourcoo.timer.OnCountDownTimerListener;
 import com.tourcoo.timer.TimeTool;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
@@ -52,16 +50,15 @@ import dji.ux.beta.core.extension.ViewExtensions;
  * @Email: 971613168@qq.com
  */
 public class PlaybackVideoView extends LinearLayout implements MediaManager.VideoPlaybackStateListener {
-    private final int SHOW_PROGRESS_DIALOG = 2;
-    private final int HIDE_PROGRESS_DIALOG = 3;
-    private final int FETCH_FILE_LIST = 6;
-    public ImageView ivPlayVideo, ivPlayPause;
-    private BaseCameraView textureView;
+    public ImageView ivPlayVideo, ivPlayPause, ivPreview;
+    private BaseCameraView baseCameraView;
     private TextView tvCurrentVideoTime, tvTotalVideoTime;
     private MediaManager mediaManager;
     private boolean isDialogAllowable = false;
     private ProgressBar pbLoading;
-    private MediaFile.VideoPlaybackStatus mVideoPlaybackState;
+    private MediaFile.VideoPlaybackStatus mVideoPlaybackStatus;
+    private MediaManager.VideoPlaybackState mVideoPlaybackStates;
+    private MediaFile.VideoPlaybackStatus lastPlayStatus;
     private MediaFile currentMedia;
     private float mVideoDuration;
     private long mMediaCreateTime;
@@ -72,27 +69,12 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     private Timer timer;
     private LinearLayout llPlayControl;
     public static final String TAG = "PlaybackVideoView";
-    private SeekBar bottomSeekProgress;
-    private Handler handler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
-
-        @Override
-        public boolean handleMessage(Message msg) {
-            switch (msg.what) {
-                case SHOW_PROGRESS_DIALOG:
-                    showProgressDialog();
-                    break;
-                case HIDE_PROGRESS_DIALOG:
-                    hideProgressDialog();
-                    break;
-                case FETCH_FILE_LIST:
-                    loadMediaList(camera);
-                    break;
-                default:
-                    break;
-            }
-            return false;
-        }
-    });
+    private SeekBar seekBar;
+    private Handler handler = new Handler(Looper.getMainLooper());
+    /**
+     * 用户是否刚拖动过进度条
+     */
+    private boolean userSeek = false;
 
     public PlaybackVideoView(Context context) {
         super(context);
@@ -110,14 +92,26 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
 
 
     private void showProgressDialog() {
-        if (pbLoading != null && isDialogAllowable) {
-            ViewExtensions.show(pbLoading);
-        }
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (pbLoading != null && isDialogAllowable) {
+                    ViewExtensions.show(pbLoading);
+                }
+            }
+        });
+
     }
 
     private void hideProgressDialog() {
         if (null != pbLoading) {
-            ViewExtensions.hide(pbLoading);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    ViewExtensions.hide(pbLoading);
+                }
+            });
+
         }
     }
 
@@ -127,13 +121,14 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Service.LAYOUT_INFLATER_SERVICE);
         layoutInflater.inflate(R.layout.media_play_back_layout, this, true);
         ivPlayVideo = findViewById(R.id.ivPlayVideo);
-        textureView = findViewById(R.id.textureView);
+        baseCameraView = findViewById(R.id.textureView);
         ivPlayPause = findViewById(R.id.ivPlayPause);
         pbLoading = findViewById(R.id.pbLoading);
         llPlayControl = findViewById(R.id.llPlayControl);
         tvCurrentVideoTime = findViewById(R.id.tvCurrentVideoTime);
         tvTotalVideoTime = findViewById(R.id.tvTotalVideoTime);
-        bottomSeekProgress = findViewById(R.id.bottomSeekProgress);
+        ivPreview = findViewById(R.id.ivPreview);
+        seekBar = findViewById(R.id.bottomSeekProgress);
         ivPlayPause.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,13 +142,44 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
                 showVideoPreview();
             }
         });
-        textureView.setOnClickListener(new OnClickListener() {
+        baseCameraView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 control();
             }
         });
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (!fromUser) {
+                    return;
+                }
 
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                //不管是否是处于播放状态 这里都需要暂停播放
+                //先获取之前的播放状态
+                lastPlayStatus = mVideoPlaybackStates.getPlaybackStatus();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                //这里说明 用户主动拖动进度条
+                userSeek = true;
+                if (MediaFile.VideoPlaybackStatus.PAUSED == lastPlayStatus) {
+                    //说明本来就是暂停状态
+                    LogUtils.i(TAG + "本来就是暂停状态");
+                } else if (MediaFile.VideoPlaybackStatus.PLAYING == lastPlayStatus) {
+                    //说明之前是
+                    LogUtils.i(TAG + "上次是播放状态 需要跳转播放");
+                    playResume();
+                    playToPosition(computeVideoProgress(seekBar.getProgress()));
+                }
+            }
+        });
+        showProgressDialog();
     }
 
     private boolean initDJIMedia() {
@@ -180,11 +206,14 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
                                     mediaManager.addMediaUpdatedVideoPlaybackStateListener(PlaybackVideoView.this);
                                 }
                             }
-                            handler.sendMessage(handler.obtainMessage(SHOW_PROGRESS_DIALOG, null));
+                            currentMedia = findCurrentMediaAndCheck(MediaTemp.previewMediaFileList);
+                            loadVideoInfo(currentMedia);
+                          /*  handler.sendMessage(handler.obtainMessage(SHOW_PROGRESS_DIALOG, null));
                             handler.sendMessageDelayed(handler.obtainMessage(FETCH_FILE_LIST, null),
-                                    1000);
+                                    1000);*/
                         } else {
                             ToastUtil.showWarning("访问相册失败");
+                            hideProgressDialog();
                         }
                     }
                 });
@@ -225,11 +254,16 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
         if (videoPlaybackState == null) {
             return;
         }
+        mVideoPlaybackStates = videoPlaybackState;
+        mVideoPlaybackStatus = videoPlaybackState.getPlaybackStatus();
+        float percent = (videoPlaybackState.getPlayingPosition() / mVideoDuration) * 100;
+        if (percent >= 100) {
+            handlePlayComplete();
+        }
         if (intercept) {
             return;
         }
-        mVideoPlaybackState = videoPlaybackState.getPlaybackStatus();
-        updateTextView(videoPlaybackState);
+        updateTextView(videoPlaybackState, percent);
     }
 
 
@@ -244,33 +278,15 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
             return;
         }
         //当视频暂停时 继续播放
-        if (MediaFile.VideoPlaybackStatus.PAUSED == mVideoPlaybackState) {
-            mediaManager.resume(new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError djiError) {
-                    if (djiError != null) {
-                        ToastUtil.showWarningCondition(djiError.getDescription(), "播放异常");
-                    } else {
-                        //todo
-                        ToastUtil.showSuccess("恢复了播放");
-                        showPause();
-                    }
-                }
-            });
+        if (MediaFile.VideoPlaybackStatus.PAUSED == mVideoPlaybackStatus) {
+            if(userSeek){
+                playToPosition(computeVideoProgress(seekBar.getProgress()));
+            }else {
+                playResume();
+            }
         }
-        if (MediaFile.VideoPlaybackStatus.PLAYING == mVideoPlaybackState) {
-            mediaManager.pause(new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError djiError) {
-                    if (djiError != null) {
-                        ToastUtil.showWarningCondition(djiError.getDescription(), "暂停异常");
-                    } else {
-                        //todo
-                        ToastUtil.showSuccess("暂停了播放");
-                        showPlay();
-                    }
-                }
-            });
+        if (MediaFile.VideoPlaybackStatus.PLAYING == mVideoPlaybackStatus) {
+            playPause();
         }
 
     }
@@ -315,10 +331,10 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     }
 
     private void doPlayVideo() {
-        if (mVideoPlaybackState == null) {
+        if (mVideoPlaybackStatus == null) {
             play();
         } else {
-            if (MediaFile.VideoPlaybackStatus.STOPPED == mVideoPlaybackState || MediaFile.VideoPlaybackStatus.UNKNOWN == mVideoPlaybackState) {
+            if (MediaFile.VideoPlaybackStatus.STOPPED == mVideoPlaybackStatus || MediaFile.VideoPlaybackStatus.UNKNOWN == mVideoPlaybackStatus) {
                 //停止时 开始回放视频
                 play();
             } else {
@@ -339,44 +355,13 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
                 if (djiError != null) {
                     ToastUtil.showWarningCondition("播放异常:" + djiError.getDescription(), "播放异常");
                 } else {
-                    ToastUtil.showSuccess("播放了视频");
+                    timeTool.resume();
                 }
             }
         });
 
     }
 
-    private void loadMediaList(Camera camera) {
-        if (camera == null) {
-            ToastUtil.showWarning("当前相册不可用");
-            return;
-        }
-        CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.StorageLocation> callbackWith = new CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.StorageLocation>() {
-            @Override
-            public void onSuccess(SettingsDefinitions.StorageLocation storageLocation) {
-                mediaManager.refreshFileListOfStorageLocation(storageLocation, new CommonCallbacks.CompletionCallback() {
-                    @Override
-                    public void onResult(DJIError djiError) {
-                        if (djiError == null) {
-                            List<MediaFile> medias = mediaManager.getSDCardFileListSnapshot();
-                            currentMedia = findCurrentMediaAndCheck(medias);
-                            handler.sendMessage(handler.obtainMessage(HIDE_PROGRESS_DIALOG, null));
-                            loadVideoInfo(currentMedia);
-                        } else {
-                            ToastUtil.showWarning("访问相册失败");
-                            //todo
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(DJIError djiError) {
-
-            }
-        };
-        camera.getStorageLocation(callbackWith);
-    }
 
     private MediaFile findCurrentMediaAndCheck(List<MediaFile> mediaFiles) {
         if (mediaFiles == null || mediaFiles.size() == 0) {
@@ -387,8 +372,6 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
         MediaFile mediaFile;
         for (int i = 0; i < mediaFiles.size(); i++) {
             mediaFile = mediaFiles.get(i);
-            String pattern = "yyyy-MM-dd-HH:mm:ss";
-            LogUtils.e(TAG + "正在寻找mMediaCreateTime=" + mMediaCreateTime + "---->" + mediaFile.getTimeCreated() + "<----" + DateUtil.parseDateString(pattern, mediaFile.getTimeCreated()) + "对应的视频");
             if (mediaFile != null && mMediaCreateTime == mediaFile.getTimeCreated()) {
                 return mediaFile;
             }
@@ -397,9 +380,10 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     }
 
     private void loadVideoInfo(MediaFile mediaFile) {
+        hideProgressDialog();
         if (mediaFile != null) {
             mVideoDuration = mediaFile.getDurationInSeconds();
-            ToastUtil.showSuccess("当前视频日期：" + DateUtil.stringForTime(mediaFile.getTimeCreated()) + "");
+            ivPreview.setImageBitmap(mediaFile.getPreview());
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -422,6 +406,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
             @Override
             public void onTick(long millisUntilFinished) {
                 intercept = false;
+//                checkPlayComplete();
                 LogUtils.i(TAG + "拦截取消");
             }
 
@@ -467,7 +452,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     }
 
 
-    private void updateTextView(MediaManager.VideoPlaybackState currentVideoPlaybackState) {
+    private void updateTextView(MediaManager.VideoPlaybackState currentVideoPlaybackState, float progress) {
         if (currentVideoPlaybackState == null) {
             ToastUtil.showWarning("当前播放异常");
             return;
@@ -476,11 +461,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
             @Override
             public void run() {
                 if (mVideoDuration > 0) {
-                    float percent = currentVideoPlaybackState.getPlayingPosition() / mVideoDuration;
-                    LogUtils.i(TAG + "percent=" + currentVideoPlaybackState.getPlayingPosition());
-                    int progress = (int) (percent * 100);
-                    LogUtils.i(TAG + "百分比=" + progress);
-                    bottomSeekProgress.setProgress(progress);
+                    seekBar.setProgress((int) progress);
                 }
                 tvCurrentVideoTime.setText(DateUtil.stringForTime(currentVideoPlaybackState.getPlayingPosition()));
                 LogUtils.i(TAG + "百分比=PlayingPosition=" + currentVideoPlaybackState.getPlayingPosition());
@@ -495,6 +476,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
                         break;
                     case PLAYING:
                         showPause();
+                        ViewExtensions.hide(ivPreview);
                         break;
                     default:
                         break;
@@ -505,14 +487,20 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
     }
 
     public void dismissControlView() {
-        if (MediaFile.VideoPlaybackStatus.PLAYING == mVideoPlaybackState) {
-            ViewExtensions.hide(llPlayControl);
+        if (MediaFile.VideoPlaybackStatus.PLAYING == mVideoPlaybackStatus) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    ViewExtensions.hide(llPlayControl);
+                }
+            });
+
         }
     }
 
 
     private void control() {
-        if (MediaFile.VideoPlaybackStatus.PLAYING != mVideoPlaybackState) {
+        if (MediaFile.VideoPlaybackStatus.PLAYING != mVideoPlaybackStatus) {
             ViewExtensions.show(llPlayControl);
         } else {
             //如果在播放状态 则根据当前状态 显示或隐藏
@@ -547,6 +535,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
             mediaManager = ProductManager.getProductInstance().getCamera().getMediaManager();
             if (null != mediaManager) {
                 if (mediaManager.isVideoPlaybackSupported()) {
+                    mediaManager.stop(null);
                     mediaManager.removeMediaUpdatedVideoPlaybackStateListener(this);
                 }
             }
@@ -555,5 +544,98 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
 
     public void setMediaCreateTime(long time) {
         mMediaCreateTime = time;
+    }
+
+    /**
+     * 恢复播放
+     */
+    public void playResume() {
+        mediaManager.resume(new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if (djiError != null) {
+                    ToastUtil.showWarningCondition(djiError.getDescription(), "播放异常");
+                } else {
+                    //todo
+                    timeTool.reset();
+                   initTimer();
+                    showPause();
+                }
+            }
+        });
+    }
+
+    /**
+     * 暂停播放
+     */
+    public void playPause() {
+        mediaManager.pause(new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if (djiError != null) {
+                    ToastUtil.showWarningCondition(djiError.getDescription(), "暂停异常");
+                } else {
+                    //todo
+                    timeTool.pause();
+                    showPlay();
+                }
+            }
+        });
+    }
+
+    /**
+     * 播放完成
+     */
+    private void handlePlayComplete() {
+        if (mediaManager != null) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    ToastUtil.showSuccessDebug("播放完成");
+                    LogUtils.i(TAG + "执行了handlePlayComplete");
+                    timeTool.pause();
+                    tvCurrentVideoTime.setText(DateUtil.stringForTime(mVideoDuration));
+                    mediaManager.stop(null);
+                    seekBar.setProgress(100);
+                    showPlay();
+                }
+            });
+
+        }
+    }
+
+    private void playToPosition(float videoPosition) {
+        if (mediaManager != null) {
+            mediaManager.moveToPosition(videoPosition, new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+                    if (djiError != null) {
+                        ToastUtil.showWarningCondition("跳转播放失败:" + djiError.getDescription(), "跳转播放失败");
+                        return;
+                    }
+                    //跳转播放成功 将拖动状态置为false
+                    userSeek = false;
+                    timeTool.reset();
+                    showPause();
+                }
+            });
+        }
+    }
+
+    private float computeVideoProgress(int seekProgress) {
+        float per = seekProgress / 100f;
+        return per * mVideoDuration;
+    }
+
+    private void pauseNoShowUi() {
+        mediaManager.pause(new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if (djiError == null) {
+                    timeTool.pause();
+                    showPlay();
+                }
+            }
+        });
     }
 }

@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+
     <com.tourcoo.aircraft.widget.camera.BaseCameraView
         android:id="@+id/textureView"
         android:layout_width="match_parent"
@@ -10,7 +12,11 @@
         android:layout_marginLeft="@dimen/dp_5"
         android:layout_marginRight="@dimen/dp_5" />
 
-
+    <ImageView
+        android:id="@+id/ivPreview"
+        android:scaleType="centerCrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <LinearLayout
         android:id="@+id/llPlayControl"

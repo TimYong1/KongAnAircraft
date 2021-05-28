@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat;
 
 import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.account.AccountHelper;
+import com.tourcoo.account.UserInfo;
 import com.tourcoo.aircraft.product.AircraftUtil;
 import com.tourcoo.aircraft.product.ProductManager;
 import com.tourcoo.aircraft.ui.account.UserInfoActivity;
@@ -42,6 +43,7 @@ import com.tourcoo.entity.event.RegisterEvent;
 import com.tourcoo.entity.sn.DeviceInfo;
 import com.tourcoo.manager.AircraftHelper;
 import com.tourcoo.retrofit.BaseLoadingObserver;
+import com.tourcoo.retrofit.BaseObserver;
 import com.tourcoo.retrofit.RequestConfig;
 import com.tourcoo.retrofit.repository.ApiRepository;
 import com.tourcoo.threadpool.ThreadManager;
@@ -122,16 +124,16 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 skipMap();
                 break;
             case R.id.ivFlyPhotoAlbum:
-//                ToastUtil.showNormal("正在开发");
-                skipFlyPhoto();
+                ToastUtil.showNormal("正在开发");
+//                skipFlyPhoto();
                 break;
             case R.id.llMy:
                 skipUserInfo();
                 break;
             case R.id.tvAirCraftName:
-                if(AircraftUtil.isAircraftConnected()){
+                if (AircraftUtil.isAircraftConnected()) {
                     skipFlyControl();
-                }else {
+                } else {
                     skipBanner();
                 }
 
@@ -156,9 +158,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 checkAndRequestPermissions();
             }
         }, 500);
-
+        requestUserInfo();
     }
-
     private void getSnNumberAndUpload() {
         ThreadManager.getDefault().execute(new Runnable() {
             @Override
@@ -545,5 +546,20 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         Intent intent = new Intent();
         intent.setClass(mContext, BannerActivity.class);
         startActivity(intent);
+    }
+
+
+    private void requestUserInfo() {
+        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseResult<UserInfo>>() {
+            @Override
+            public void onRequestSuccess(BaseResult<UserInfo> entity) {
+                if (entity == null) {
+                    return;
+                }
+                if (entity.status == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
+                    AccountHelper.getInstance().setUserInfo(entity.data);
+                }
+            }
+        });
     }
 }

@@ -42,6 +42,7 @@ import dji.thirdparty.io.reactivex.disposables.Disposable
 import dji.thirdparty.io.reactivex.functions.Consumer
 import dji.ux.beta.core.base.DJISDKModel
 import dji.ux.beta.core.base.UXSDKError
+import dji.ux.beta.core.base.widget.DJIKeyActionCallback
 import dji.ux.beta.core.base.widget.IconButtonWidget
 import dji.ux.beta.core.base.widget.IconButtonWidget.UIState.*
 import dji.ux.beta.core.communication.GlobalPreferencesManager
@@ -378,6 +379,9 @@ open class TakeOffWidget @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         if (!isInEditMode) {
             widgetModel.cleanup()
+            slidingDialog?.dismiss()
+            slidingDialog = null
+            widgetModel.release()
         }
         super.onDetachedFromWindow()
     }
@@ -920,6 +924,13 @@ open class TakeOffWidget @JvmOverloads constructor(
         slidingDialog?.setCancelTextAppearance(textAppearance)
     }
 
+
+
+    fun addDJIKeyActionCallback(djiKeyActionCallback: DJIKeyActionCallback ?){
+        DJISDKModel.getInstance().addDJIKeyActionCallback(djiKeyActionCallback)
+    }
+
+
     /**
      * Set the text appearance of the slider message for all the dialogs shown by this widget
      *
@@ -950,6 +961,7 @@ open class TakeOffWidget @JvmOverloads constructor(
 
         /**
          * Takeoff Landing State update
+         * 起飞着陆状态更新
          */
         data class TakeOffLandingStateUpdated(val state: TakeOffLandingState) : ModelState()
 
@@ -965,6 +977,7 @@ open class TakeOffWidget @JvmOverloads constructor(
 
         /**
          * Precision Takeoff started successfully
+         * 精确起飞成功开始
          */
         object PrecisionTakeOffStartSucceeded : ModelState()
 
@@ -975,6 +988,7 @@ open class TakeOffWidget @JvmOverloads constructor(
 
         /**
          * Landing started successfully
+         * 着陆成功开始
          */
         object LandingStartSucceeded : ModelState()
 
@@ -985,6 +999,7 @@ open class TakeOffWidget @JvmOverloads constructor(
 
         /**
          * Landing confirmed successfully
+         * 着陆确认成功
          */
         object LandingConfirmSucceeded : ModelState()
 
@@ -995,6 +1010,7 @@ open class TakeOffWidget @JvmOverloads constructor(
 
         /**
          * Landing canceled successfully
+         * 着陆取消成功
          */
         object LandingCancelSucceeded : ModelState()
 
@@ -1018,6 +1034,7 @@ open class TakeOffWidget @JvmOverloads constructor(
         /**
          * The landing dialog, which is shown when the widget is clicked and the aircraft is ready
          * to land.
+         * 着陆对话框，当小部件被点击并且飞机准备就绪时显示
          */
         object Landing : DialogType()
 
@@ -1035,4 +1052,12 @@ open class TakeOffWidget @JvmOverloads constructor(
     }
 
     //endregion
+
+    fun setTakeOffListener(listener: TakeOffListener? ){
+        widgetModel.setTakeOffListener(listener)
+    }
+
+    fun setIsFlying(value: Boolean) {
+        widgetModel.setIsFlying(value)
+    }
 }

@@ -89,16 +89,20 @@ public class BaseCameraView extends FrameLayout implements TextureView.SurfaceTe
 
     @Override
     protected void onDetachedFromWindow() {
-      release();
+        release();
         super.onDetachedFromWindow();
     }
 
-    private void release(){
-        if(codecManager != null){
-//            codecManager.resetVideoSurface();
+    private void release() {
+        if (codecManager != null) {
             codecManager.resetDecoder();
             codecManager.resetKeyFrame();
             codecManager.cleanSurface();
+            codecManager.setYuvDataCallback(null);
+            codecManager.destroyCodec();
+            codecManager.setOnVideoSizeChangedListener(null);
+            codecManager.setOnNoVideoDataListener(null);
+            codecManager = null;
         }
     }
 }

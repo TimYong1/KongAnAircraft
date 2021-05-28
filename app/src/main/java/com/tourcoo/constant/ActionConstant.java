@@ -18,4 +18,9 @@ public class ActionConstant {
      * 上传无人机相关信息
      */
     public static final String ACTION_AIR_CRAFT_UPLOAD_INFO = "com.tourcoo.aircraftmanager.ACTION_AIR_CRAFT_UPLOAD_INFO";
+
+    /**
+     * 起飞时间
+     */
+    public static final String ACTION_TAKE_OFF = "FlightController/0/TakeOff";
 }

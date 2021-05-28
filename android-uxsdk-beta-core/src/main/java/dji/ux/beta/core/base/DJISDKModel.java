@@ -27,6 +27,7 @@ import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +48,7 @@ import dji.thirdparty.io.reactivex.Completable;
 import dji.thirdparty.io.reactivex.Flowable;
 import dji.thirdparty.io.reactivex.FlowableEmitter;
 import dji.thirdparty.io.reactivex.Single;
+import dji.ux.beta.core.base.widget.DJIKeyActionCallback;
 
 /**
  * Encapsulates communication with SDK KeyManager for SDKKeys.
@@ -58,6 +60,7 @@ public class DJISDKModel {
     private static final int MAX_COMPONENT_INDEX = 10;
     private Map<Object, List<KeyListener>> keyListeners;
     //endregion
+    private List<DJIKeyActionCallback> djiKeyActionCallbacks = new ArrayList<>();
 
     private DJISDKModel() {
         keyListeners = new ConcurrentHashMap<>();
@@ -201,18 +204,35 @@ public class DJISDKModel {
                 emitter.onError(getKeyManagerException());
                 return;
             }
-
             getKeyManager().performAction(key, new ActionCallback() {
                 @Override
                 public void onSuccess() {
                     DJILog.d(TAG, "Performed action for  key " + key.toString());
                     emitter.onComplete();
+                    DJIKeyActionCallback djiKeyActionCallback;
+                    if(djiKeyActionCallbacks != null){
+                        for (int i = 0; i < djiKeyActionCallbacks.size(); i++) {
+                            djiKeyActionCallback = djiKeyActionCallbacks.get(i);
+                            if(djiKeyActionCallback != null){
+                                djiKeyActionCallback.onSuccess(key);
+                            }
+                        }
+                    }
                 }
 
                 @Override
                 public void onFailure(@NonNull DJIError djiError) {
                     DJILog.e(TAG, "Failure performing action key " + key.toString() + ". " + djiError.getDescription());
                     emitter.onError(new UXSDKError(djiError));
+                    DJIKeyActionCallback djiKeyActionCallback;
+                    if(djiKeyActionCallbacks != null){
+                        for (int i = 0; i < djiKeyActionCallbacks.size(); i++) {
+                            djiKeyActionCallback = djiKeyActionCallbacks.get(i);
+                            if(djiKeyActionCallback != null){
+                                djiKeyActionCallback.onFailed(key,djiError);
+                            }
+                        }
+                    }
                 }
             }, arguments);
         }).subscribeOn(SchedulerProvider.computation());
@@ -338,4 +358,22 @@ public class DJISDKModel {
         private static DJISDKModel instance = new DJISDKModel();
     }
     //endregion
+
+
+    public void clearCallback() {
+        if (djiKeyActionCallbacks != null && !djiKeyActionCallbacks.isEmpty()) {
+            DJIKeyActionCallback callback;
+            for (int i = 0; i < djiKeyActionCallbacks.size(); i++) {
+                callback = djiKeyActionCallbacks.get(i);
+                callback = null;
+            }
+            djiKeyActionCallbacks.clear();
+        }
+    }
+
+    public void addDJIKeyActionCallback(DJIKeyActionCallback callback) {
+        if (djiKeyActionCallbacks != null) {
+            djiKeyActionCallbacks.add(callback);
+        }
+    }
 }

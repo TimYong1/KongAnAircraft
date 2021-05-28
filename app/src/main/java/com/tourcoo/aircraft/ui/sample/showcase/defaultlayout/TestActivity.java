@@ -40,6 +40,7 @@ import com.tourcoo.aircraftmanager.R;
 import com.tourcoo.entity.BaseResult;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.flight.FlightRealTimeData;
+import com.tourcoo.entity.flight.FlightRecordEntity;
 import com.tourcoo.entity.flight.LocateData;
 import com.tourcoo.entity.sn.DeviceInfo;
 import com.tourcoo.entity.socket.BaseSocketResult;
@@ -52,6 +53,7 @@ import com.tourcoo.socket.WebSocketManager;
 import com.tourcoo.threadpool.ThreadManager;
 import com.tourcoo.timer.OnCountDownTimerListener;
 import com.tourcoo.timer.TimeTool;
+import com.tourcoo.util.DateUtil;
 import com.tourcoo.util.LocateHelper;
 import com.tourcoo.util.SpUtil;
 import com.tourcoo.util.StringUtil;
@@ -64,12 +66,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import dji.common.airlink.PhysicalSource;
 import dji.common.error.DJIError;
 import dji.common.util.CommonCallbacks;
+import dji.keysdk.DJIKey;
 import dji.keysdk.KeyManager;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
@@ -77,10 +81,13 @@ import dji.thirdparty.io.reactivex.android.schedulers.AndroidSchedulers;
 import dji.thirdparty.io.reactivex.disposables.CompositeDisposable;
 import dji.ux.beta.accessory.widget.rtk.RTKWidget;
 import dji.ux.beta.cameracore.widget.fpvinteraction.FPVInteractionWidget;
+import dji.ux.beta.core.base.widget.DJIKeyActionCallback;
 import dji.ux.beta.core.extension.ViewExtensions;
 import dji.ux.beta.core.panel.systemstatus.SystemStatusListPanelWidget;
 import dji.ux.beta.core.util.SettingDefinitions;
 import dji.ux.beta.core.widget.fpv.FPVWidget;
+import dji.ux.beta.flight.widget.takeoff.TakeOffWidget;
+import dji.ux.beta.flight.widget.takeoff.TakeOffListener;
 import dji.ux.beta.map.widget.map.MapWidget;
 import dji.ux.beta.training.widget.simulatorcontrol.SimulatorControlWidget;
 import io.rong.calllib.IRongCallListener;
@@ -88,6 +95,7 @@ import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
 
+import static com.tourcoo.constant.ActionConstant.ACTION_TAKE_OFF;
 import static com.tourcoo.constant.CommandConstant.COMMAND_CAMERA_MODE;
 import static com.tourcoo.constant.CommandConstant.COMMAND_RECORD_MODE;
 import static com.tourcoo.constant.CommandConstant.COMMAND_START_RECORD;
@@ -142,6 +150,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
     private static final int PHONE_NO_CALL = 0;
     private FlightRealTimeData mFlightRealTimeData;
     private String mDroneId;
+    private Handler mHandler = new Handler(Looper.getMainLooper());
     /**
      * 响铃中
      */
@@ -157,7 +166,8 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
     private VibratorPlayer vibratorPlayer = null;
 
     private ImageView ivLive, ivCall, ivCallClose;
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private TakeOffWidget takeOffWidget;
+    private Long mFlightId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -168,6 +178,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
             EventBus.getDefault().register(this);
         }
         initView();
+
         findViewById(R.id.icBackHome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,6 +202,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
 
     private void initView() {
         rootView = findViewById(R.id.rootView);
+        takeOffWidget = findViewById(R.id.widget_take_off);
         findViewById(R.id.statusView).setOnClickListener(this);
         fpvInteractionWidget = findViewById(R.id.widget_fpv_interaction);
         mapWidget = findViewById(R.id.widget_map);
@@ -213,6 +225,38 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         deviceHeight = displayMetrics.heightPixels;
         deviceWidth = displayMetrics.widthPixels;
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                takeOffWidget.addDJIKeyActionCallback(new DJIKeyActionCallback() {
+                    @Override
+                    public void onSuccess(DJIKey djiKey) {
+                        if (djiKey == null) {
+                            return;
+                        }
+                        switch (djiKey.toString()) {
+                            case ACTION_TAKE_OFF:
+                                //无人机起飞事件
+                                takeOffWidget.setIsFlying(true);
+                                doUploadTakeOffRecord();
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onFailed(DJIKey key, DJIError e) {
+                        ToastUtil.showFailedDebug("事件执行失败=" + e.toString());
+                    }
+                });
+                takeOffWidget.setTakeOffListener(new TakeOffListener() {
+                    @Override
+                    public void onLandSuccess() {
+                        ToastUtil.showSuccess("已着陆");
+                        requestFlightRecord(null,DateUtil.parseDate("yyyy-MM-dd HH:mm:ss",new Date()),mFlightId);
+                    }
+                });
+            }
+        }, 500);
     }
 
     private void handleMapClick(View view) {
@@ -1016,6 +1060,7 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
                         Map<String, Object> hashMap = new HashMap<>();
                         hashMap.put("droneId", deviceInfo.id);
                         mDroneId = deviceInfo.id;
+                        ProductManager.getInstance().setDroneId(deviceInfo.id);
                         hashMap.put("userId", AccountHelper.getInstance().getUserId());
                         hashMap.put("userLatitude", lastLat);
                         hashMap.put("userLongitude", lastLang);
@@ -1059,6 +1104,47 @@ public class TestActivity extends RxAppCompatActivity implements View.OnClickLis
             default:
                 break;
         }
+    }
 
+
+    /**
+     * 上传飞行记录
+     */
+    private void doUploadTakeOffRecord() {
+        mFlightId = null;
+        requestFlightRecord(DateUtil.parseDate("yyyy-MM-dd HH:mm:ss",new Date()),null,mFlightId);
+    }
+
+
+    private void requestFlightRecord(String takeOffTime, String landTime, Long id) {
+        Map<String, Object> params = new HashMap<>(4);
+        params.put("appUserId", AccountHelper.getInstance().getUserId());
+        params.put("droneId", ProductManager.getInstance().getDroneId());
+        if (mFlightRealTimeData != null && mFlightRealTimeData.getLocateData() != null) {
+            params.put("address", mFlightRealTimeData.getLocateData().getLongitude()+","+mFlightRealTimeData.getLocateData().getLatitude());
+        }
+        if (takeOffTime != null) {
+            params.put("takeTime", takeOffTime);
+        }
+        if (landTime != null) {
+            params.put("landTime", landTime);
+        }
+        if (id != null) {
+            params.put("id", id);
+        }
+
+        ApiRepository.getInstance().requestFlyRecord(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<FlightRecordEntity>>() {
+            @Override
+            public void onRequestSuccess(BaseResult<FlightRecordEntity> entity) {
+                if (entity == null) {
+                    return;
+                }
+                if (entity.status == RequestConfig.REQUEST_CODE_SUCCESS&&entity.data != null) {
+                    if(entity.data.getId() != null){
+                        mFlightId = entity.data.getId();
+                    }
+                }
+            }
+        });
     }
 }
