@@ -388,6 +388,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
                 @Override
                 public void run() {
                     tvTotalVideoTime.setText(DateUtil.stringForTime(mVideoDuration));
+                    showVideoPreview();
                 }
             });
         } else {
@@ -398,7 +399,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
 
     private void initTimer() {
         if (timeTool == null) {
-            timeTool = new TimeTool(Integer.MAX_VALUE, 1000);
+            timeTool = new TimeTool(Integer.MAX_VALUE, 400);
         } else {
             timeTool.reset();
         }

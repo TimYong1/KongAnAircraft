@@ -43,7 +43,11 @@ public interface ApiService {
     @GET("/api/app/auth/info")
     Observable<BaseResult<Object>> requestUserInfo(@QueryMap Map<String, Object> map);
 
-
+    /**
+     * 设备信息
+     * @param map
+     * @return
+     */
     @POST("/api/app/drone/uploadDroneData")
     Observable<BaseResult<Object>> requestUploadDroneData(@Body Map<String, Object> map);
 

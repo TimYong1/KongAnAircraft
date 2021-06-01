@@ -31,16 +31,11 @@ import com.tourcoo.aircraft.ui.account.UserInfoActivity;
 import com.tourcoo.aircraft.ui.banner.BannerActivity;
 import com.tourcoo.aircraft.ui.map.MapActivity;
 import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
-import com.tourcoo.aircraft.ui.photo.MediaTestActivity;
-import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.DefaultLayoutActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity;
 import com.tourcoo.aircraftmanager.R;
 
-import com.tourcoo.config.AppConfig;
 import com.tourcoo.entity.BaseResult;
-import com.tourcoo.entity.event.AirCraftEvent;
 import com.tourcoo.entity.event.CommonEvent;
-import com.tourcoo.entity.event.RegisterEvent;
 import com.tourcoo.entity.sn.DeviceInfo;
 import com.tourcoo.manager.AircraftHelper;
 import com.tourcoo.retrofit.BaseLoadingObserver;
@@ -125,12 +120,12 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 skipMap();
                 break;
             case R.id.ivFlyPhotoAlbum:
-                if (AppConfig.DEBUG_BODE) {
+             /*   if (AppConfig.DEBUG_BODE) {
                     skipFlyPhoto();
                 } else {
                     ToastUtil.showNormal("正在开发");
-                }
-
+                }*/
+                skipFlyPhoto();
                 break;
             case R.id.llMy:
                 skipUserInfo();
@@ -368,18 +363,18 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         }
         runOnUiThread(() -> {
             tvConnectStatus.setText("已连接");
-            if (AircraftUtil.isAircraft()) {
-                if (baseProduct.getModel() != null) {
-                    tvAirCraftName.setText(baseProduct.getModel().name());
-                }
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getSnNumberAndUpload();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (AircraftUtil.isAircraft()) {
+                        if (baseProduct.getModel() != null) {
+                            tvAirCraftName.setText(baseProduct.getModel().name());
+                        }
                     }
-                }, 200);
+                    getSnNumberAndUpload();
+                }
+            }, 300);
 
-            }
             ivConnectStatus.setImageResource(R.drawable.shape_circle_green);
             hideNavigation();
         });
@@ -551,11 +546,18 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 deviceInfo.remoteSn = s;
                 deviceInfo.id = s;
                 ProductManager.getInstance().setDroneId(s);
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestHasUpload(deviceInfo);
+                    }
+                }, 200);
             }
 
             @Override
             public void onFailure(DJIError djiError) {
-
+                ToastUtil.showWarning("未获取到设备信息，请重新插拔连接线后再试");
             }
         });
         if (aircraft.getFlightController() != null) {
@@ -571,13 +573,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 }
             });
 
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    requestHasUpload(deviceInfo);
-                }
-            }, 200);
+
         }
 
     }

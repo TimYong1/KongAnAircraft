@@ -1,7 +1,6 @@
 package com.tourcoo.aircraft.ui.photo;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 
@@ -40,5 +39,23 @@ public class PlayVideoActivityNew extends RxAppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hideNavigation();
+    }
+
+    private void hideNavigation() {
+        /**
+         * 隐藏虚拟按键，并且全屏
+         */
+        View decorView = this.getWindow().getDecorView();
+        decorView.setSystemUiVisibility(0);
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
     }
 }
