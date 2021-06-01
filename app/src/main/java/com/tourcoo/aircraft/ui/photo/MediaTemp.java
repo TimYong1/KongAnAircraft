@@ -18,6 +18,5 @@ import dji.sdk.media.MediaFile;
  * @Email: 971613168@qq.com
  */
 public class MediaTemp {
-    static ArrayMap<Long, Bitmap> bitmapCacheMap = new ArrayMap<>();
     public static List<MediaFile> previewMediaFileList = new ArrayList<>();
 }

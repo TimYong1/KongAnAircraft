@@ -40,4 +40,6 @@ public class RequestConfig {
     public static final String SOCKET_URL_IP = "ws://" + SERVICE_IP + SERVICE_PORT + "/webSocket/android:";
 
 
+
+
 }

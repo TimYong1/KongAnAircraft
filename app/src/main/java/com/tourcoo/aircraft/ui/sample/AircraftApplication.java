@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import androidx.multidex.MultiDex;
@@ -14,6 +15,8 @@ import com.apkfuns.logutils.LogUtils;
 import com.secneo.sdk.Helper;
 import com.tencent.mmkv.MMKV;
 import com.tourcoo.account.AccountHelper;
+import com.tourcoo.aircraft.ui.photo.DaoMaster;
+import com.tourcoo.aircraft.ui.photo.DaoSession;
 import com.tourcoo.config.AppConfig;
 import com.tourcoo.control.ActivityControlImpl;
 import com.tourcoo.control.UiManager;
@@ -33,6 +36,7 @@ import static com.tourcoo.aircraft.ui.sample.DJIConnectionControlActivity.ACCESS
 
 public class AircraftApplication extends Application {
     private static Application app;
+    public static DaoSession mSession;
     public static final String TAG = "AircraftApplication";
     @Override
     public void onCreate() {
@@ -68,7 +72,7 @@ public class AircraftApplication extends Application {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACCESSORY_ATTACHED);
         registerReceiver(br, filter);
-
+        initDb();
     }
 
     @Override
@@ -130,5 +134,25 @@ public class AircraftApplication extends Application {
     public void onLowMemory() {
         super.onLowMemory();
         LogUtils.e(TAG + "内存不足");
+    }
+
+
+
+    /**
+     * 连接数据库并创建会话
+     */
+    public void initDb() {
+        // 1、获取需要连接的数据库
+        DaoMaster.DevOpenHelper devOpenHelper = new DaoMaster.DevOpenHelper(this, "tour_coo_aircraft.db");
+        SQLiteDatabase db = devOpenHelper.getWritableDatabase();
+        // 2、创建数据库连接
+        DaoMaster daoMaster = new DaoMaster(db);
+        // 3、创建数据库会话
+        mSession = daoMaster.newSession();
+    }
+
+    // 供外接使用
+    public static DaoSession getDaoSession() {
+        return mSession;
     }
 }

@@ -1,7 +1,6 @@
 package com.tourcoo.aircraft.ui.photo;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,6 @@ import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import dji.common.error.DJIError;
 import dji.common.util.CommonCallbacks;
@@ -37,7 +35,6 @@ import dji.sdk.media.FetchMediaTaskContent;
 import dji.sdk.media.MediaFile;
 import dji.sdk.media.MediaManager;
 
-import static com.tourcoo.aircraft.ui.photo.MediaTemp.bitmapCacheMap;
 
 
 /**
@@ -371,13 +368,7 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
                 CameraHelper.getInstance().setCameraModePhotoSingle();
                 exitPlayCallback = null;
             }
-            if (bitmapCacheMap != null) {
-                for (Map.Entry<Long, Bitmap> longBitmapEntry : bitmapCacheMap.entrySet()) {
-                    if (longBitmapEntry.getValue() != null) {
-                        longBitmapEntry.getValue().recycle();
-                    }
-                }
-            }
+
         }
     }
 }

@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,10 +21,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.apkfuns.logutils.LogUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.tourcoo.aircraft.widget.camera.CameraHelper;
+import com.tourcoo.aircraft.widget.greendao.GreenDaoManager;
 import com.tourcoo.aircraftmanager.R;
 import com.tourcoo.entity.media.MediaEntity;
 import com.tourcoo.entity.media.MediaFileGroup;
 import com.tourcoo.threadpool.ThreadManager;
+import com.tourcoo.util.BitmapUtil;
 import com.tourcoo.util.DateUtil;
 import com.tourcoo.util.SizeUtil;
 import com.tourcoo.util.ToastUtil;
@@ -48,11 +51,11 @@ import dji.sdk.media.FetchMediaTaskContent;
 import dji.sdk.media.FetchMediaTaskScheduler;
 import dji.sdk.media.MediaFile;
 import dji.sdk.media.MediaManager;
+import dji.ux.beta.core.extension.ViewExtensions;
 
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_SETTLING;
 import static com.tourcoo.aircraft.ui.photo.LiveDataConstantNew.liveMediaDataList;
-import static com.tourcoo.aircraft.ui.photo.MediaTemp.bitmapCacheMap;
 import static com.tourcoo.aircraft.ui.photo.MediaTemp.previewMediaFileList;
 import static com.tourcoo.aircraft.ui.photo.PhotoPreviewActivityNew.EXTRA_CREATE_TIME;
 import static com.tourcoo.aircraft.ui.photo.PhotoPreviewActivityNew.EXTRA_IMAGE_COUNT;
@@ -91,6 +94,8 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     private List<FetchMediaTask.Callback> mediaCallbackList = new ArrayList<>();
     public static final int REQUEST_CODE_PREVIEW = 1100;
     private boolean isBackground = false;
+    private GreenDaoManager daoManager;
+    private ProgressBar pbLoading;
     private final MediaManager.FileListStateListener mStateListener = new MediaManager.FileListStateListener() {
         @Override
         public void onFileListStateChange(MediaManager.FileListState fileListState) {
@@ -103,12 +108,14 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         contentView = inflater.inflate(R.layout.layout_recyclerview, container, false);
         mCommonRecyclerView = contentView.findViewById(R.id.mCommonRecyclerView);
+        pbLoading = contentView.findViewById(R.id.pbLoading);
         return contentView;
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        daoManager = new GreenDaoManager();
         mHandler = new Handler(Looper.getMainLooper());
     }
 
@@ -216,7 +223,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                     }
                     List<MediaFileGroup> mediaGroupFileList = createMediaGroupFileList(groupMediaList(mediaEntityList));
                     liveMediaDataList.postValue(mediaFiles);
-                    showMediaFileList(mediaGroupFileList);
+                    findLocalImageAssignmentAndShow(mediaGroupFileList);
                 }
             };
             completionCallbackList.add(fileListCallback);
@@ -229,6 +236,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
         runUiThread(new Runnable() {
             @Override
             public void run() {
+                closeLoading();
                 if (groupAdapter == null) {
                     loadAdapter();
                 } else {
@@ -239,10 +247,14 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                         @Override
                         public void onResult(DJIError djiError) {
                             if (isBackground) {
-                                LogUtils.e(TAG+"当前处于后台 需要拦截掉");
+                                LogUtils.e(TAG + "当前处于后台 需要拦截掉");
                                 return;
                             }
-                            getThumbnails();
+                            if (groupAdapter.getData().isEmpty()) {
+                                return;
+                            }
+                            List<MediaFileGroup> groupList = new ArrayList<>(groupAdapter.getData());
+                            loadMediaImageByList(groupList);
                         }
                     };
                     completionCallbackList.add(completionCallback);
@@ -413,11 +425,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                         data.getMediaEntity().getMedia().stopFetchingFileData(null);
                     }
                 }
-                if (groupAdapter.getBitmapCacheMap() != null) {
-                    for (Map.Entry<Long, Bitmap> longBitmapEntry : groupAdapter.getBitmapCacheMap().entrySet()) {
-                        longBitmapEntry.getValue().recycle();
-                    }
-                }
+
                 groupAdapter.getData().clear();
             }
             mediaManager.stop(null);
@@ -449,27 +457,20 @@ public class AircraftPhotoFragmentNew extends RxFragment {
             mCompletionCallback = null;
         }
         unSetCallback();
-        if (bitmapCacheMap != null) {
-            for (Map.Entry<Long, Bitmap> longBitmapEntry : bitmapCacheMap.entrySet()) {
-                if (longBitmapEntry.getValue() != null) {
-                    longBitmapEntry.getValue().recycle();
-                }
-            }
-            bitmapCacheMap.clear();
-            if (previewMediaFileList != null) {
-                for (MediaFile mediaFile : previewMediaFileList) {
-                    if (mediaFile != null) {
-                        mediaFile.resetPreview(null);
-                        mediaFile.resetThumbnail(null);
-                        mediaFile.stopFetchingFileData(null);
-                    }
-                }
-                if (mediaFiles != null) {
-                    mediaFiles.clear();
-                }
-            }
 
+        if (previewMediaFileList != null) {
+            for (MediaFile mediaFile : previewMediaFileList) {
+                if (mediaFile != null) {
+                    mediaFile.resetPreview(null);
+                    mediaFile.resetThumbnail(null);
+                    mediaFile.stopFetchingFileData(null);
+                }
+            }
+            if (mediaFiles != null) {
+                mediaFiles.clear();
+            }
         }
+
     }
 
     private void unSetCallback() {
@@ -555,73 +556,6 @@ public class AircraftPhotoFragmentNew extends RxFragment {
         }
     }
 
-    private void getThumbnails() {
-        if (groupAdapter.getData().isEmpty()) {
-            return;
-        }
-        List<MediaFileGroup> groupList = groupAdapter.getData();
-        int size = groupList.size();
-        MediaFileGroup mediaFileGroup;
-
-        MediaFile mediaFile;
-        FetchMediaTask mediaTask;
-        FetchMediaTask.Callback fetchMediaCallback;
-        for (int i = 0; i < size; i++) {
-            mediaFileGroup = groupList.get(i);
-            if (mediaFileGroup == null || mediaFileGroup.getMediaEntity() == null || mediaFileGroup.getMediaEntity().getMedia() == null) {
-                continue;
-            }
-            mediaEntity = mediaFileGroup.getMediaEntity();
-            mediaFile = mediaEntity.getMedia();
-            int index = groupAdapter.getBitmapCacheMap().indexOfKey(mediaFile.getTimeCreated());
-            LogUtils.i(TAG + "当前索引为=" + index);
-            if (index >= 0) {
-                //说明当前有缓存bitmap 直接显示
-                mCommonRecyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        groupAdapter.notifyDataSetChanged();
-                    }
-                });
-                LogUtils.i(TAG + "当前有缓存bitmap 直接显示");
-                continue;
-            }
-            if (isBackground) {
-                LogUtils.e(TAG+"当前处于后台 需要拦截掉");
-                return;
-            }
-            fetchMediaCallback = new FetchMediaTask.Callback() {
-                @Override
-                public void onUpdate(MediaFile mediaFile, FetchMediaTaskContent fetchMediaTaskContent, DJIError djiError) {
-                    if (null == djiError) {
-                        //表示加载完成 已经获取到bitmap
-                        runUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                LogUtils.e(TAG+"当前处于后台 需要拦截掉");
-                                if (isBackground) {
-                                    LogUtils.e(TAG+"当前处于后台 需要拦截掉");
-                                    return;
-                                }
-                                LogUtils.i(TAG + "执行了notifyDataSetChanged");
-                                groupAdapter.notifyDataSetChanged();
-                            }
-                        });
-                        if (mediaFile != null && mediaFile.getThumbnail() != null) {
-                            LogUtils.i(TAG + "添加缓存");
-                            mediaEntity.setThumbnail(mediaFile.getThumbnail());
-                            groupAdapter.getBitmapCacheMap().put(mediaFile.getTimeCreated(), mediaFile.getThumbnail());
-                        }
-                    }
-                }
-            };
-            mediaTask = new FetchMediaTask(mediaFile, FetchMediaTaskContent.THUMBNAIL, fetchMediaCallback);
-            mediaCallbackList.add(fetchMediaCallback);
-            mediaTaskList.add(mediaTask);
-            taskScheduler.moveTaskToEnd(mediaTask);
-        }
-    }
-
 
     private void skipPhotoPreview(int position) {
         if (mediaFiles == null || mediaFiles.isEmpty()) {
@@ -653,11 +587,150 @@ public class AircraftPhotoFragmentNew extends RxFragment {
             default:
                 break;
         }
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
         isBackground = true;
+    }
+
+    private void loadMediaImageByList(List<MediaFileGroup> groupList) {
+        if (groupList.isEmpty()) {
+            ToastUtil.showSuccessDebug("加载完成");
+            return;
+        }
+        MediaFileGroup mediaFileGroup = groupList.get(0);
+        if (mediaFileGroup == null || mediaFileGroup.getMediaEntity() == null || mediaFileGroup.getMediaEntity().getMedia() == null) {
+            groupList.remove(0);
+            //这里使用递归加载
+            loadMediaImageByList(groupList);
+            return;
+        }
+        mediaEntity = mediaFileGroup.getMediaEntity();
+        if (mediaEntity.getThumbnailBytes() != null && mediaEntity.getThumbnailBytes().length > 0) {
+            //说明本地数据库已经有了数据
+            groupList.remove(0);
+            //这里也使用递归加载
+            loadMediaImageByList(groupList);
+            return;
+        }
+        MediaFile mediaFile = mediaEntity.getMedia();
+        //todo
+            /*if (isBackground) {
+                LogUtils.e(TAG + "当前处于后台 需要拦截掉");
+                return;
+            }*/
+        FetchMediaTask mediaTask;
+        FetchMediaTask.Callback fetchMediaCallback;
+        fetchMediaCallback = new FetchMediaTask.Callback() {
+            @Override
+            public void onUpdate(MediaFile mediaFile, FetchMediaTaskContent fetchMediaTaskContent, DJIError djiError) {
+                if (null == djiError) {
+                    //表示加载完成 已经获取到bitmap
+                    runUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //todo
+                          /*  LogUtils.e(TAG + "当前处于后台 需要拦截掉");
+                            if (isBackground) {
+                                LogUtils.e(TAG + "当前处于后台 需要拦截掉");
+                                return;
+                            }*/
+                            LogUtils.i(TAG + "执行了notifyDataSetChanged");
+                            groupAdapter.notifyDataSetChanged();
+                            groupList.remove(0);
+                            loadMediaImageByList(groupList);
+                        }
+                    });
+                    loadAndSaveImageCache(groupList);
+                }
+            }
+        };
+        mediaTask = new FetchMediaTask(mediaFile, FetchMediaTaskContent.THUMBNAIL, fetchMediaCallback);
+        mediaCallbackList.add(fetchMediaCallback);
+        mediaTaskList.add(mediaTask);
+        taskScheduler.moveTaskToEnd(mediaTask);
+    }
+
+
+    private void loadAndSaveImageCache(List<MediaFileGroup> mediaFiles) {
+        MediaFileGroup mediaFileGroup;
+        MediaFile currentMedia;
+        PhotoLocalData localData;
+        PhotoLocalData sqData;
+        MediaEntity mediaEntity;
+        long createTime;
+        String fileName;
+        for (int i = 0; i < mediaFiles.size(); i++) {
+            mediaFileGroup = mediaFiles.get(i);
+            if (mediaFileGroup != null && mediaFileGroup.getMediaEntity() != null && mediaFileGroup.getMediaEntity().getMedia() != null) {
+                mediaEntity = mediaFileGroup.getMediaEntity();
+                currentMedia = mediaEntity.getMedia();
+                if (currentMedia.getThumbnail() == null) {
+                    continue;
+                }
+                createTime = currentMedia.getTimeCreated();
+                fileName = currentMedia.getFileName();
+                List<PhotoLocalData> localDataList = daoManager.findThumbnail(createTime, fileName);
+                if (localDataList.isEmpty()) {
+                    //说明本地数据库没有 则 需要保存到数据库
+                    localData = new PhotoLocalData();
+                    localData.setCreateTime(createTime);
+                    localData.setFileName(fileName);
+                    localData.setThumbnail(BitmapUtil.bitmap2Bytes(currentMedia.getThumbnail()));
+                    daoManager.insertPhotoLocal(localData);
+                    LogUtils.w(TAG + "保存到数据库：" + createTime);
+                } else {
+                    //说明数据库有数据 直接获取
+                    sqData = localDataList.get(0);
+                    mediaEntity.setThumbnailBytes(sqData.getThumbnail());
+                    LogUtils.i(TAG + "从数据库取到了缓存数据：" + sqData.getCreateTime());
+                }
+            }
+        }
+    }
+
+    /**
+     * 先查找本地数据库并赋值
+     */
+    private void findLocalImageAssignmentAndShow(List<MediaFileGroup> mediaGroupFileList) {
+        showLoading();
+        int size = mediaGroupFileList.size();
+        MediaFileGroup mediaFileGroup;
+        MediaEntity entity;
+        MediaFile mediaFile;
+        PhotoLocalData sqData;
+        for (int i = 0; i < size; i++) {
+            mediaFileGroup = mediaGroupFileList.get(i);
+            if (mediaFileGroup != null && mediaFileGroup.getMediaEntity() != null && mediaFileGroup.getMediaEntity().getMedia() != null) {
+                entity = mediaFileGroup.getMediaEntity();
+                mediaFile = entity.getMedia();
+                List<PhotoLocalData> localDataList = daoManager.findThumbnail(mediaFile.getTimeCreated(), mediaFile.getFileName());
+                if (!localDataList.isEmpty()) {
+                    //说明数据库有数据 直接获取
+                    sqData = localDataList.get(0);
+                    if (sqData != null) {
+                        entity.setThumbnailBytes(sqData.getThumbnail());
+                        LogUtils.i(TAG + "从数据库取到了缓存数据需要赋值给mediaFile");
+                    }
+                }
+            }
+        }
+        showMediaFileList(mediaGroupFileList);
+    }
+
+    private void showLoading() {
+        runUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ViewExtensions.show(pbLoading);
+            }
+        });
+    }
+
+    private void closeLoading() {
+        ViewExtensions.hide(pbLoading);
     }
 }

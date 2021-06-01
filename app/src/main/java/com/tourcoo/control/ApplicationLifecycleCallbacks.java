@@ -29,7 +29,6 @@ public class ApplicationLifecycleCallbacks extends FragmentManager.FragmentLifec
 
     private String TAG = getClass().getSimpleName();
     private ActivityFragmentControl mActivityFragmentControl;
-    private Application.ActivityLifecycleCallbacks mActivityLifecycleCallbacks;
     private FragmentManager.FragmentLifecycleCallbacks mFragmentLifecycleCallbacks;
 
     @Override
@@ -46,10 +45,7 @@ public class ApplicationLifecycleCallbacks extends FragmentManager.FragmentLifec
                 fragmentManager.registerFragmentLifecycleCallbacks(mFragmentLifecycleCallbacks, true);
             }
         }
-        //回调给其他监听者实现自己逻辑
-        if (mActivityLifecycleCallbacks != null) {
-            mActivityLifecycleCallbacks.onActivityCreated(activity, savedInstanceState);
-        }
+
     }
 
     /**
@@ -66,19 +62,14 @@ public class ApplicationLifecycleCallbacks extends FragmentManager.FragmentLifec
 
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-        //回调给开发者实现自己应用逻辑
-        if (mActivityLifecycleCallbacks != null) {
-            mActivityLifecycleCallbacks.onActivityStarted(activity);
-        }
+
     }
 
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
         LogUtils.i(TAG, "onActivityResumed:" + activity.getClass().getSimpleName());
-        if (mActivityLifecycleCallbacks != null) {
-            mActivityLifecycleCallbacks.onActivityResumed(activity);
-        }
+
     }
 
     @Override
@@ -90,27 +81,21 @@ public class ApplicationLifecycleCallbacks extends FragmentManager.FragmentLifec
 //            KeyboardHelper.closeKeyboard(activity);
         }
         //回调给开发者实现自己应用逻辑
-        if (mActivityLifecycleCallbacks != null) {
-            mActivityLifecycleCallbacks.onActivityPaused(activity);
-        }
+
     }
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
         LogUtils.i(TAG, "onActivityStopped:" + activity.getClass().getSimpleName() + ";isFinishing:" + activity.isFinishing());
         //回调给开发者实现自己应用逻辑
-        if (mActivityLifecycleCallbacks != null) {
-            mActivityLifecycleCallbacks.onActivityStopped(activity);
-        }
+
     }
 
     @Override
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
         LogUtils.i(TAG, "onActivitySaveInstanceState:" + activity.getClass().getSimpleName());
         //回调给开发者实现自己应用逻辑
-        if (mActivityLifecycleCallbacks != null) {
-            mActivityLifecycleCallbacks.onActivitySaveInstanceState(activity, outState);
-        }
+
     }
 
     @Override
@@ -130,9 +115,7 @@ public class ApplicationLifecycleCallbacks extends FragmentManager.FragmentLifec
         /*//清除BasisHelper
         DelegateManager.getInstance().removeBasisHelper(activity);*/
         //回调给开发者实现自己应用逻辑
-        if (mActivityLifecycleCallbacks != null) {
-            mActivityLifecycleCallbacks.onActivityDestroyed(activity);
-        }
+
     }
 
     @Override
@@ -153,7 +136,6 @@ public class ApplicationLifecycleCallbacks extends FragmentManager.FragmentLifec
         if (mActivityFragmentControl == null) {
             return;
         }
-        mActivityLifecycleCallbacks = mActivityFragmentControl.getActivityLifecycleCallbacks();
         mFragmentLifecycleCallbacks = mActivityFragmentControl.getFragmentLifecycleCallbacks();
     }
 

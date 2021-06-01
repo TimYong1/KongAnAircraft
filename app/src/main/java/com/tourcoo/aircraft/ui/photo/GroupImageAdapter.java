@@ -14,6 +14,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.tourcoo.aircraftmanager.R;
 import com.tourcoo.entity.media.MediaEntity;
 import com.tourcoo.entity.media.MediaFileGroup;
+import com.tourcoo.util.BitmapUtil;
 import com.tourcoo.util.DateUtil;
 import com.tourcoo.util.GlideManager;
 import com.tourcoo.util.StringUtil;
@@ -44,6 +45,9 @@ public class GroupImageAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup,
 
     @Override
     protected void convert(@NonNull BaseViewHolder helper, MediaFileGroup item) {
+      /*  if(isScrolling){
+            return;
+        }*/
         LogUtils.i(TAG + "convert()=" + helper.getItemViewType());
         if (item == null) {
             return;
@@ -58,17 +62,27 @@ public class GroupImageAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup,
                 }
                 MediaEntity mediaEntity = item.getMediaEntity();
                 MediaFile mediaFile;
-                if (mediaEntity != null) {
+                if (mediaEntity != null ) {
                     mediaFile = mediaEntity.getMedia();
-                    if (mediaFile != null) {
-                        GlideManager.loadImgCenterCrop(mediaFile.getThumbnail(), ivPhoto, R.drawable.ic_aircraft_default);
+                    if (mediaEntity.getThumbnailBytes() != null && mediaEntity.getThumbnailBytes().length > 0) {
+                        LogUtils.i(TAG + "直接显示数据库图片");
+                        ivPhoto.setImageBitmap(BitmapUtil.bytes2Bitmap(mediaEntity.getThumbnailBytes()));
+//                        GlideManager.loadImgCenterCrop(BitmapUtil.bytes2Bitmap(mediaEntity.getThumbnailBytes()), ivPhoto, R.drawable.ic_aircraft_default);
+                    } else {
+                        if (mediaFile != null) {
+                            LogUtils.w(TAG + "显示实时图片");
+                            ivPhoto.setImageBitmap(mediaFile.getThumbnail());
+//                            GlideManager.loadImgCenterCrop(mediaFile.getThumbnail(), ivPhoto, R.drawable.ic_aircraft_default);
+                        } else {
+                            LogUtils.e(TAG + "mediaFile==null");
+                        }
+                    }
+                    if(mediaFile != null){
                         boolean isPhoto = mediaFile.getMediaType() == MediaFile.MediaType.JPEG || mediaFile.getMediaType() == MediaFile.MediaType.RAW_DNG;
                         if (!isPhoto) {
                             helper.setText(R.id.tvVideoDuration, DateUtil.stringForTime(mediaFile.getDurationInSeconds()) + "");
                         }
                         helper.setGone(R.id.llVideo, !isPhoto);
-                    } else {
-                        LogUtils.e(TAG + "mediaFile==null");
                     }
                 } else {
                     LogUtils.i(TAG + "执行了缩略图复用");
@@ -87,10 +101,6 @@ public class GroupImageAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup,
             default:
                 break;
         }
-    }
-
-    public ArrayMap<Long, Bitmap> getBitmapCacheMap() {
-        return MediaTemp.bitmapCacheMap;
     }
 
 

@@ -99,7 +99,6 @@ public class HttpRequestControlImpl implements HttpRequestControl {
             } else if (e instanceof JsonParseException) {
                 //数据格式化错误
                 reason = R.string.exception_json_syntax;
-                ToastUtil.showFailedDebug(e.toString());
             } else if (e instanceof SocketTimeoutException || e instanceof TimeoutException) {
                 reason = R.string.exception_time_out;
             } else if (e instanceof ClassCastException) {

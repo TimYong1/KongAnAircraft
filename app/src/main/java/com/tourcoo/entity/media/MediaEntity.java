@@ -1,6 +1,5 @@
 package com.tourcoo.entity.media;
 
-import android.graphics.Bitmap;
 
 import dji.sdk.media.MediaFile;
 
@@ -17,7 +16,7 @@ public class MediaEntity {
     private float durationInSeconds;
     private String dateCreated;
     private MediaFile media;
-    private Bitmap thumbnail;
+    private byte[] thumbnailBytes;
     public int getMediaType() {
         return mediaType;
     }
@@ -58,11 +57,11 @@ public class MediaEntity {
         this.media = media;
     }
 
-    public Bitmap getThumbnail() {
-        return thumbnail;
+    public byte[] getThumbnailBytes() {
+        return thumbnailBytes;
     }
 
-    public void setThumbnail(Bitmap thumbnail) {
-        this.thumbnail = thumbnail;
+    public void setThumbnailBytes(byte[] thumbnailBytes) {
+        this.thumbnailBytes = thumbnailBytes;
     }
 }

@@ -89,7 +89,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     public static final String TAG = "HomeActivity";
     private Activity mContext;
     private TextView tvConnectStatus, tvAirCraftName;
-
+    private Handler mHandler = new Handler(Looper.getMainLooper());
     private ImageView ivConnectStatus, ivHandFly, ivFlyMap, ivFlyPhotoAlbum;
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.VIBRATE, // Gimbal rotation
@@ -125,9 +125,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 skipMap();
                 break;
             case R.id.ivFlyPhotoAlbum:
-                if(AppConfig.DEBUG_BODE){
+                if (AppConfig.DEBUG_BODE) {
                     skipFlyPhoto();
-                }else {
+                } else {
                     ToastUtil.showNormal("正在开发");
                 }
 
@@ -165,6 +165,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         }, 500);
         requestUserInfo();
     }
+
     private void getSnNumberAndUpload() {
         ThreadManager.getDefault().execute(new Runnable() {
             @Override
@@ -179,12 +180,12 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                     @Override
                     public void onSuccess(String s) {
                         deviceInfo.name = s;
-                        doUpload(aircraft,deviceInfo);
+                        doUpload(aircraft, deviceInfo);
                     }
 
                     @Override
                     public void onFailure(DJIError djiError) {
-                            ToastUtil.showNormalCondition(djiError.getDescription(),"未获取到设备名称");
+                        ToastUtil.showNormalCondition(djiError.getDescription(), "未获取到设备名称");
                     }
                 });
             }
@@ -371,7 +372,13 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 if (baseProduct.getModel() != null) {
                     tvAirCraftName.setText(baseProduct.getModel().name());
                 }
-                getSnNumberAndUpload();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSnNumberAndUpload();
+                    }
+                }, 200);
+
             }
             ivConnectStatus.setImageResource(R.drawable.shape_circle_green);
             hideNavigation();
@@ -533,8 +540,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         });
     }
 
-    private void doUpload(Aircraft aircraft,DeviceInfo deviceInfo){
-        if(aircraft ==null){
+    private void doUpload(Aircraft aircraft, DeviceInfo deviceInfo) {
+        if (aircraft == null || aircraft.getRemoteController() == null) {
             return;
         }
         aircraft.getRemoteController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
@@ -551,24 +558,27 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
             }
         });
-        aircraft.getFlightController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
-            @Override
-            public void onSuccess(String s) {
-                System.out.println("飞控序列号：" + s);
-                deviceInfo.productSn = s;
-            }
+        if (aircraft.getFlightController() != null) {
+            aircraft.getFlightController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+                @Override
+                public void onSuccess(String s) {
+                    System.out.println("飞控序列号：" + s);
+                    deviceInfo.productSn = s;
+                }
 
-            @Override
-            public void onFailure(DJIError djiError) {
-            }
-        });
+                @Override
+                public void onFailure(DJIError djiError) {
+                }
+            });
 
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                requestHasUpload(deviceInfo);
-            }
-        }, 200);
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    requestHasUpload(deviceInfo);
+                }
+            }, 200);
+        }
+
     }
 }
