@@ -141,11 +141,11 @@ public class PhotoPreviewActivityNew extends RxAppCompatActivity implements View
                 public void onPageScrollStateChanged(int state) {
                     switch (state) {
                         case 1:
-                            tvPhotoTime.setText(getString(R.string.loading));
+//                            tvPhotoTime.setText(getString(R.string.loading));
                             break;
                         case 2:
-                            setViewGone(pbLoading,true);
-                            tvPhotoTime.setText(getString(R.string.loading));
+                          /*  setViewGone(pbLoading,true);
+                            tvPhotoTime.setText(getString(R.string.loading));*/
                             break;
                         default:
                             break;

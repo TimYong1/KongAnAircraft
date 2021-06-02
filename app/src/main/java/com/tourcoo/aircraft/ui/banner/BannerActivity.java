@@ -63,7 +63,7 @@ public class BannerActivity extends RxAppCompatActivity {
         BannerBean bannerBean2 = new BannerBean();
         bannerBean2.setImageRes(R.drawable.matrice_rtk_three);
         bannerBean2.setDesc("经纬 M300 RTK");
-
+        bannerBean2.setTips("1.取出摇杆并安装；2.短按再长按遥控器电源按键，以开启遥控器；");
 
         BannerBean bannerBean3 = new BannerBean();
         bannerBean3.setImageRes(R.drawable.mavic_air_two);

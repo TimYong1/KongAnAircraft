@@ -1,5 +1,6 @@
 package com.tourcoo.aircraft.ui.banner;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,9 @@ public class ImageAdapter extends BannerAdapter<BannerBean, ImageHolder> {
     public void onBindView(ImageHolder holder, BannerBean data, int position, int size) {
         holder.imageView.setImageResource(data.getImageRes());
         holder.tvDesc.setText(StringUtil.getNotNullValue(data.getDesc()));
+        if(!TextUtils.isEmpty(data.getTips())){
+            holder.tvTip.setText(data.getTips());
+        }
     }
 
 }

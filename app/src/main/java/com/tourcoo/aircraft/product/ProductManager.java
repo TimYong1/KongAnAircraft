@@ -1,13 +1,10 @@
 package com.tourcoo.aircraft.product;
 
-import android.content.Intent;
 import android.text.TextUtils;
-
-import androidx.annotation.Nullable;
 
 import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.aircraft.ui.sample.AircraftApplication;
-import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity;
+import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivity;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.threadpool.ThreadManager;
 import com.tourcoo.util.SpUtil;
@@ -21,17 +18,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
-import dji.common.product.Model;
-import dji.sdk.accessory.AccessoryAggregation;
-import dji.sdk.accessory.beacon.Beacon;
-import dji.sdk.accessory.speaker.Speaker;
-import dji.sdk.accessory.spotlight.Spotlight;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
-import dji.sdk.flightcontroller.FlightController;
-import dji.sdk.flightcontroller.Simulator;
-import dji.sdk.products.Aircraft;
-import dji.sdk.products.HandHeld;
 import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
 import io.rong.calllib.IRongReceivedCallListener;
@@ -199,7 +187,7 @@ public class ProductManager {
      * 处理来电话的逻辑
      */
     private void handleCallComing() {
-        if (StackUtil.getInstance().getActivity(TestActivity.class) != null) {
+        if (StackUtil.getInstance().getActivity(FlyControlActivity.class) != null) {
             EventBus.getDefault().post(new CommonEvent(EVENT_PHONE_HANG_UP));
             LogUtils.d(TAG + "管理后台发起了语音通话");
         } else {

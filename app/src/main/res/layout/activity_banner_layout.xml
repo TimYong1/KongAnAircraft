@@ -36,12 +36,14 @@
         <com.youth.banner.Banner
             android:id="@+id/banner"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_270"
-            android:layout_margin="@dimen/dp_10"
-            banner:banner_radius="@dimen/dp_5"
-            android:layout_centerInParent="true"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/dp_20"
+            android:layout_marginStart="@dimen/dp_30"
+            android:layout_marginEnd="@dimen/dp_30"
+            android:layout_marginBottom="@dimen/dp_30"
             banner:banner_indicator_normal_color="@android:color/white"
-            banner:banner_indicator_selected_color="@color/colorPrimary" />
+            banner:banner_indicator_selected_color="@color/colorPrimary"
+            banner:banner_radius="@dimen/dp_5" />
     </RelativeLayout>
 
 </LinearLayout>

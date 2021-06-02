@@ -178,7 +178,7 @@
             tools:ignore="LockedOrientationActivity"
             />
         <activity
-            android:name="com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity"
+            android:name="com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivity"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustNothing" />

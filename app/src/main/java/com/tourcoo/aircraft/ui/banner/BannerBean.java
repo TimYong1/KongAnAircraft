@@ -11,6 +11,7 @@ public class BannerBean {
     private String imageUrl;
     private int imageRes;
     private String desc;
+    private String tips;
 
 
     public String getImageUrl() {
@@ -35,5 +36,13 @@ public class BannerBean {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String getTips() {
+        return tips;
+    }
+
+    public void setTips(String tips) {
+        this.tips = tips;
     }
 }

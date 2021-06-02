@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -31,7 +30,7 @@ import com.tourcoo.aircraft.ui.account.UserInfoActivity;
 import com.tourcoo.aircraft.ui.banner.BannerActivity;
 import com.tourcoo.aircraft.ui.map.MapActivity;
 import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
-import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity;
+import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivity;
 import com.tourcoo.aircraftmanager.R;
 
 import com.tourcoo.entity.BaseResult;
@@ -311,7 +310,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
     private void skipFlyControl() {
         Intent intent = new Intent();
-        intent.setClass(mContext, TestActivity.class);
+        intent.setClass(mContext, FlyControlActivity.class);
         startActivity(intent);
     }
 

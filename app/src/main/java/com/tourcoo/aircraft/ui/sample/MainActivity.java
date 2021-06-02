@@ -48,7 +48,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.DefaultLayoutActivity;
-import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.TestActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.map.MapWidgetActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.widgetlist.WidgetsActivity;
 import com.tourcoo.aircraft.ui.sample.util.MapUtil;

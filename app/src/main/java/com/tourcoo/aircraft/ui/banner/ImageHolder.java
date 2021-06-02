@@ -12,9 +12,11 @@ import com.tourcoo.aircraftmanager.R;
 public class ImageHolder extends RecyclerView.ViewHolder {
     public ImageView imageView;
     public TextView tvDesc;
+    public TextView tvTip;
     public ImageHolder(@NonNull View view) {
         super(view);
         this.imageView = view.findViewById(R.id.ivBanner);
         this.tvDesc = view.findViewById(R.id.tvDesc);
+        this.tvTip = view.findViewById(R.id.tvTip);
     }
 }

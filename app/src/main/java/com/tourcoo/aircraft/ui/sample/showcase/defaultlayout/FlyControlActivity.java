@@ -121,7 +121,7 @@ import static com.tourcoo.entity.socket.SocketConstant.SOCKET_TYPE_REAL_TIME_DAT
  * @date 2021年04月29日15:39
  * @Email: 971613168@qq.com
  */
-public class TestActivity extends RxAppCompatActivity implements View.OnClickListener {
+public class FlyControlActivity extends RxAppCompatActivity implements View.OnClickListener {
     public static final String TAG = "TestActivity";
     private ConstraintLayout rootView;
     private FPVInteractionWidget fpvInteractionWidget;
