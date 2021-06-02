@@ -171,7 +171,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
             @Override
             public void onResult(DJIError djiError) {
                 if (djiError != null) {
-                    ToastUtil.showWarningCondition("媒体模式设置错误：" + djiError.getDescription(), "媒体模式设置错误");
+                    ToastUtil.showWarningCondition("媒体模式设置错误：" + djiError.getDescription(), "媒体模块繁忙或无人机已断开");
                     return;
                 }
                 boolean busy = (MediaManager.FileListState.SYNCING == mFileListState) || (MediaManager.FileListState.DELETING == mFileListState) || (mediaType == null) || (mediaType == UNKNOWN);
@@ -195,7 +195,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                 @Override
                 public void onResult(DJIError djiError) {
                     if (djiError != null) {
-                        ToastUtil.showWarningCondition("获取媒体文件列表错误：" + djiError.getDescription(), "获取媒体文件列表错误，请稍后重试");
+                        ToastUtil.showWarningCondition("获取媒体文件列表错误：" + djiError.getDescription(), "媒体模块繁忙或无人机断开，请稍后重试");
                         mHandler.sendMessage(mHandler.obtainMessage(CODE_HIDE_PROGRESS_DIALOG, null));
                         return;
                     }
