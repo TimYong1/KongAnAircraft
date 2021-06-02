@@ -72,4 +72,13 @@
     <color name="centerpoint_yellow">#fbc600</color>
     <color name="custom_unlock_enabled">#00ff00</color>
     <color name="custom_unlock_not_sent">#008000</color>
+
+
+
+    <color name="trans">#00000000</color>
+
+    <color name="alertdialog_line">#E0E0E0</color>
+    <color name="actionsheet_blue">#037BFF</color>
+    <color name="actionsheet_red">#FD4A2E</color>
+    <color name="actionsheet_gray">#8F8F8F</color>
 </resources>

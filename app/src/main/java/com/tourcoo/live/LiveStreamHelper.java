@@ -7,6 +7,7 @@ import com.tourcoo.threadpool.ThreadManager;
 import com.tourcoo.util.ToastUtil;
 
 import dji.sdk.sdkmanager.DJISDKManager;
+import dji.sdk.sdkmanager.LiveStreamManager;
 
 /**
  * @author :JenkinsZhou
@@ -58,6 +59,12 @@ public class LiveStreamHelper {
         ThreadManager.getDefault().execute(() -> {
             DJISDKManager.getInstance().getLiveStreamManager().setLiveUrl(liveShowUrl);
             int result = DJISDKManager.getInstance().getLiveStreamManager().startStream();
+            DJISDKManager.getInstance().getLiveStreamManager().registerListener(new LiveStreamManager.OnLiveChangeListener() {
+                @Override
+                public void onStatusChanged(int i) {
+
+                }
+            });
             DJISDKManager.getInstance().getLiveStreamManager().setAudioMuted(true);
             DJISDKManager.getInstance().getLiveStreamManager().setStartTime();
             LogUtils.d(TAG + "直播流开启结果=" + result +

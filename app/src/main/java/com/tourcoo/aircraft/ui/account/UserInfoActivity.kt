@@ -7,8 +7,8 @@ import android.view.View
 import com.apkfuns.logutils.LogUtils
 import com.tourcoo.account.AccountHelper
 import com.tourcoo.account.UserInfo
-import com.tourcoo.aircraft.ui.home.HomeActivity
 import com.tourcoo.aircraftmanager.R
+import com.tourcoo.dialog.TourCooDialog
 import com.tourcoo.entity.BaseResult
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.BaseObserver
@@ -16,6 +16,8 @@ import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository
 import com.tourcoo.util.StringUtil
 import com.tourcoo.util.ToastUtil
+import com.tourcoo.util.cache.CacheDataManager
+import com.tourcoo.util.cache.ExecuteListener
 import com.trello.rxlifecycle3.android.ActivityEvent
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_login_new.*
@@ -30,6 +32,7 @@ import kotlinx.android.synthetic.main.activity_my_info.*
  */
 class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
     private var mContext: Activity? = null
+    private  var cacheUtil: CacheDataManager ? =null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_info)
@@ -39,13 +42,14 @@ class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
             requestLogout()
         }
         llEditPass.setOnClickListener(this)
-
+        llClearCache.setOnClickListener(this)
 
     }
 
     override fun onResume() {
         super.onResume()
         hideNavigation()
+        showCache()
         requestUserInfo()
     }
 
@@ -129,6 +133,9 @@ class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
             R.id.llEditPass -> {
                 skipEditPass()
             }
+            R.id.llClearCache -> {
+                showDialog()
+            }
             else -> {
             }
         }
@@ -145,4 +152,50 @@ class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
         startActivity(intent)
         finish()
     }
+
+    private fun showCache() {
+        tvCacheSize.text =  cacheUtil?.getTotalCacheSize(this)
+       if(cacheUtil != null){
+            cacheUtil?.getTotalCacheSize(applicationContext)
+        }else{
+            cacheUtil = CacheDataManager(object : ExecuteListener {
+                override fun onExecuteStart() {
+                    runOnUiThread {
+                        tvCacheSize.text = "正在计算..."
+                        llClearCache.isEnabled = false
+                    }
+                }
+
+                override fun onExecuteFinish(result: String?) {
+                    runOnUiThread {
+                        tvCacheSize.text = result
+                        llClearCache.isEnabled = true
+                    }
+                }
+
+                override fun onError(e: Throwable?) {
+                    runOnUiThread {
+                        tvCacheSize.text = "0.00MB"
+                        llClearCache.isEnabled = true
+                    }
+                }
+
+            })
+            cacheUtil?.getTotalCacheSize(applicationContext)
+        }
+
+    }
+
+
+    private fun showDialog() {
+        TourCooDialog(this@UserInfoActivity)
+                .init()
+                .setMsg("是否确定清除缓存?")
+                .setPositiveButton("确认", View.OnClickListener {
+                    cacheUtil?.clearAllCache(applicationContext)
+                    showCache()
+                })
+                .setNegativeButton("取消", View.OnClickListener { }).show()
+    }
+
 }

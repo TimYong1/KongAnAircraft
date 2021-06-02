@@ -252,10 +252,11 @@
 
 
             <LinearLayout
+                android:id="@+id/llClearCache"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:visibility="invisible"
+                android:visibility="visible"
                 android:paddingTop="@dimen/dp_margin_item_user_info"
                 android:paddingBottom="@dimen/dp_margin_item_user_info">
 
@@ -270,18 +271,27 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dp_8"
                     android:layout_weight="1"
-                    android:text="服务条款"
+                    android:text="清除缓存"
                     android:textColor="@color/white"
                     android:textSize="@dimen/sp_15" />
 
+                <TextView
+                    android:id="@+id/tvCacheSize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0MB"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/sp_15" />
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical|end"
+                    android:visibility="visible"
                     android:src="@mipmap/ic_arrow_right" />
             </LinearLayout>
 
-           <!-- <include layout="@layout/line_gray_dp_0_5" />-->
+            <include layout="@layout/line_gray_dp_0_5" />
 
             <LinearLayout
                 android:id="@+id/llPrivacyPolicy"

@@ -158,7 +158,8 @@ public class AircraftPhotoFragmentNew extends RxFragment {
         };
         mediaManager = camera.getMediaManager();
         if (mediaManager == null) {
-            ToastUtil.showWarning("媒体管理器繁忙或发生错误请返回稍后重试");
+            ToastUtil.showWarning("媒体管理器繁忙或无人机断开");
+            closeLoading();
             return;
         }
         completionCallbackWithList.add(callbackWith);
@@ -425,7 +426,6 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                         data.getMediaEntity().getMedia().stopFetchingFileData(null);
                     }
                 }
-
                 groupAdapter.getData().clear();
             }
             mediaManager.stop(null);
@@ -627,24 +627,12 @@ public class AircraftPhotoFragmentNew extends RxFragment {
         fetchMediaCallback = new FetchMediaTask.Callback() {
             @Override
             public void onUpdate(MediaFile mediaFile, FetchMediaTaskContent fetchMediaTaskContent, DJIError djiError) {
+                handleMediaTaskCallback(groupList);
                 if (null == djiError) {
                     //表示加载完成 已经获取到bitmap
-                    runUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //todo
-                          /*  LogUtils.e(TAG + "当前处于后台 需要拦截掉");
-                            if (isBackground) {
-                                LogUtils.e(TAG + "当前处于后台 需要拦截掉");
-                                return;
-                            }*/
-                            LogUtils.i(TAG + "执行了notifyDataSetChanged");
-                            groupAdapter.notifyDataSetChanged();
-                            groupList.remove(0);
-                            loadMediaImageByList(groupList);
-                        }
-                    });
                     loadAndSaveImageCache(groupList);
+                } else {
+                    LogUtils.e(TAG + "fetchMediaCallback异常了：" + djiError.getDescription());
                 }
             }
         };
@@ -731,6 +719,24 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     }
 
     private void closeLoading() {
-        ViewExtensions.hide(pbLoading);
+        runUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ViewExtensions.hide(pbLoading);
+            }
+        });
+    }
+
+
+    private void handleMediaTaskCallback(List<MediaFileGroup> groupList) {
+        runUiThread(new Runnable() {
+            @Override
+            public void run() {
+                LogUtils.i(TAG + "执行了notifyDataSetChanged");
+                groupAdapter.notifyDataSetChanged();
+                groupList.remove(0);
+                loadMediaImageByList(groupList);
+            }
+        });
     }
 }
