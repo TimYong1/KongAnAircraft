@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.aircraft.ui.account.LoginNewActivity;
 import com.tourcoo.aircraft.ui.sample.AircraftApplication;
+import com.tourcoo.config.AppConfig;
 import com.tourcoo.util.SpUtil;
 import com.tourcoo.util.StackUtil;
 import com.tourcoo.util.StringUtil;
@@ -18,7 +19,12 @@ import static com.tourcoo.constant.AccountConstant.PREF_KEY_SAS_TENANT;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_SYS_TOKEN;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_USER_CODE;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_USER_ID;
-import static com.tourcoo.retrofit.RequestConfig.SOCKET_URL_IP;
+import static com.tourcoo.constant.CommonConstant.APP_TYPE_KONG_AN;
+import static com.tourcoo.constant.CommonConstant.APP_TYPE_PRO;
+import static com.tourcoo.constant.CommonConstant.APP_TYPE_SAS;
+import static com.tourcoo.retrofit.RequestConfig.SOCKET_KONG_AN_URL_IP;
+import static com.tourcoo.retrofit.RequestConfig.SOCKET_PRO_URL_IP;
+import static com.tourcoo.retrofit.RequestConfig.SOCKET_SAS_URL_IP;
 
 /**
  * @author :JenkinsZhou
@@ -132,14 +138,26 @@ public class AccountHelper {
         return userCode;
     }
 
-    public String getSocketUrl() {
+    public String getSocketUrl(String deviceId) {
         if (!AccountHelper.getInstance().isLogin()) {
             socketUrl = "";
         }
-        //新空安 要求
-//        socketUrl = SOCKET_URL_IP + getUserId();
-        //检察院要求传userCode
-        socketUrl = SOCKET_URL_IP + getUserCode();
+        switch (AppConfig.APP_TYPE) {
+
+            case APP_TYPE_KONG_AN:
+                //新空安 要求传userId
+                socketUrl = SOCKET_KONG_AN_URL_IP + getUserId();
+                break;
+            case APP_TYPE_SAS:
+                //sas系统传 租户id和设备id
+                socketUrl = SOCKET_SAS_URL_IP + getSasTenant() + "/" + deviceId;
+                break;
+            case APP_TYPE_PRO:
+                //检察院要求传userCode
+                socketUrl = SOCKET_PRO_URL_IP + getUserCode();
+            default:
+                break;
+        }
         return socketUrl;
     }
 

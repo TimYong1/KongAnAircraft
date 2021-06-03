@@ -32,12 +32,21 @@ import dji.ux.beta.core.communication.GlobalPreferencesManager;
 import io.rong.imlib.RongIMClient;
 
 import static com.tourcoo.aircraft.ui.sample.DJIConnectionControlActivity.ACCESSORY_ATTACHED;
+import static com.tourcoo.constant.CommonConstant.APP_TYPE_KONG_AN;
+import static com.tourcoo.constant.CommonConstant.APP_TYPE_PRO;
+import static com.tourcoo.constant.CommonConstant.APP_TYPE_SAS;
+import static com.tourcoo.retrofit.RequestConfig.BASE_KONG_AN_URL;
+import static com.tourcoo.retrofit.RequestConfig.BASE_PRO_URL;
+import static com.tourcoo.retrofit.RequestConfig.BASE_SAS_URL;
+import static com.tourcoo.retrofit.RequestConfig.BASE_TEST_URL;
+import static com.tourcoo.retrofit.RequestConfig.SERVICE__SAS_IP;
 
 
 public class AircraftApplication extends Application {
     private static Application app;
     public static DaoSession mSession;
     public static final String TAG = "AircraftApplication";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -52,7 +61,7 @@ public class AircraftApplication extends Application {
         //初始化Retrofit配置
         RetrofitHelper.getInstance()
                 //配置全局网络请求BaseUrl
-                .setBaseUrl(RequestConfig.BASE_URL)
+                .setBaseUrl(getBaseUrl())
                 //信任所有证书--也可设置setCertificates(单/双向验证)
                 .setCertificates()
                 //设置统一请求头
@@ -137,7 +146,6 @@ public class AircraftApplication extends Application {
     }
 
 
-
     /**
      * 连接数据库并创建会话
      */
@@ -154,5 +162,19 @@ public class AircraftApplication extends Application {
     // 供外接使用
     public static DaoSession getDaoSession() {
         return mSession;
+    }
+
+
+    private String getBaseUrl() {
+        switch (AppConfig.APP_TYPE) {
+            case APP_TYPE_PRO:
+                return BASE_PRO_URL;
+            case APP_TYPE_KONG_AN:
+                return BASE_KONG_AN_URL;
+            case APP_TYPE_SAS:
+                return BASE_SAS_URL;
+            default:
+                return BASE_TEST_URL;
+        }
     }
 }

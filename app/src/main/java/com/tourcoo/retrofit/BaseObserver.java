@@ -7,8 +7,7 @@ import com.tourcoo.account.AccountHelper;
 import com.tourcoo.control.IHttpPageRequestControl;
 import com.tourcoo.control.IHttpRequestControl;
 import com.tourcoo.control.UiManager;
-import com.tourcoo.entity.AbstractResult;
-import com.tourcoo.entity.BaseResultOld;
+import com.tourcoo.entity.BaseAbstractResult;
 
 import java.io.IOException;
 
@@ -106,7 +105,7 @@ public abstract class BaseObserver<T> extends DefaultObserver<T> {
                 body = response.errorBody();
                 if (body != null) {
                     try {
-                        AbstractResult result = gson.fromJson(body.string(), AbstractResult.class);
+                        BaseAbstractResult result = gson.fromJson(body.string(), BaseAbstractResult.class);
                         if (result == null) {
                             onRequestError(e);
                             LogUtils.d("执行了");

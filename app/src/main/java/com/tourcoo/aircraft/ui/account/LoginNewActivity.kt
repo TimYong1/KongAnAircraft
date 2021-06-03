@@ -96,23 +96,20 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         screenHeight = outMetrics.heightPixels
         val contentHeightPercent = 450f / 540f
         val widthPercent = 580f / 960f
-        val heightPercent = 400f / 540f
         val inputViewWidthPercent = 360f / 500f
         val inputViewHeightPercent = 40f / 360f
-        val parentWidth: Int
         val inputWidth: Int
-        val inputHeight: Int
         val params = nScrollView.layoutParams as ConstraintLayout.LayoutParams
         val inputPhoneParams = llPhone.layoutParams as LinearLayout.LayoutParams
         val inputSasParams = llSas.layoutParams as LinearLayout.LayoutParams
         val inputPassParams = llPass.layoutParams as LinearLayout.LayoutParams
         val tvLoginPassParams = tvLogin.layoutParams as LinearLayout.LayoutParams
         val cBoxRemindPassParams = cBoxRemindPass.layoutParams as LinearLayout.LayoutParams
-        parentWidth = (widthPercent * screenWidth!!).toInt()
+        val parentWidth: Int = (widthPercent * screenWidth!!).toInt()
         params.width = parentWidth
         params.height = (contentHeightPercent * screenHeight!!).toInt()
         inputWidth = (inputViewWidthPercent * parentWidth).toInt()
-        inputHeight = (inputViewHeightPercent * inputWidth).toInt()
+        val inputHeight: Int = (inputViewHeightPercent * inputWidth).toInt()
         inputPhoneParams.width = inputWidth
         inputPhoneParams.height = inputHeight
         inputPassParams.width = inputWidth
@@ -124,7 +121,7 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         LogUtils.d("屏幕尺寸" + params.width + "---" + params.height + "inputParams.inputHeight=" + inputHeight)
 
         when (APP_TYPE) {
-            APP_TYPE_KONG_AN, APP_TYPE_PROCURATORATE -> {
+            APP_TYPE_KONG_AN, APP_TYPE_PRO -> {
                 setViewVisible(llSas, false)
             }
             APP_TYPE_SAS -> {
@@ -204,7 +201,7 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
             SpUtil.put(PREF_KEY_PASS, "")
         }
         when (APP_TYPE) {
-            APP_TYPE_KONG_AN, APP_TYPE_PROCURATORATE -> {
+            APP_TYPE_KONG_AN, APP_TYPE_PRO -> {
 
             }
             APP_TYPE_SAS -> {

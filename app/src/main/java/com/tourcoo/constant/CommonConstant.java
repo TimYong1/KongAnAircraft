@@ -15,7 +15,7 @@ public class CommonConstant {
     /**
      * 检察院
      */
-    public static final int  APP_TYPE_PROCURATORATE = 2;
+    public static final int  APP_TYPE_PRO = 2;
     /**
      * SAS
      */

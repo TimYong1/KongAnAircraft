@@ -1,11 +1,9 @@
 package com.tourcoo.retrofit;
 
 
-import com.apkfuns.logutils.LogUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.tourcoo.entity.AbstractResult;
-import com.tourcoo.entity.BaseResultOld;
+import com.tourcoo.entity.BaseAbstractResult;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,9 +38,9 @@ public class ResponseInterceptor implements Interceptor {
         BufferedSource source = responseBody.source();
         source.request(Long.MAX_VALUE);
         String respString = source.getBuffer().clone().readString(Charset.defaultCharset());
-        AbstractResult result;
+        BaseAbstractResult result;
         try {
-            result = new Gson().fromJson(respString, AbstractResult.class);
+            result = new Gson().fromJson(respString, BaseAbstractResult.class);
         } catch (JsonSyntaxException | ClassCastException e) {
             result = null;
             e.printStackTrace();
