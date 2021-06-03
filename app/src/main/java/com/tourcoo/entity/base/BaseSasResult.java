@@ -1,4 +1,4 @@
-package com.tourcoo.entity;
+package com.tourcoo.entity.base;
 
 
 /**
@@ -13,6 +13,7 @@ public class BaseSasResult<T> extends BaseResult<T> {
     private String msg;
     private String errorMsg;
     private String path;
+    private String extra;
     private long timestamp;
     private T data;
     private boolean isSuccess;
@@ -81,5 +82,13 @@ public class BaseSasResult<T> extends BaseResult<T> {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
     }
 }

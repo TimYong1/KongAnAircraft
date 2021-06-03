@@ -1,4 +1,4 @@
-package com.tourcoo.entity;
+package com.tourcoo.entity.base;
 
 /**
  * @author :JenkinsZhou

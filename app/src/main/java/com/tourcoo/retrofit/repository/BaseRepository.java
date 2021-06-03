@@ -2,7 +2,7 @@ package com.tourcoo.retrofit.repository;
 
 import android.accounts.NetworkErrorException;
 
-import com.tourcoo.entity.BaseCommonResult;
+import com.tourcoo.entity.base.BaseCommonResult;
 import com.tourcoo.retrofit.DataNullException;
 import com.tourcoo.retrofit.RetryWhen;
 import com.tourcoo.retrofit.ThreadTransformer;

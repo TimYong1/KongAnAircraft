@@ -10,7 +10,7 @@ import android.widget.ImageView
 import com.apkfuns.logutils.LogUtils
 import com.tourcoo.account.AccountHelper
 import com.tourcoo.aircraftmanager.R
-import com.tourcoo.entity.BaseCommonResult
+import com.tourcoo.entity.base.BaseCommonResult
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository

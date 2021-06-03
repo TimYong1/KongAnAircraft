@@ -4,7 +4,7 @@ package com.tourcoo.retrofit.repository;
 import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.account.TokenInfo;
 import com.tourcoo.account.UserInfo;
-import com.tourcoo.entity.BaseCommonResult;
+import com.tourcoo.entity.base.BaseCommonResult;
 import com.tourcoo.entity.flight.FlightRecordEntity;
 import com.tourcoo.retrofit.ApiService;
 import com.tourcoo.retrofit.RetrofitHelper;

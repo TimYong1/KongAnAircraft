@@ -1,7 +1,7 @@
 package com.tourcoo.control;
 
 
-import com.tourcoo.entity.BaseCommonResult;
+import com.tourcoo.entity.base.BaseCommonResult;
 
 import io.reactivex.annotations.NonNull;
 

@@ -3,7 +3,7 @@ package com.tourcoo.retrofit;
 
 import com.tourcoo.account.TokenInfo;
 import com.tourcoo.account.UserInfo;
-import com.tourcoo.entity.BaseCommonResult;
+import com.tourcoo.entity.base.BaseCommonResult;
 import com.tourcoo.entity.flight.FlightRecordEntity;
 
 import java.util.Map;

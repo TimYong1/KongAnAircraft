@@ -13,7 +13,7 @@ import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.aircraftmanager.R;
 import com.tourcoo.control.HttpRequestControl;
 import com.tourcoo.control.IHttpRequestControl;
-import com.tourcoo.entity.BaseCommonResult;
+import com.tourcoo.entity.base.BaseCommonResult;
 import com.tourcoo.retrofit.NetworkUtil;
 import com.tourcoo.retrofit.RequestConfig;
 import com.tourcoo.util.ToastUtil;

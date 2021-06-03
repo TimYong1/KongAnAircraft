@@ -7,7 +7,7 @@ import com.tourcoo.account.AccountHelper;
 import com.tourcoo.control.IHttpPageRequestControl;
 import com.tourcoo.control.IHttpRequestControl;
 import com.tourcoo.control.UiManager;
-import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.base.BaseResult;
 
 import java.io.IOException;
 

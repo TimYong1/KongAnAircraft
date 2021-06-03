@@ -4,9 +4,8 @@ package com.tourcoo.retrofit;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.tourcoo.config.AppConfig;
-import com.tourcoo.entity.BaseCommonResult;
-import com.tourcoo.entity.BaseResult;
-import com.tourcoo.entity.BaseSasResult;
+import com.tourcoo.entity.base.BaseCommonResult;
+import com.tourcoo.entity.base.BaseSasResult;
 
 import org.jetbrains.annotations.NotNull;
 

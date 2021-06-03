@@ -37,7 +37,7 @@ import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.aircraft.widget.camera.CameraHelper;
 import com.tourcoo.aircraft.widget.gimble.GimHelper;
 import com.tourcoo.aircraftmanager.R;
-import com.tourcoo.entity.BaseCommonResult;
+import com.tourcoo.entity.base.BaseCommonResult;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.flight.FlightRealTimeData;
 import com.tourcoo.entity.flight.FlightRecordEntity;

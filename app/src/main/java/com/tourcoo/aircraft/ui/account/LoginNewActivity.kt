@@ -22,7 +22,7 @@ import com.tourcoo.aircraft.ui.sample.AircraftApplication
 import com.tourcoo.aircraftmanager.R
 import com.tourcoo.config.AppConfig.APP_TYPE
 import com.tourcoo.constant.CommonConstant.*
-import com.tourcoo.entity.BaseCommonResult
+import com.tourcoo.entity.base.BaseCommonResult
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository

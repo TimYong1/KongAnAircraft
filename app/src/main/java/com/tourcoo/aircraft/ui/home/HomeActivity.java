@@ -33,7 +33,7 @@ import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivity;
 import com.tourcoo.aircraftmanager.R;
 
-import com.tourcoo.entity.BaseCommonResult;
+import com.tourcoo.entity.base.BaseCommonResult;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.sn.DeviceInfo;
 import com.tourcoo.manager.AircraftHelper;

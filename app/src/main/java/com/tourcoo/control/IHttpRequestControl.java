@@ -2,7 +2,7 @@ package com.tourcoo.control;
 
 import android.view.View;
 
-import com.tourcoo.entity.BaseCommonResult;
+import com.tourcoo.entity.base.BaseCommonResult;
 
 
 /**

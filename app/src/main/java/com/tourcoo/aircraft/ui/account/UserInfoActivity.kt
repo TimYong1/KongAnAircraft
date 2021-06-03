@@ -9,7 +9,7 @@ import com.tourcoo.account.AccountHelper
 import com.tourcoo.account.UserInfo
 import com.tourcoo.aircraftmanager.R
 import com.tourcoo.dialog.TourCooDialog
-import com.tourcoo.entity.BaseCommonResult
+import com.tourcoo.entity.base.BaseCommonResult
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.BaseObserver
 import com.tourcoo.retrofit.RequestConfig
