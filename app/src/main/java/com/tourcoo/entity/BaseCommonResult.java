@@ -7,7 +7,7 @@ package com.tourcoo.entity;
  * @date 2020年11月13日16:21
  * @Email: 971613168@qq.com
  */
-public class BaseResultOld<T> {
+public class BaseCommonResult<T> {
     /**
      * code : 1
      * errMsg : 操作成功

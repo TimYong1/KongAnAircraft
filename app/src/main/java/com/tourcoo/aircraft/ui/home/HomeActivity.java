@@ -33,7 +33,7 @@ import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivity;
 import com.tourcoo.aircraftmanager.R;
 
-import com.tourcoo.entity.BaseResultOld;
+import com.tourcoo.entity.BaseCommonResult;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.sn.DeviceInfo;
 import com.tourcoo.manager.AircraftHelper;
@@ -189,9 +189,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         params.put("productSn", StringUtil.getNotNullValue(deviceInfo.productSn));
         params.put("remoteSn", StringUtil.getNotNullValue(deviceInfo.remoteSn));
         params.put("type", deviceInfo.type);
-        ApiRepository.getInstance().requestUploadDroneData(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResultOld<Object>>() {
+        ApiRepository.getInstance().requestUploadDroneData(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseCommonResult<Object>>() {
             @Override
-            public void onRequestSuccess(BaseResultOld<Object> entity) {
+            public void onRequestSuccess(BaseCommonResult<Object> entity) {
                 if (entity == null) {
                     return;
                 }
@@ -515,9 +515,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void requestUserInfo() {
-        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseResultOld<UserInfo>>() {
+        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseCommonResult<UserInfo>>() {
             @Override
-            public void onRequestSuccess(BaseResultOld<UserInfo> entity) {
+            public void onRequestSuccess(BaseCommonResult<UserInfo> entity) {
                 if (entity == null) {
                     return;
                 }

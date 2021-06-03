@@ -10,7 +10,7 @@ import android.widget.ImageView
 import com.apkfuns.logutils.LogUtils
 import com.tourcoo.account.AccountHelper
 import com.tourcoo.aircraftmanager.R
-import com.tourcoo.entity.BaseResultOld
+import com.tourcoo.entity.BaseCommonResult
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository
@@ -82,9 +82,9 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
 
 
     private fun requestEditPass(pass: String, newPass: String) {
-        ApiRepository.getInstance().requestEditPass(pass, newPass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResultOld<Any?>?>() {
+        ApiRepository.getInstance().requestEditPass(pass, newPass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseCommonResult<Any?>?>() {
 
-            override fun onRequestSuccess(entity: BaseResultOld<Any?>?) {
+            override fun onRequestSuccess(entity: BaseCommonResult<Any?>?) {
                 handleEditSuccess(entity)
                 hideNavigation()
             }
@@ -100,7 +100,7 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
 
-    private fun handleEditSuccess(entity: BaseResultOld<Any?>?) {
+    private fun handleEditSuccess(entity: BaseCommonResult<Any?>?) {
         if (entity == null) {
             ToastUtil.showFailed("服务器走丢了")
             return
@@ -159,8 +159,8 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
     private fun requestLogout() {
-        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResultOld<Any?>?>() {
-            override fun onRequestSuccess(entity: BaseResultOld<Any?>?) {
+        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseCommonResult<Any?>?>() {
+            override fun onRequestSuccess(entity: BaseCommonResult<Any?>?) {
                 if (entity == null) {
                     return
                 }

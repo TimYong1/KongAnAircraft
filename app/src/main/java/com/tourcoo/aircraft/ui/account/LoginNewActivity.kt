@@ -22,7 +22,7 @@ import com.tourcoo.aircraft.ui.sample.AircraftApplication
 import com.tourcoo.aircraftmanager.R
 import com.tourcoo.config.AppConfig.APP_TYPE
 import com.tourcoo.constant.CommonConstant.*
-import com.tourcoo.entity.BaseResultOld
+import com.tourcoo.entity.BaseCommonResult
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository
@@ -122,7 +122,7 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
 
         when (APP_TYPE) {
             APP_TYPE_KONG_AN, APP_TYPE_PRO -> {
-                setViewVisible(llSas, false)
+                setViewGone(llSas, false)
             }
             APP_TYPE_SAS -> {
                 setViewVisible(llSas, true)
@@ -152,9 +152,9 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
     private fun requestLogin(user: String, pass: String) {
-        ApiRepository.getInstance().requestAppLogin(user, pass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResultOld<TokenInfo?>?>() {
+        ApiRepository.getInstance().requestAppLogin(user, pass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseCommonResult<TokenInfo?>?>() {
 
-            override fun onRequestSuccess(entity: BaseResultOld<TokenInfo?>?) {
+            override fun onRequestSuccess(entity: BaseCommonResult<TokenInfo?>?) {
                 handleLoginSuccess(entity)
                 hideNavigation()
             }
@@ -169,7 +169,7 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         })
     }
 
-    private fun handleLoginSuccess(entity: BaseResultOld<TokenInfo?>?) {
+    private fun handleLoginSuccess(entity: BaseCommonResult<TokenInfo?>?) {
         if (entity == null) {
             Toast.makeText(mContext, "服务器数据异常", Toast.LENGTH_SHORT).show()
             return

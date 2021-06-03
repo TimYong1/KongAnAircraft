@@ -2,7 +2,7 @@ package com.tourcoo.retrofit.repository;
 
 import android.accounts.NetworkErrorException;
 
-import com.tourcoo.entity.BaseResultOld;
+import com.tourcoo.entity.BaseCommonResult;
 import com.tourcoo.retrofit.DataNullException;
 import com.tourcoo.retrofit.RetryWhen;
 import com.tourcoo.retrofit.ThreadTransformer;
@@ -28,10 +28,10 @@ public class BaseRepository {
      * @param <T>
      * @return
      */
-    protected <T> Observable<T> transform(Observable<BaseResultOld<T>> observable) {
+    protected <T> Observable<T> transform(Observable<BaseCommonResult<T>> observable) {
         return ThreadTransformer.switchSchedulers(
                 observable.retryWhen(new RetryWhen())
-                        .flatMap((Function<BaseResultOld<T>, ObservableSource<T>>) result -> {
+                        .flatMap((Function<BaseCommonResult<T>, ObservableSource<T>>) result -> {
                             if (result == null) {
                                 return Observable.error(new DataNullException());
                             }

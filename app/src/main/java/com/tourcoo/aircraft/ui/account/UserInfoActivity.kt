@@ -9,7 +9,7 @@ import com.tourcoo.account.AccountHelper
 import com.tourcoo.account.UserInfo
 import com.tourcoo.aircraftmanager.R
 import com.tourcoo.dialog.TourCooDialog
-import com.tourcoo.entity.BaseResultOld
+import com.tourcoo.entity.BaseCommonResult
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.BaseObserver
 import com.tourcoo.retrofit.RequestConfig
@@ -73,8 +73,8 @@ class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
 
 
     private fun requestUserInfo() {
-        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseResultOld<UserInfo?>?>() {
-            override fun onRequestSuccess(entity: BaseResultOld<UserInfo?>?) {
+        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseCommonResult<UserInfo?>?>() {
+            override fun onRequestSuccess(entity: BaseCommonResult<UserInfo?>?) {
                 if (entity == null) {
                     return
                 }
@@ -96,8 +96,8 @@ class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
     private fun requestLogout() {
-        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResultOld<Any?>?>() {
-            override fun onRequestSuccess(entity: BaseResultOld<Any?>?) {
+        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseCommonResult<Any?>?>() {
+            override fun onRequestSuccess(entity: BaseCommonResult<Any?>?) {
                 if (entity == null) {
                     return
                 }

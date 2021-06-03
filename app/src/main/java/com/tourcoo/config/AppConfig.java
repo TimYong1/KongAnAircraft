@@ -1,7 +1,8 @@
 package com.tourcoo.config;
 
 
-import static com.tourcoo.constant.CommonConstant.APP_TYPE_PROCURATORATE;
+import static com.tourcoo.constant.CommonConstant.APP_TYPE_PRO;
+import static com.tourcoo.constant.CommonConstant.APP_TYPE_SAS;
 
 /**
  * @author :JenkinsZhou
@@ -12,6 +13,6 @@ import static com.tourcoo.constant.CommonConstant.APP_TYPE_PROCURATORATE;
  */
 public class AppConfig {
     public static boolean DEBUG_BODE = false;
-    public static int APP_TYPE = APP_TYPE_PROCURATORATE;
+    public static int APP_TYPE = APP_TYPE_SAS;
 
 }

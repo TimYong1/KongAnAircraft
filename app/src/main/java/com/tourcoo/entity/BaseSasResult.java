@@ -8,13 +8,14 @@ package com.tourcoo.entity;
  * @date 2021年06月03日12:00
  * @Email: 971613168@qq.com
  */
-public class BaseSasResult<T> extends BaseAbstractResult<T> {
+public class BaseSasResult<T> extends BaseResult<T> {
     private int code;
     private String msg;
+    private String errorMsg;
     private String path;
     private long timestamp;
     private T data;
-
+    private boolean isSuccess;
     @Override
     public int getStatus() {
         return code;
@@ -64,5 +65,21 @@ public class BaseSasResult<T> extends BaseAbstractResult<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+
+    public void setSuccess(boolean success) {
+        isSuccess = success;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 }
