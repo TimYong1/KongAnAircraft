@@ -4,7 +4,7 @@ package com.tourcoo.retrofit.repository;
 import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.account.TokenInfo;
 import com.tourcoo.account.UserInfo;
-import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.BaseResultOld;
 import com.tourcoo.entity.flight.FlightRecordEntity;
 import com.tourcoo.retrofit.ApiService;
 import com.tourcoo.retrofit.RetrofitHelper;
@@ -55,7 +55,7 @@ public class ApiRepository extends BaseRepository {
      *
      * @return
      */
-    public Observable<BaseResult<TokenInfo>> requestAppLogin(String userName, String pass) {
+    public Observable<BaseResultOld<TokenInfo>> requestAppLogin(String userName, String pass) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("username", userName);
         params.put("password", pass);
@@ -63,21 +63,21 @@ public class ApiRepository extends BaseRepository {
     }
 
 
-    public Observable<BaseResult<String>> requestStreamUrl(Map<String, Object> params) {
+    public Observable<BaseResultOld<String>> requestStreamUrl(Map<String, Object> params) {
         LogUtils.tag("提交到服务器的数据").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestStreamUrl(params).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseResult<Object>> requestLogout() {
+    public Observable<BaseResultOld<Object>> requestLogout() {
         return ThreadTransformer.switchSchedulers(getApiService().requestLogout().retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseResult<Object>> requestUploadDroneData(Map<String, Object> params) {
+    public Observable<BaseResultOld<Object>> requestUploadDroneData(Map<String, Object> params) {
         LogUtils.tag("提交到服务器的数据").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestUploadDroneData(params).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseResult<Object>> requestEditPass(String oldPass, String newPass) {
+    public Observable<BaseResultOld<Object>> requestEditPass(String oldPass, String newPass) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("oldPass", oldPass);
         params.put("newPass", newPass);
@@ -86,12 +86,12 @@ public class ApiRepository extends BaseRepository {
     }
 
 
-    public Observable<BaseResult<UserInfo>> requestUserInfo() {
+    public Observable<BaseResultOld<UserInfo>> requestUserInfo() {
         return ThreadTransformer.switchSchedulers(getApiService().requestUserInfo().retryWhen(new RetryWhen()));
     }
 
 
-    public Observable<BaseResult<FlightRecordEntity>> requestFlyRecord(Map<String, Object> params) {
+    public Observable<BaseResultOld<FlightRecordEntity>> requestFlyRecord(Map<String, Object> params) {
         /*{
             "address": "",
                 "appUserId": 0,

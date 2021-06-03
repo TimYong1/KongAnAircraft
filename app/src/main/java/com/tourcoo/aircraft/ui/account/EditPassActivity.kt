@@ -7,26 +7,19 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Toast
 import com.apkfuns.logutils.LogUtils
 import com.tourcoo.account.AccountHelper
-import com.tourcoo.account.TokenInfo
-import com.tourcoo.aircraft.ui.sample.AircraftApplication
 import com.tourcoo.aircraftmanager.R
-import com.tourcoo.entity.BaseResult
+import com.tourcoo.entity.BaseResultOld
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository
-import com.tourcoo.threadpool.ThreadManager
 import com.tourcoo.util.RsaUtils
-import com.tourcoo.util.RsaUtils.KEY
 import com.tourcoo.util.RsaUtils.PUBLISH_KEY
-import com.tourcoo.util.StringUtil
 import com.tourcoo.util.ToastUtil
 import com.trello.rxlifecycle3.android.ActivityEvent
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_edit_pass.*
-import kotlinx.android.synthetic.main.activity_login_new.*
 
 /**
  *@description :
@@ -89,9 +82,9 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
 
 
     private fun requestEditPass(pass: String, newPass: String) {
-        ApiRepository.getInstance().requestEditPass(pass, newPass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any?>?>() {
+        ApiRepository.getInstance().requestEditPass(pass, newPass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResultOld<Any?>?>() {
 
-            override fun onRequestSuccess(entity: BaseResult<Any?>?) {
+            override fun onRequestSuccess(entity: BaseResultOld<Any?>?) {
                 handleEditSuccess(entity)
                 hideNavigation()
             }
@@ -107,7 +100,7 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
 
-    private fun handleEditSuccess(entity: BaseResult<Any?>?) {
+    private fun handleEditSuccess(entity: BaseResultOld<Any?>?) {
         if (entity == null) {
             ToastUtil.showFailed("服务器走丢了")
             return
@@ -166,8 +159,8 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
     private fun requestLogout() {
-        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any?>?>() {
-            override fun onRequestSuccess(entity: BaseResult<Any?>?) {
+        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResultOld<Any?>?>() {
+            override fun onRequestSuccess(entity: BaseResultOld<Any?>?) {
                 if (entity == null) {
                     return
                 }

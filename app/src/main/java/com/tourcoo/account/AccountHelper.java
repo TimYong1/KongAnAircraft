@@ -14,6 +14,7 @@ import com.tourcoo.util.StringUtil;
 import io.rong.imlib.RongIMClient;
 
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_RY_TOKEN;
+import static com.tourcoo.constant.AccountConstant.PREF_KEY_SAS_TENANT;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_SYS_TOKEN;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_USER_CODE;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_USER_ID;
@@ -40,7 +41,14 @@ public class AccountHelper {
     private String userId = "";
     private String userCode = "";
     private String socketUrl = "";
+    /**
+     * 租户信息（仅SAS系统需要）
+     */
+    private String sasTenant;
+
+
     private UserInfo userInfo;
+
     private static class Holder {
         private static final AccountHelper instance = new AccountHelper();
     }
@@ -55,6 +63,30 @@ public class AccountHelper {
         return Holder.instance;
     }
 
+    /**
+     * 获取租户信息
+     *
+     * @return
+     */
+    public String getSasTenant() {
+        if (TextUtils.isEmpty(sasTenant)) {
+            sasTenant = SpUtil.INSTANCE.getString(PREF_KEY_SAS_TENANT);
+            if (null == sasTenant) {
+                sasTenant = "";
+            }
+            return sasTenant;
+        }
+        return sasTenant;
+    }
+
+    private void setSasTenant(String tenant) {
+        if (null == tenant) {
+            tenant = "";
+        }
+        sasTenant = tenant;
+        SpUtil.INSTANCE.put(PREF_KEY_SAS_TENANT, tenant);
+    }
+
     public String getSysToken() {
         if (TextUtils.isEmpty(sysToken)) {
             sysToken = SpUtil.INSTANCE.getString(PREF_KEY_SYS_TOKEN);
@@ -65,6 +97,7 @@ public class AccountHelper {
         }
         return sysToken;
     }
+
 
     public static String getRyToken() {
         if (TextUtils.isEmpty(ryToken)) {
@@ -195,11 +228,11 @@ public class AccountHelper {
         this.userInfo = userInfo;
     }
 
-    public UserInfo getUserInfo(){
+    public UserInfo getUserInfo() {
         return userInfo;
     }
 
-    public void logoutAndSkipLogin(){
+    public void logoutAndSkipLogin() {
         logout();
         skipLogin();
     }

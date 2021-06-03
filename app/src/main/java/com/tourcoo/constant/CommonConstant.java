@@ -8,6 +8,21 @@ package com.tourcoo.constant;
  * @Email: 971613168@qq.com
  */
 public class CommonConstant {
+    /**
+     * 空安
+     */
+    public static final int APP_TYPE_KONG_AN = 1;
+    /**
+     * 检察院
+     */
+    public static final int  APP_TYPE_PROCURATORATE = 2;
+    /**
+     * SAS
+     */
+    public static final int  APP_TYPE_SAS = 3;
+
+
+
     public static final String SMART_REFRESH_LAYOUT_CLASS = "com.scwang.smartrefresh.layout.SmartRefreshLayout";
 
     public static final String EXCEPTION_NOT_INIT_FAST_MANAGER = "You've to call static method init(Application) first in Application";

@@ -7,7 +7,8 @@ import com.tourcoo.account.AccountHelper;
 import com.tourcoo.control.IHttpPageRequestControl;
 import com.tourcoo.control.IHttpRequestControl;
 import com.tourcoo.control.UiManager;
-import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.AbstractResult;
+import com.tourcoo.entity.BaseResultOld;
 
 import java.io.IOException;
 
@@ -105,12 +106,12 @@ public abstract class BaseObserver<T> extends DefaultObserver<T> {
                 body = response.errorBody();
                 if (body != null) {
                     try {
-                        BaseResult result = gson.fromJson(body.string(), BaseResult.class);
+                        AbstractResult result = gson.fromJson(body.string(), AbstractResult.class);
                         if (result == null) {
                             onRequestError(e);
                             LogUtils.d("执行了");
                         } else {
-                            switch (result.status) {
+                            switch (result.getStatus()) {
                                 case REQUEST_CODE_TOKEN_INVALID:
                                     AccountHelper.getInstance().logoutAndSkipLogin();
                                     LogUtils.e("执行了");

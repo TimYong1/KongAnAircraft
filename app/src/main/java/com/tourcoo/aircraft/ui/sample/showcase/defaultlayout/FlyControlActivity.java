@@ -37,7 +37,7 @@ import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.aircraft.widget.camera.CameraHelper;
 import com.tourcoo.aircraft.widget.gimble.GimHelper;
 import com.tourcoo.aircraftmanager.R;
-import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.BaseResultOld;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.flight.FlightRealTimeData;
 import com.tourcoo.entity.flight.FlightRecordEntity;
@@ -590,9 +590,9 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
     }
 
     private void requestStreamUrlAndUpload(Map<String, Object> hashMap) {
-        ApiRepository.getInstance().requestStreamUrl(hashMap).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<String>>("正在获取直播地址...") {
+        ApiRepository.getInstance().requestStreamUrl(hashMap).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResultOld<String>>("正在获取直播地址...") {
             @Override
-            public void onRequestSuccess(BaseResult<String> entity) {
+            public void onRequestSuccess(BaseResultOld<String> entity) {
                 if (entity == null) {
                     ToastUtil.showSuccess("直播流地址获取失败");
                     return;
@@ -1134,9 +1134,9 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
             params.put("id", id);
         }
 
-        ApiRepository.getInstance().requestFlyRecord(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<FlightRecordEntity>>() {
+        ApiRepository.getInstance().requestFlyRecord(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResultOld<FlightRecordEntity>>() {
             @Override
-            public void onRequestSuccess(BaseResult<FlightRecordEntity> entity) {
+            public void onRequestSuccess(BaseResultOld<FlightRecordEntity> entity) {
                 if (entity == null) {
                     return;
                 }

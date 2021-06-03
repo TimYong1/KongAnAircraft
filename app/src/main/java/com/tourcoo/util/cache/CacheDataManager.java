@@ -20,12 +20,12 @@ import java.util.List;
  * @Email: 971613168@qq.com
  */
 public class CacheDataManager {
-    private String cacheSizeResult = "";
-    private GreenDaoManager daoManager = new GreenDaoManager();
+    private String cacheSizeResult = "0.00MB";
+    private final GreenDaoManager daoManager = new GreenDaoManager();
     /**
      * 考虑到数据库查找数据需要耗时 所以这里才用异步操作
      */
-    private ExecuteListener listener;
+    private final ExecuteListener listener;
 
     /**
      * 获取整体缓存大小

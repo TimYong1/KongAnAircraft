@@ -33,7 +33,7 @@ import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivity;
 import com.tourcoo.aircraftmanager.R;
 
-import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.BaseResultOld;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.sn.DeviceInfo;
 import com.tourcoo.manager.AircraftHelper;
@@ -119,11 +119,6 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 skipMap();
                 break;
             case R.id.ivFlyPhotoAlbum:
-             /*   if (AppConfig.DEBUG_BODE) {
-                    skipFlyPhoto();
-                } else {
-                    ToastUtil.showNormal("正在开发");
-                }*/
                 skipFlyPhoto();
                 break;
             case R.id.llMy:
@@ -194,9 +189,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         params.put("productSn", StringUtil.getNotNullValue(deviceInfo.productSn));
         params.put("remoteSn", StringUtil.getNotNullValue(deviceInfo.remoteSn));
         params.put("type", deviceInfo.type);
-        ApiRepository.getInstance().requestUploadDroneData(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<Object>>() {
+        ApiRepository.getInstance().requestUploadDroneData(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResultOld<Object>>() {
             @Override
-            public void onRequestSuccess(BaseResult<Object> entity) {
+            public void onRequestSuccess(BaseResultOld<Object> entity) {
                 if (entity == null) {
                     return;
                 }
@@ -335,7 +330,6 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         }
         Intent intent = new Intent();
         intent.setClass(mContext, FlyPhotoActivity.class);
-//        intent.setClass(mContext, MediaTestActivity.class);
         startActivity(intent);
     }
 
@@ -521,9 +515,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void requestUserInfo() {
-        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseResult<UserInfo>>() {
+        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseResultOld<UserInfo>>() {
             @Override
-            public void onRequestSuccess(BaseResult<UserInfo> entity) {
+            public void onRequestSuccess(BaseResultOld<UserInfo> entity) {
                 if (entity == null) {
                     return;
                 }

@@ -11,10 +11,12 @@ package com.tourcoo.constant;
  */
 public class AccountConstant {
     public static final String PREF_KEY_SYS_TOKEN = "PREF_KEY_SYS_TOKEN";
-
     public static final String PREF_KEY_RY_TOKEN = "PREF_KEY_RY_TOKEN";
     public static final String PREF_KEY_USER_ID = "PREF_KEY_USER_ID";
     public static final String PREF_KEY_USER_CODE = "PREF_KEY_USER_CODE";
+    public static final String PREF_KEY_SAS_TENANT= "PREF_KEY_SAS_TENANT";
+
+
     public static final String PREF_IS_FIRST_START = "PREF_IS_FIRST_START";
 
     public static final String PREF_KEY_IS_LOGIN_DJ_ACCOUNT = "PREF_KEY_IS_LOGIN_DJ_ACCOUNT";

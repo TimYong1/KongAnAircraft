@@ -1,45 +1,68 @@
 package com.tourcoo.entity;
 
+
 /**
  * @author :JenkinsZhou
- * @description : 网络请求基类
+ * @description :
  * @company :途酷科技
- * @date 2020年11月13日16:21
+ * @date 2021年06月03日12:00
  * @Email: 971613168@qq.com
  */
-public class BaseResult<T> {
-    /**
-     * code : 1
-     * errMsg : 操作成功
-     * data : {}
-     */
+public class BaseResult<T> extends AbstractResult<T> {
+    private int code;
+    private String msg;
+    private String path;
+    private long timestamp;
+    private T data;
 
-    public int status;
-    public String message;
-    public T data;
+    @Override
+    public int getStatus() {
+        return code;
+    }
 
+    @Override
+    public String getMessage() {
+        return msg;
+    }
 
+    @Override
     public T getData() {
         return data;
     }
 
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public void setData(T data) {
         this.data = data;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 }

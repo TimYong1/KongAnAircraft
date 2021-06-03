@@ -1,7 +1,7 @@
 package com.tourcoo.control;
 
 
-import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.BaseResultOld;
 
 import io.reactivex.annotations.NonNull;
 
@@ -18,7 +18,7 @@ public interface HttpRequestControl {
      *
      * @param httpRequestControl
      */
-    void httpRequestSuccess(IHttpRequestControl httpRequestControl, BaseResult<?> data);
+    void httpRequestSuccess(IHttpRequestControl httpRequestControl, BaseResultOld<?> data);
 
 
     /**

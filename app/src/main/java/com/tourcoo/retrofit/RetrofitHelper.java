@@ -94,12 +94,13 @@ public class RetrofitHelper {
             Request.Builder request = chain.request().newBuilder();
             //避免某些服务器配置攻击,请求返回403 forbidden 问题
             addHeader("User-Agent", "Mozilla/5.0 (Android)");
-              addHeader("Content-Type", "application/json");
-            addHeader("Accept-Language","zh-CN,zh;q=0.9");
+            addHeader("Content-Type", "application/json");
+            addHeader("Accept-Language", "zh-CN,zh;q=0.9");
             String token = AccountHelper.getInstance().getSysToken();
             LogUtils.tag(mLogTag).d("token=" + token);
             addHeader("Authorization", token);
-
+            //SAS系统需要传
+            addHeader("tenant", AccountHelper.getInstance().getSasTenant());
             if (mHeaderMap.size() > 0) {
                 for (Map.Entry<String, Object> entry : mHeaderMap.entrySet()) {
                     request.addHeader(entry.getKey(), String.valueOf(entry.getValue()));
@@ -110,7 +111,7 @@ public class RetrofitHelper {
     };
 
     private RetrofitHelper() {
-                sClientBuilder = new OkHttpClient.Builder();
+        sClientBuilder = new OkHttpClient.Builder();
         sClientBuilder.addInterceptor(mHeaderInterceptor);
         sClientBuilder.addInterceptor(new ResponseInterceptor());
         sRetrofitBuilder = new Retrofit.Builder()
@@ -461,14 +462,14 @@ public class RetrofitHelper {
                     boolean isJson = message.startsWith("[") || message.startsWith("{");
                     isJson = isJson && mLogJsonEnable;
                     if (isJson) {
-                        if(message.length()>LOG_LENGTH_JSON_MAX){
+                        if (message.length() > LOG_LENGTH_JSON_MAX) {
                             return;
                         }
                         LogUtils.tag(mLogTag).json(message);
                         return;
                     }
-                    if(AppConfig.DEBUG_BODE){
-                        if(message.length()>LOG_LENGTH_MAX){
+                    if (AppConfig.DEBUG_BODE) {
+                        if (message.length() > LOG_LENGTH_MAX) {
                             return;
                         }
                         Log.d(mLogTag, message);

@@ -2,7 +2,7 @@ package com.tourcoo.control;
 
 import android.view.View;
 
-import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.BaseResultOld;
 
 
 /**
@@ -20,5 +20,5 @@ public interface IHttpRequestControl extends StatusLayoutControl {
      */
     View getContentView();
 
-    void  handleSuccessData(BaseResult<?> netData);
+    void  handleSuccessData(BaseResultOld<?> netData);
 }

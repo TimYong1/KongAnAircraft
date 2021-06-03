@@ -3,7 +3,7 @@ package com.tourcoo.retrofit;
 
 import com.tourcoo.account.TokenInfo;
 import com.tourcoo.account.UserInfo;
-import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.BaseResultOld;
 import com.tourcoo.entity.flight.FlightRecordEntity;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ public interface ApiService {
 
 
     @POST("/api/app/auth/login")
-    Observable<BaseResult<TokenInfo>> requestAppLogin(@Body Map<String, Object> map);
+    Observable<BaseResultOld<TokenInfo>> requestAppLogin(@Body Map<String, Object> map);
 
     /**
      * 获取直播地址
@@ -34,14 +34,14 @@ public interface ApiService {
      * @return
      */
     @GET("/api/app/stream/getUrl")
-    Observable<BaseResult<String>> requestStreamUrl(@QueryMap Map<String, Object> map);
+    Observable<BaseResultOld<String>> requestStreamUrl(@QueryMap Map<String, Object> map);
 
     @DELETE("/api/app/auth/logout")
-    Observable<BaseResult<Object>> requestLogout();
+    Observable<BaseResultOld<Object>> requestLogout();
 
 
     @GET("/api/app/auth/info")
-    Observable<BaseResult<Object>> requestUserInfo(@QueryMap Map<String, Object> map);
+    Observable<BaseResultOld<Object>> requestUserInfo(@QueryMap Map<String, Object> map);
 
     /**
      * 设备信息
@@ -49,17 +49,17 @@ public interface ApiService {
      * @return
      */
     @POST("/api/app/drone/uploadDroneData")
-    Observable<BaseResult<Object>> requestUploadDroneData(@Body Map<String, Object> map);
+    Observable<BaseResultOld<Object>> requestUploadDroneData(@Body Map<String, Object> map);
 
     @POST("/api/app/auth/updatePass")
-    Observable<BaseResult<Object>> requestEditPass(@Body Map<String, Object> map);
+    Observable<BaseResultOld<Object>> requestEditPass(@Body Map<String, Object> map);
 
 
     @GET("/api/app/auth/info")
-    Observable<BaseResult<UserInfo>> requestUserInfo();
+    Observable<BaseResultOld<UserInfo>> requestUserInfo();
 
     @POST("/api/flyRecord")
-    Observable<BaseResult<FlightRecordEntity>> requestFlyRecord(@Body Map<String, Object> map);
+    Observable<BaseResultOld<FlightRecordEntity>> requestFlyRecord(@Body Map<String, Object> map);
 
 
 

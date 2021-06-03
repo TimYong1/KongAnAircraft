@@ -13,7 +13,7 @@ import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.aircraftmanager.R;
 import com.tourcoo.control.HttpRequestControl;
 import com.tourcoo.control.IHttpRequestControl;
-import com.tourcoo.entity.BaseResult;
+import com.tourcoo.entity.BaseResultOld;
 import com.tourcoo.retrofit.NetworkUtil;
 import com.tourcoo.retrofit.RequestConfig;
 import com.tourcoo.util.ToastUtil;
@@ -43,7 +43,7 @@ public class HttpRequestControlImpl implements HttpRequestControl {
     private Gson gson = new Gson();
 
     @Override
-    public void httpRequestSuccess(IHttpRequestControl httpRequestControl, BaseResult<?> data) {
+    public void httpRequestSuccess(IHttpRequestControl httpRequestControl, BaseResultOld<?> data) {
         LogUtils.tag(TAG).i("执行了1");
         if (httpRequestControl == null) {
             Toast.makeText(AircraftApplication.getContext(), "httpRequestControl=null", Toast.LENGTH_SHORT).show();
@@ -140,7 +140,7 @@ public class HttpRequestControlImpl implements HttpRequestControl {
                 body = response.errorBody();
                 if (body != null) {
                     try {
-                        BaseResult result = gson.fromJson(body.string(), BaseResult.class);
+                        BaseResultOld result = gson.fromJson(body.string(), BaseResultOld.class);
                         if (result == null) {
                             ToastUtil.showFailed(R.string.exception_network_data_error);
                             LogUtils.d("执行了");

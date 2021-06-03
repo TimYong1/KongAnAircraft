@@ -20,7 +20,9 @@ import com.tourcoo.account.TokenInfo
 import com.tourcoo.aircraft.ui.home.HomeActivity
 import com.tourcoo.aircraft.ui.sample.AircraftApplication
 import com.tourcoo.aircraftmanager.R
-import com.tourcoo.entity.BaseResult
+import com.tourcoo.config.AppConfig.APP_TYPE
+import com.tourcoo.constant.CommonConstant.*
+import com.tourcoo.entity.BaseResultOld
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository
@@ -54,7 +56,6 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         const val PREF_KEY_PHONE = "PREF_KEY_PHONE"
         const val PREF_KEY_PASS = "PREF_KEY_PASS"
         const val PREF_KEY_IS_REMIND = "PREF_KEY_IS_REMIND"
-
 
 
     }
@@ -93,30 +94,43 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         mContext!!.windowManager.defaultDisplay.getRealMetrics(outMetrics)
         screenWidth = outMetrics.widthPixels
         screenHeight = outMetrics.heightPixels
+        val contentHeightPercent = 450f / 540f
         val widthPercent = 580f / 960f
-        val heightPercent = 450f / 540f
+        val heightPercent = 400f / 540f
         val inputViewWidthPercent = 360f / 500f
-        val inputViewHeightPercent = 45f / 360f
+        val inputViewHeightPercent = 40f / 360f
         val parentWidth: Int
         val inputWidth: Int
         val inputHeight: Int
         val params = nScrollView.layoutParams as ConstraintLayout.LayoutParams
         val inputPhoneParams = llPhone.layoutParams as LinearLayout.LayoutParams
+        val inputSasParams = llSas.layoutParams as LinearLayout.LayoutParams
         val inputPassParams = llPass.layoutParams as LinearLayout.LayoutParams
         val tvLoginPassParams = tvLogin.layoutParams as LinearLayout.LayoutParams
         val cBoxRemindPassParams = cBoxRemindPass.layoutParams as LinearLayout.LayoutParams
         parentWidth = (widthPercent * screenWidth!!).toInt()
         params.width = parentWidth
-        params.height = (heightPercent * screenHeight!!).toInt()
+        params.height = (contentHeightPercent * screenHeight!!).toInt()
         inputWidth = (inputViewWidthPercent * parentWidth).toInt()
-        inputPhoneParams.width = inputWidth
         inputHeight = (inputViewHeightPercent * inputWidth).toInt()
+        inputPhoneParams.width = inputWidth
         inputPhoneParams.height = inputHeight
         inputPassParams.width = inputWidth
         tvLoginPassParams.width = inputWidth
         inputPassParams.height = inputHeight
+        inputSasParams.width = inputWidth
+        inputSasParams.height = inputHeight
         cBoxRemindPassParams.setMargins((parentWidth - inputWidth) / 2, 0, 0, 0)
         LogUtils.d("屏幕尺寸" + params.width + "---" + params.height + "inputParams.inputHeight=" + inputHeight)
+
+        when (APP_TYPE) {
+            APP_TYPE_KONG_AN, APP_TYPE_PROCURATORATE -> {
+                setViewVisible(llSas, false)
+            }
+            APP_TYPE_SAS -> {
+                setViewVisible(llSas, true)
+            }
+        }
     }
 
     override fun onClick(v: View?) {
@@ -141,9 +155,9 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
     private fun requestLogin(user: String, pass: String) {
-        ApiRepository.getInstance().requestAppLogin(user, pass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<TokenInfo?>?>() {
+        ApiRepository.getInstance().requestAppLogin(user, pass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResultOld<TokenInfo?>?>() {
 
-            override fun onRequestSuccess(entity: BaseResult<TokenInfo?>?) {
+            override fun onRequestSuccess(entity: BaseResultOld<TokenInfo?>?) {
                 handleLoginSuccess(entity)
                 hideNavigation()
             }
@@ -158,7 +172,7 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         })
     }
 
-    private fun handleLoginSuccess(entity: BaseResult<TokenInfo?>?) {
+    private fun handleLoginSuccess(entity: BaseResultOld<TokenInfo?>?) {
         if (entity == null) {
             Toast.makeText(mContext, "服务器数据异常", Toast.LENGTH_SHORT).show()
             return
@@ -189,7 +203,22 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
             SpUtil.put(PREF_KEY_PHONE, "")
             SpUtil.put(PREF_KEY_PASS, "")
         }
+        when (APP_TYPE) {
+            APP_TYPE_KONG_AN, APP_TYPE_PROCURATORATE -> {
+
+            }
+            APP_TYPE_SAS -> {
+                if (TextUtils.isEmpty(etSasNum.text.toString())) {
+                    ToastUtil.showNormal("请输入租户号")
+                    return
+                }
+            }
+        }
+
         SpUtil.put(PREF_KEY_IS_REMIND, cBoxRemindPass.isChecked)
+
+
+
         requestLogin(etUserPhone.text.toString(), etUserPass.text.toString())
     }
 
@@ -242,11 +271,17 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         view.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
 
-
+    fun setViewGone(view: View?, visible: Boolean) {
+        if (view == null) {
+            return
+        }
+        view.visibility = if (visible) View.VISIBLE else View.GONE
+    }
 
     private fun initListener() {
         listenInput(etUserPhone, ivClearPhone)
         listenInput(etUserPass, ivClearPass)
+        listenInput(etSasNum, ivClearSas)
         checkInput()
         ivPassVisible.setOnClickListener {
             controlPassVisible()
