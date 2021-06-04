@@ -14,8 +14,8 @@ public class BaseSasResult<T> extends BaseResult<T> {
     private String errorMsg;
     private String path;
     private String extra;
-    private long timestamp;
-    private T data;
+    private String timestamp;
+    public T data;
     private boolean isSuccess;
     @Override
     public int getStatus() {
@@ -56,11 +56,11 @@ public class BaseSasResult<T> extends BaseResult<T> {
         this.path = path;
     }
 
-    public long getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 

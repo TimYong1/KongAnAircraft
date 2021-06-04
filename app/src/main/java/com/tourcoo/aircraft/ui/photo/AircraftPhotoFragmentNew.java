@@ -512,6 +512,8 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     private void loadAdapter() {
         if (groupAdapter == null) {
             groupAdapter = new GroupImageAdapter(new ArrayList<>());
+            View footerView = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_view, null);
+            groupAdapter.addFooterView(footerView);
             int spanCount = 6;
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), spanCount);
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {

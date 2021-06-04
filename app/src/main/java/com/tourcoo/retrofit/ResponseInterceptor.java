@@ -1,6 +1,7 @@
 package com.tourcoo.retrofit;
 
 
+import com.apkfuns.logutils.LogUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.tourcoo.config.AppConfig;
@@ -30,7 +31,7 @@ import static com.tourcoo.constant.CommonConstant.APP_TYPE_SAS;
  * @Email: 971613168@qq.com
  */
 public class ResponseInterceptor implements Interceptor {
-
+public static final String TAG = "ResponseInterceptor";
     @NotNull
     @Override
     public Response intercept(final Chain chain) throws IOException {
@@ -45,6 +46,7 @@ public class ResponseInterceptor implements Interceptor {
         source.request(Long.MAX_VALUE);
         String respString = source.getBuffer().clone().readString(Charset.defaultCharset());
         handleResponse(respString);
+        LogUtils.i(TAG+respString+"---"+new Gson().toJson(request.headers()));
         return response;
 
     }
@@ -76,11 +78,9 @@ public class ResponseInterceptor implements Interceptor {
                     result = null;
                     e.printStackTrace();
                 }
-                if (result != null && result.getStatus() == 401) {
-        /*    ToastUtil.showNormal(result.getErrMsg());
-            AccountHelper.getInstance().logout();*/
-                    //todo
-                }
+             /*   if(result !=null && result.getStatus() == ){
+                    ,
+                }*/
                 break;
         }
     }

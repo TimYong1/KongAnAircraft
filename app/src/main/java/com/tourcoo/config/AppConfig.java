@@ -1,6 +1,7 @@
 package com.tourcoo.config;
 
 
+import static com.tourcoo.constant.CommonConstant.APP_TYPE_KONG_AN;
 import static com.tourcoo.constant.CommonConstant.APP_TYPE_PRO;
 import static com.tourcoo.constant.CommonConstant.APP_TYPE_SAS;
 

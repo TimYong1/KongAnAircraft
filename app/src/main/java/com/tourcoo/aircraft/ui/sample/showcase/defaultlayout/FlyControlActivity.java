@@ -38,6 +38,7 @@ import com.tourcoo.aircraft.widget.camera.CameraHelper;
 import com.tourcoo.aircraft.widget.gimble.GimHelper;
 import com.tourcoo.aircraftmanager.R;
 import com.tourcoo.entity.base.BaseCommonResult;
+import com.tourcoo.entity.base.BaseSasResult;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.flight.FlightRealTimeData;
 import com.tourcoo.entity.flight.FlightRecordEntity;
@@ -122,7 +123,7 @@ import static com.tourcoo.entity.socket.SocketConstant.SOCKET_TYPE_REAL_TIME_DAT
  * @Email: 971613168@qq.com
  */
 public class FlyControlActivity extends RxAppCompatActivity implements View.OnClickListener {
-    public static final String TAG = "TestActivity";
+    public static final String TAG = "FlyControlActivity";
     private ConstraintLayout rootView;
     private FPVInteractionWidget fpvInteractionWidget;
     private MapWidget mapWidget;
@@ -178,7 +179,6 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
             EventBus.getDefault().register(this);
         }
         initView();
-
         findViewById(R.id.icBackHome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -589,18 +589,18 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         RongCallClient.getInstance().setVoIPCallListener(null);
     }
 
-    private void requestStreamUrlAndUpload(Map<String, Object> hashMap) {
-        ApiRepository.getInstance().requestStreamUrl(hashMap).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseCommonResult<String>>("正在获取直播地址...") {
+    private void requestStreamUrlAndUpload(String droneId) {
+        ApiRepository.getInstance().requestStreamUrl(droneId).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseSasResult<String>>("正在获取直播地址...") {
             @Override
-            public void onRequestSuccess(BaseCommonResult<String> entity) {
+            public void onRequestSuccess(BaseSasResult<String> entity) {
                 if (entity == null) {
                     ToastUtil.showSuccess("直播流地址获取失败");
                     return;
                 }
-                if (RequestConfig.RESPONSE_CODE_SUCCESS == entity.status && null != entity.data) {
+                if (entity.isSuccess()) {
                     handleUploadStream(entity.data);
                 } else {
-                    ToastUtil.showNormal(entity.message);
+                    ToastUtil.showNormal(entity.getErrorMsg());
                 }
 
             }
@@ -756,6 +756,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         mFlightRealTimeData = FlightRealDataManager.getInstance().getRealTimeData();
         mFlightRealTimeData.setUserLocateData(userLocate);
         mFlightRealTimeData.setDroneId(ProductManager.getInstance().getDroneId());
+        mFlightRealTimeData.setTenantId(AccountHelper.getInstance().getSasTenant());
         socketUploadEntity.setData(mFlightRealTimeData);
 
         socketUploadEntity.setMsgType(SOCKET_TYPE_REAL_TIME_DATA_FLIGHT);
@@ -914,8 +915,8 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         ThreadManager.getDefault().execute(new Runnable() {
             @Override
             public void run() {
-                String socketUrl = AccountHelper.getInstance().getSocketUrl("");
-                LogUtils.d(TAG + "socket即将连接到" + socketUrl);
+                String socketUrl = AccountHelper.getInstance().getSocketUrl();
+                LogUtils.i(TAG + "socket即将连接到" + socketUrl);
                 webSocketManager = WebSocketManager.getInstance(socketUrl);
                 initSocket();
                 initTimer();
@@ -1027,7 +1028,9 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         }
     }
 
-
+    /**
+     * 开启直播流
+     */
     private void doUploadLiveStream() {
         Double lastLat = SpUtil.INSTANCE.getDouble(PREF_KEY_LAST_LOCATE_LAT);
         Double lastLang = SpUtil.INSTANCE.getDouble(PREF_KEY_LAST_LOCATE_LANG);
@@ -1057,21 +1060,21 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                     public void onSuccess(String s) {
                         deviceInfo.remoteSn = StringUtil.getNotNullValue(s);
                         deviceInfo.id = StringUtil.getNotNullValue(s);
-                        Map<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("droneId", deviceInfo.id);
+                     /*   Map<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("droneId", deviceInfo.id);*/
                         mDroneId = deviceInfo.id;
                         ProductManager.getInstance().setDroneId(deviceInfo.id);
-                        hashMap.put("userId", AccountHelper.getInstance().getUserId());
+                     /*   hashMap.put("userId", AccountHelper.getInstance().getUserId());
                         hashMap.put("userLatitude", lastLat);
-                        hashMap.put("userLongitude", lastLang);
-                        if (mFlightRealTimeData != null && mFlightRealTimeData.getLocateData() != null) {
+                        hashMap.put("userLongitude", lastLang);*/
+                       /* if (mFlightRealTimeData != null && mFlightRealTimeData.getLocateData() != null) {
                             hashMap.put("droneLatitude", mFlightRealTimeData.getLocateData().getLatitude());
                             hashMap.put("droneLongitude", mFlightRealTimeData.getLocateData().getLongitude());
                         } else {
                             hashMap.put("droneLatitude", 0.0);
                             hashMap.put("droneLongitude", 0.0);
-                        }
-                        requestStreamUrlAndUpload(hashMap);
+                        }*/
+                        requestStreamUrlAndUpload(deviceInfo.id);
                     }
 
                     @Override
@@ -1134,20 +1137,20 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
             params.put("id", id);
         }
 
-        ApiRepository.getInstance().requestFlyRecord(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseCommonResult<FlightRecordEntity>>() {
+        ApiRepository.getInstance().requestFlyRecord(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseSasResult<FlightRecordEntity>>() {
             @Override
-            public void onRequestSuccess(BaseCommonResult<FlightRecordEntity> entity) {
+            public void onRequestSuccess(BaseSasResult<FlightRecordEntity> entity) {
                 if (entity == null) {
                     return;
                 }
-                if (entity.status == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
+                if (entity.getStatus() == RequestConfig.REQUEST_CODE_SUCCESS && entity.getData() != null) {
                     if (entity.data.getId() != null) {
                         mFlightId = entity.data.getId();
                         ToastUtil.showSuccessDebug("成功获取飞行记录id=" + mFlightId);
-                    }else {
+                    } else {
                         ToastUtil.showWarningDebug(new Gson().toJson(entity));
                     }
-                }else {
+                } else {
                     ToastUtil.showFailedDebug(new Gson().toJson(entity));
                 }
             }

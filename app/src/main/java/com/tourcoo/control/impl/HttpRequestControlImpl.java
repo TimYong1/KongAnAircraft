@@ -14,6 +14,7 @@ import com.tourcoo.aircraftmanager.R;
 import com.tourcoo.control.HttpRequestControl;
 import com.tourcoo.control.IHttpRequestControl;
 import com.tourcoo.entity.base.BaseCommonResult;
+import com.tourcoo.entity.base.BaseSasResult;
 import com.tourcoo.retrofit.NetworkUtil;
 import com.tourcoo.retrofit.RequestConfig;
 import com.tourcoo.util.ToastUtil;
@@ -107,28 +108,13 @@ public class HttpRequestControlImpl implements HttpRequestControl {
                 handleHttpError(e);
             }
         }
-        boolean needShowToast = !(e instanceof HttpException) && httpRequestControl == null;
+        boolean needShowToast = (!(e instanceof HttpException) && httpRequestControl ==null) ;
         LogUtils.w("是否显示:" + needShowToast);
         if (needShowToast) {
             ToastUtil.showFailed(reason);
             return;
         }
-        //todo
-       /* else if (e instanceof HttpException) {
-            if (e.toString().contains("" + RequestConfig.REQUEST_CODE_TOKEN_INVALID)) {
-                reason = R.string.exception_accounts;
-                AccountHelper.getInstance().logout();
-            }else {
-                reason = R.string.exception_http;
-            }
-            //DNS错误
-        } */
-      /*  LoadService statusManager = httpRequestControl.getStatusLayoutManager();
-        if (!NetworkUtil.isConnected(FlyApplication.getContext())) {
-            statusManager.showCallback(MultiStatusNetErrorCallback.class);
-            return;
-        }
-        statusManager.showCallback(MultiStatusErrorCallback.class);*/
+
     }
 
     private void handleHttpError(Throwable e) {
@@ -136,39 +122,31 @@ public class HttpRequestControlImpl implements HttpRequestControl {
             Response response = ((HttpException) e).response();
             ResponseBody body;
             if (response != null) {
-                LogUtils.e("执行了");
+                LogUtils.e("执行了1");
                 body = response.errorBody();
                 if (body != null) {
                     try {
-                        BaseCommonResult result = gson.fromJson(body.string(), BaseCommonResult.class);
+                        BaseSasResult result = gson.fromJson(body.string(), BaseSasResult.class);
                         if (result == null) {
                             ToastUtil.showFailed(R.string.exception_network_data_error);
-                            LogUtils.d("执行了");
+                            LogUtils.d("执行了2");
                         } else {
-                            switch (result.status) {
-                                case REQUEST_CODE_TOKEN_INVALID:
-                                   AccountHelper.getInstance().logoutAndSkipLogin();
-                                    LogUtils.e("执行了");
-                                    break;
-                                default:
-                                    LogUtils.i("执行了");
-                                    ToastUtil.showFailed(result.getMessage());
-                                    break;
-                            }
+                            LogUtils.i("执行了3");
+                            ToastUtil.showFailed(result.getMessage());
                         }
 
                     } catch (IOException | JsonSyntaxException ex) {
                         ex.printStackTrace();
                         ToastUtil.showFailedDebug(ex.toString());
-                        LogUtils.e("执行了");
+                        LogUtils.e("执行了4");
                     }
                 }
             } else {
-                LogUtils.e("执行了");
+                LogUtils.e("执行了5");
                 ToastUtil.showFailedDebug(e.toString());
             }
         } else {
-            LogUtils.e("执行了");
+            LogUtils.e("执行了6");
             ToastUtil.showFailedDebug(e.toString());
         }
     }
