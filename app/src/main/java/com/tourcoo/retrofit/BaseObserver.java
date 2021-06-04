@@ -77,20 +77,22 @@ public abstract class BaseObserver<T> extends DefaultObserver<T> {
         LogUtils.e(TAG + e.toString());
         boolean isIntercept = UiManager.getInstance().getObserverControl() != null && UiManager.getInstance().getObserverControl().onError(this, e);
         if (isIntercept) {
+            LogUtils.e(TAG+"已被拦截1");
             return;
         }
         if (e instanceof DataNullException) {
             onNext(null);
+            LogUtils.e(TAG+"已被拦截2");
             return;
         }
         if (UiManager.getInstance().getRequestControl() != null) {
             UiManager.getInstance().getRequestControl().httpRequestError(requestControl, e);
-            LogUtils.e("执行了");
+            LogUtils.e(TAG+"已被拦截3");
             return;
         }
         if (UiManager.getInstance().getHttpRequestPageControl() != null) {
             UiManager.getInstance().getHttpRequestPageControl().httpRequestError(mHttpPageRequestControl, e);
-            LogUtils.e("执行了");
+            LogUtils.e(TAG+"已被拦截4");
             return;
         }
         handleHttpError(e);
@@ -101,39 +103,31 @@ public abstract class BaseObserver<T> extends DefaultObserver<T> {
             Response response = ((HttpException) e).response();
             ResponseBody body;
             if (response != null) {
-                LogUtils.e("执行了");
+                LogUtils.e("执行了1");
                 body = response.errorBody();
                 if (body != null) {
                     try {
                         BaseResult result = gson.fromJson(body.string(), BaseResult.class);
                         if (result == null) {
                             onRequestError(e);
-                            LogUtils.d("执行了");
+                            LogUtils.e("执行了2");
                         } else {
-                            switch (result.getStatus()) {
-                                case REQUEST_CODE_TOKEN_INVALID:
-                                    AccountHelper.getInstance().logoutAndSkipLogin();
-                                    LogUtils.e("执行了");
-                                    break;
-                                default:
-                                    LogUtils.e("执行了");
-                                    onRequestSuccess((T) result);
-                                    break;
-                            }
+                            LogUtils.e("执行了3");
+                            onRequestSuccess((T) result);
                         }
 
                     } catch (IOException | JsonSyntaxException ex) {
                         ex.printStackTrace();
                         onRequestError(e);
-                        LogUtils.e("执行了");
+                        LogUtils.e("执行了4");
                     }
                 }
             } else {
-                LogUtils.e("执行了");
+                LogUtils.e("执行了5");
                 onRequestError(e);
             }
         } else {
-            LogUtils.e("执行了");
+            LogUtils.e("执行了6");
             onRequestError(e);
         }
     }

@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.apkfuns.logutils.LogUtils
@@ -33,7 +35,7 @@ import java.util.*
 class SplashActivity : RxAppCompatActivity() {
     private var mContext: Activity? = null
     private val missingPermission: MutableList<String> = ArrayList()
-
+    private var mHandler : Handler ? = Handler(Looper.getMainLooper())
     companion object {
         private var isAppStarted = false
         private const val SKIP_TIME = 1500L
@@ -123,9 +125,20 @@ class SplashActivity : RxAppCompatActivity() {
         }
         if (missingPermission.isEmpty()) {
             //说明权限充足 直接发起注册
-            ProductManager.getInstance().startSDKRegistration()
+                try {
+                    mHandler?.postDelayed( Runnable {
+                        ProductManager.getInstance().startSDKRegistration()
+                    },500 )
+                }catch (e :Exception){
+                    e.printStackTrace()
+                }
         } else {
             LogUtils.e("权限不足，暂时不能注册")
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mHandler?.removeCallbacksAndMessages(null)
     }
 }

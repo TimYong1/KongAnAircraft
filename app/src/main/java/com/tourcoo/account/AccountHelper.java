@@ -1,12 +1,15 @@
 package com.tourcoo.account;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.text.TextUtils;
 
 import com.apkfuns.logutils.LogUtils;
+import com.tourcoo.aircraft.product.ProductManager;
 import com.tourcoo.aircraft.ui.account.LoginNewActivity;
 import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.config.AppConfig;
+import com.tourcoo.entity.account.SasTokenBean;
 import com.tourcoo.util.SpUtil;
 import com.tourcoo.util.StackUtil;
 import com.tourcoo.util.StringUtil;
@@ -14,6 +17,7 @@ import com.tourcoo.util.StringUtil;
 
 import io.rong.imlib.RongIMClient;
 
+import static com.tourcoo.constant.AccountConstant.PREF_KEY_REFRESH_TOKEN;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_RY_TOKEN;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_SAS_TENANT;
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_SYS_TOKEN;
@@ -28,7 +32,7 @@ import static com.tourcoo.retrofit.RequestConfig.SOCKET_SAS_URL_IP;
 
 /**
  * @author :JenkinsZhou
- * @description : 账户管理类
+ * @description : 账户管理类(SAS)
  * @company :途酷科技
  * @date 2021年03月22日10:05
  * @Email: 971613168@qq.com
@@ -39,6 +43,11 @@ public class AccountHelper {
      * 系统token
      */
     private static String sysToken = "";
+
+    /**
+     * 刷新token时需要的token
+     */
+    private static String refreshToken = "";
     /**
      * 融云相关token
      */
@@ -53,7 +62,7 @@ public class AccountHelper {
     private String sasTenant;
 
 
-    private UserInfo userInfo;
+    private SasUserInfo userInfo;
 
     private static class Holder {
         private static final AccountHelper instance = new AccountHelper();
@@ -85,7 +94,7 @@ public class AccountHelper {
         return sasTenant;
     }
 
-    private void setSasTenant(String tenant) {
+    public void setSasTenant(String tenant) {
         if (null == tenant) {
             tenant = "";
         }
@@ -102,6 +111,25 @@ public class AccountHelper {
             return sysToken;
         }
         return sysToken;
+    }
+
+    public String getRefreshToken() {
+        if (TextUtils.isEmpty(refreshToken)) {
+            refreshToken = SpUtil.INSTANCE.getString(PREF_KEY_REFRESH_TOKEN);
+            if (null == refreshToken) {
+                refreshToken = "";
+            }
+            return refreshToken;
+        }
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String token) {
+        if (null == token) {
+            token = "";
+        }
+        refreshToken = token;
+        SpUtil.INSTANCE.put(PREF_KEY_REFRESH_TOKEN, token);
     }
 
 
@@ -138,7 +166,7 @@ public class AccountHelper {
         return userCode;
     }
 
-    public String getSocketUrl(String deviceId) {
+    public String getSocketUrl() {
         if (!AccountHelper.getInstance().isLogin()) {
             socketUrl = "";
         }
@@ -150,7 +178,7 @@ public class AccountHelper {
                 break;
             case APP_TYPE_SAS:
                 //sas系统传 租户id和设备id
-                socketUrl = SOCKET_SAS_URL_IP + getSasTenant() + "/" + deviceId;
+                socketUrl = SOCKET_SAS_URL_IP + getSasTenant() + "/" + ProductManager.getInstance().getDroneId();
                 break;
             case APP_TYPE_PRO:
                 //检察院要求传userCode
@@ -161,7 +189,7 @@ public class AccountHelper {
         return socketUrl;
     }
 
-    private void setSysToken(String token) {
+    public void setSysToken(String token) {
         if (null == token) {
             token = "";
         }
@@ -169,7 +197,7 @@ public class AccountHelper {
         SpUtil.INSTANCE.put(PREF_KEY_SYS_TOKEN, token);
     }
 
-    private void setRyToken(String token) {
+    public void setRyToken(String token) {
         if (null == token) {
             token = "";
         }
@@ -196,16 +224,17 @@ public class AccountHelper {
     /**
      * 登录
      *
-     * @param token
+     * @param tokenBean
      */
-    public void login(TokenInfo token) {
-        if (token == null) {
+    public void login(SasTokenBean tokenBean) {
+        if (tokenBean == null) {
             return;
         }
-        setSysToken(token.getSystemToken());
-        setRyToken(token.getRongCloudToken());
-        setUserId(token.getUserId());
-        setUserCode(token.getUserCode());
+        setSysToken(tokenBean.getToken());
+        setUserId(tokenBean.getUserId());
+        setRefreshToken(tokenBean.getRefreshToken());
+
+
     }
 
 
@@ -218,7 +247,6 @@ public class AccountHelper {
             if (RongIMClient.getInstance() != null) {
                 RongIMClient.getInstance().disconnect();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             LogUtils.e(TAG + e.toString());
@@ -226,32 +254,36 @@ public class AccountHelper {
     }
 
     public void skipLogin() {
-        StackUtil.getInstance().popAll();
         Intent intent = new Intent(AircraftApplication.getContext(), LoginNewActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         AircraftApplication.getContext().startActivity(intent);
-
     }
 
     public boolean isLogin() {
-        return !TextUtils.isEmpty(getSysToken()) && !TextUtils.isEmpty(getRyToken()) && !TextUtils.isEmpty(getUserId());
+        return !TextUtils.isEmpty(getSysToken())  && !TextUtils.isEmpty(getUserId());
     }
 
 
-    public void setUserInfo(UserInfo userInfo) {
+    public void setUserInfo(SasUserInfo userInfo) {
         if (userInfo == null) {
             return;
         }
-        setUserId(StringUtil.getNotNullValue(userInfo.getUserId()));
+        setUserId(StringUtil.getNotNullValue(userInfo.getId()));
         this.userInfo = userInfo;
     }
 
-    public UserInfo getUserInfo() {
+
+
+    public SasUserInfo getUserInfo() {
         return userInfo;
     }
 
+    /**
+     * 退出并且跳转到登录
+     */
     public void logoutAndSkipLogin() {
         logout();
+        StackUtil.getInstance().popAll();
         skipLogin();
     }
 }

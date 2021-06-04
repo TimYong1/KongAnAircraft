@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
+import cn.hutool.core.codec.Base64;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.CookieJar;
@@ -33,6 +34,8 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.tourcoo.retrofit.TokenInterceptor.HEADER_SAS_TENANT;
+
 /**
  * @author :JenkinsZhou
  * @description :
@@ -41,12 +44,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * @Email: 971613168@qq.com
  */
 public class RetrofitHelper {
+    private static final String TAG = "RetrofitHelper";
     private static volatile RetrofitHelper sManager;
     private static volatile Retrofit sRetrofit;
     private static volatile Retrofit.Builder sRetrofitBuilder;
     private static OkHttpClient.Builder sClientBuilder;
     private static OkHttpClient sClient;
-    private static String TAG = "RetrofitHelper";
+    public static final String HEADER_AUTHORIZATION = "Authorization";
+    public static final String VALUE_AUTH = "j9hn8eiovwazd6k0sxv6rfom:igbd39r16d4o8ittqppuiqv8sy5r2r00";
     /**
      * 允许打印的日志最大长度
      */
@@ -96,11 +101,13 @@ public class RetrofitHelper {
             addHeader("User-Agent", "Mozilla/5.0 (Android)");
             addHeader("Content-Type", "application/json");
             addHeader("Accept-Language", "zh-CN,zh;q=0.9");
-            String token = AccountHelper.getInstance().getSysToken();
-            LogUtils.tag(mLogTag).d("token=" + token);
-            addHeader("Authorization", token);
-            //SAS系统需要传
-            addHeader("tenant", AccountHelper.getInstance().getSasTenant());
+            String authValue = Base64.encode(VALUE_AUTH);
+            LogUtils.i("加密的值="+authValue);
+            addHeader(HEADER_AUTHORIZATION,"Basic "+authValue);
+            //SAS系统需要传租户id
+            LogUtils.i("加密的租户id="+AccountHelper.getInstance().getSasTenant());
+            String sasEncode =Base64.encode(AccountHelper.getInstance().getSasTenant());
+            addHeader(HEADER_SAS_TENANT, sasEncode);
             if (mHeaderMap.size() > 0) {
                 for (Map.Entry<String, Object> entry : mHeaderMap.entrySet()) {
                     request.addHeader(entry.getKey(), String.valueOf(entry.getValue()));
@@ -112,7 +119,7 @@ public class RetrofitHelper {
 
     private RetrofitHelper() {
         sClientBuilder = new OkHttpClient.Builder();
-        sClientBuilder.addInterceptor(mHeaderInterceptor);
+        sClientBuilder.addInterceptor(mHeaderInterceptor).addInterceptor(new TokenInterceptor());
         sClientBuilder.addInterceptor(new ResponseInterceptor());
         sRetrofitBuilder = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())

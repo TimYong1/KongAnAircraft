@@ -11,6 +11,7 @@ import com.apkfuns.logutils.LogUtils
 import com.tourcoo.account.AccountHelper
 import com.tourcoo.aircraftmanager.R
 import com.tourcoo.entity.base.BaseCommonResult
+import com.tourcoo.entity.base.BaseSasResult
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository
@@ -77,14 +78,15 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
             AccountHelper.getInstance().skipLogin()
             return
         }
-        tvUserAccount.text = AccountHelper.getInstance().userInfo.username
+        tvUserAccount.text = AccountHelper.getInstance().userInfo.name
     }
 
 
-    private fun requestEditPass(pass: String, newPass: String) {
-        ApiRepository.getInstance().requestEditPass(pass, newPass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseCommonResult<Any?>?>() {
 
-            override fun onRequestSuccess(entity: BaseCommonResult<Any?>?) {
+    private fun requestEditPass(pass: String, newPass: String) {
+        ApiRepository.getInstance().requestEditPass(pass, newPass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseSasResult<Any?>?>() {
+
+            override fun onRequestSuccess(entity: BaseSasResult<Any?>?) {
                 handleEditSuccess(entity)
                 hideNavigation()
             }
@@ -100,7 +102,7 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
 
-    private fun handleEditSuccess(entity: BaseCommonResult<Any?>?) {
+    private fun handleEditSuccess(entity: BaseSasResult<Any?>?) {
         if (entity == null) {
             ToastUtil.showFailed("服务器走丢了")
             return
@@ -159,8 +161,8 @@ class EditPassActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
     private fun requestLogout() {
-        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseCommonResult<Any?>?>() {
-            override fun onRequestSuccess(entity: BaseCommonResult<Any?>?) {
+        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseSasResult<Any?>?>() {
+            override fun onRequestSuccess(entity: BaseSasResult<Any?>?) {
                 if (entity == null) {
                     return
                 }

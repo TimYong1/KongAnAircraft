@@ -8,6 +8,7 @@ import android.text.InputType
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.DisplayMetrics
+import android.view.KeyEvent
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
@@ -16,15 +17,14 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.apkfuns.logutils.LogUtils
 import com.tourcoo.account.AccountHelper
-import com.tourcoo.account.TokenInfo
 import com.tourcoo.aircraft.ui.home.HomeActivity
 import com.tourcoo.aircraft.ui.sample.AircraftApplication
 import com.tourcoo.aircraftmanager.R
 import com.tourcoo.config.AppConfig.APP_TYPE
 import com.tourcoo.constant.CommonConstant.*
-import com.tourcoo.entity.base.BaseCommonResult
+import com.tourcoo.entity.account.SasTokenBean
+import com.tourcoo.entity.base.BaseSasResult
 import com.tourcoo.retrofit.BaseLoadingObserver
-import com.tourcoo.retrofit.RequestConfig
 import com.tourcoo.retrofit.repository.ApiRepository
 import com.tourcoo.threadpool.ThreadManager
 import com.tourcoo.util.SizeUtil
@@ -34,6 +34,7 @@ import com.tourcoo.util.ToastUtil
 import com.trello.rxlifecycle3.android.ActivityEvent
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_login_new.*
+import kotlin.system.exitProcess
 
 
 /**
@@ -51,12 +52,14 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
     private var rememberPass: Boolean? = null
     private var lastPhone: String? = null
     private var lastPass: String? = null
+    private var lastTenant: String? = null
 
+    //声明一个long类型变量：用于存放上一点击“返回键”的时刻
+    private var mExitTime: Long = 0
     companion object {
         const val PREF_KEY_PHONE = "PREF_KEY_PHONE"
         const val PREF_KEY_PASS = "PREF_KEY_PASS"
         const val PREF_KEY_IS_REMIND = "PREF_KEY_IS_REMIND"
-
 
     }
 
@@ -152,9 +155,9 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
     private fun requestLogin(user: String, pass: String) {
-        ApiRepository.getInstance().requestAppLogin(user, pass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseCommonResult<TokenInfo?>?>() {
+        ApiRepository.getInstance().requestAppLogin(user, pass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseSasResult<SasTokenBean?>?>() {
 
-            override fun onRequestSuccess(entity: BaseCommonResult<TokenInfo?>?) {
+            override fun onRequestSuccess(entity: BaseSasResult<SasTokenBean?>?) {
                 handleLoginSuccess(entity)
                 hideNavigation()
             }
@@ -169,16 +172,14 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         })
     }
 
-    private fun handleLoginSuccess(entity: BaseCommonResult<TokenInfo?>?) {
+    private fun handleLoginSuccess(entity: BaseSasResult<SasTokenBean?>?) {
         if (entity == null) {
             Toast.makeText(mContext, "服务器数据异常", Toast.LENGTH_SHORT).show()
             return
         }
-        if (RequestConfig.RESPONSE_CODE_SUCCESS == entity.status && null != entity.data) {
+        if (entity.isSuccess && null != entity.data) {
             AccountHelper.getInstance().login(entity.data)
-            skipByCondition()
-            ThreadManager.getDefault().execute { AircraftApplication.initRongYun() }
-
+            requestRongYunToken()
         } else {
             ToastUtil.showNormal(entity.message)
         }
@@ -211,11 +212,8 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
                 }
             }
         }
-
+        AccountHelper.getInstance().sasTenant = etSasNum.text.toString()
         SpUtil.put(PREF_KEY_IS_REMIND, cBoxRemindPass.isChecked)
-
-
-
         requestLogin(etUserPhone.text.toString(), etUserPass.text.toString())
     }
 
@@ -310,9 +308,11 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
             cBoxRemindPass.isChecked = rememberPass!!
             lastPhone = StringUtil.getNotNullValue(SpUtil.getString(PREF_KEY_PHONE))
             lastPass = StringUtil.getNotNullValue(SpUtil.getString(PREF_KEY_PASS))
+            lastTenant = AccountHelper.getInstance().sasTenant
             etUserPhone.setText(lastPhone)
             moveCursor()
             etUserPass.setText(StringUtil.getNotNullValue(lastPass))
+            etSasNum.setText(StringUtil.getNotNullValue(lastTenant))
         } else {
             cBoxRemindPass.isChecked = false
             etUserPhone.setText("")
@@ -325,5 +325,51 @@ class LoginNewActivity : RxAppCompatActivity(), View.OnClickListener {
         etUserPass.setSelection(etUserPass.text.length)
     }
 
+    /**
+     * 获取融云token
+     */
+    private fun requestRongYunToken() {
+        ApiRepository.getInstance().requestRongYunToken().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseSasResult<String?>?>() {
+
+            override fun onRequestSuccess(entity: BaseSasResult<String?>?) {
+                if (entity == null) {
+                    return
+                }
+                if (entity.isSuccess && entity.data != null) {
+                    AccountHelper.getInstance().setRyToken(entity.data)
+                    skipByCondition()
+                    ThreadManager.getDefault().execute { AircraftApplication.initRongYun() }
+                } else {
+                    ToastUtil.showNormal(entity.msg)
+                }
+                hideNavigation()
+            }
+
+            override fun onRequestError(throwable: Throwable) {
+                super.onRequestError(throwable)
+                LogUtils.tag(TAG).e("onRequestError=$throwable")
+                hideNavigation()
+            }
+        })
+    }
+
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        //判断用户是否点击了“返回键”
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            //与上次点击返回键时刻作差
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                //大于2000ms则认为是误操作，使用Toast进行提示
+                ToastUtil.showNormal("再按一次退出程序")
+                //并记录下本次点击“返回键”的时刻，以便下次进行判断
+                mExitTime = System.currentTimeMillis();
+            } else {
+                //小于2000ms则认为是用户确实希望退出程序-调用System.exit()方法进行退出
+                exitProcess(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
 }

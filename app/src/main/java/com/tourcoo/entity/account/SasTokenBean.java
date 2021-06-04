@@ -8,7 +8,7 @@ package com.tourcoo.entity.account;
  * @date 2021年06月03日14:43
  * @Email: 971613168@qq.com
  */
-public class DataBean {
+public class SasTokenBean {
 
     /**
      * token : eyJ0eXAiOiJKc29uV2ViVG9rZW4iLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi6LaF57qn566h55CG5ZGYIiwidG9rZW5fdHlwZSI6InRva2VuIiwidXNlcmlkIjoiMiIsImFjY291bnQiOiJsYW1wIiwiaWF0IjoxNjIyNjkxMjIwLCJuYmYiOjE2MjI2OTEyMjAsImV4cCI6MTYyMjcyMDAyMH0.D_UHXSdiW2kZ_Nfzo8-VWIkHTaY6OQFiQW8Kt4Xawvc

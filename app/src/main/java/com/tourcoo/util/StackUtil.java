@@ -141,7 +141,7 @@ public class StackUtil {
             while (mActivityStack.size() > 0) {
                 Activity activity = this.getCurrent();
                 if (activity == null) {
-                    break;
+                    continue;
                 }
                 pop(activity);
             }

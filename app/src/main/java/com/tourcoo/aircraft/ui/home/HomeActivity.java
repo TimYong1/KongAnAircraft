@@ -22,8 +22,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.apkfuns.logutils.LogUtils;
+import com.google.gson.Gson;
 import com.tourcoo.account.AccountHelper;
-import com.tourcoo.account.UserInfo;
+import com.tourcoo.account.SasUserInfo;
 import com.tourcoo.aircraft.product.AircraftUtil;
 import com.tourcoo.aircraft.product.ProductManager;
 import com.tourcoo.aircraft.ui.account.UserInfoActivity;
@@ -33,13 +34,16 @@ import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivity;
 import com.tourcoo.aircraftmanager.R;
 
-import com.tourcoo.entity.base.BaseCommonResult;
+import com.tourcoo.entity.account.SasTokenBean;
+import com.tourcoo.entity.base.BaseSasResult;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.sn.DeviceInfo;
 import com.tourcoo.manager.AircraftHelper;
 import com.tourcoo.retrofit.BaseLoadingObserver;
 import com.tourcoo.retrofit.BaseObserver;
 import com.tourcoo.retrofit.RequestConfig;
+import com.tourcoo.retrofit.ResponseInterceptor;
+import com.tourcoo.retrofit.TokenService;
 import com.tourcoo.retrofit.repository.ApiRepository;
 import com.tourcoo.threadpool.ThreadManager;
 import com.tourcoo.util.SpUtil;
@@ -57,6 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.hutool.core.codec.Base64;
 import dji.common.error.DJIError;
 import dji.common.useraccount.UserAccountState;
 import dji.common.util.CommonCallbacks;
@@ -65,12 +70,17 @@ import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
 import io.rong.imlib.RongIMClient;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.tourcoo.constant.AccountConstant.PREF_KEY_IS_LOGIN_DJ_ACCOUNT;
 import static com.tourcoo.constant.ActionConstant.ACTION_AIR_CRAFT_DIS_CONNECT;
 import static com.tourcoo.constant.ActionConstant.ACTION_AIR_CRAFT_UPLOAD_INFO;
 import static com.tourcoo.constant.EventConstant.EVENT_AIRCRAFT_CONNECT;
 import static com.tourcoo.constant.EventConstant.EVENT_AIRCRAFT_DISCONNECT;
+import static com.tourcoo.retrofit.TokenInterceptor.URL_REFRESH_TOKEN;
 
 /**
  * @author :JenkinsZhou
@@ -152,7 +162,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 checkAndRequestPermissions();
             }
         }, 500);
-        requestUserInfo();
+        requestUserInfo(AccountHelper.getInstance().getUserId());
+
+
     }
 
     private void getSnNumberAndUpload() {
@@ -189,17 +201,17 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         params.put("productSn", StringUtil.getNotNullValue(deviceInfo.productSn));
         params.put("remoteSn", StringUtil.getNotNullValue(deviceInfo.remoteSn));
         params.put("type", deviceInfo.type);
-        ApiRepository.getInstance().requestUploadDroneData(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseCommonResult<Object>>() {
+        ApiRepository.getInstance().requestUploadDroneData(params).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseSasResult<Object>>() {
             @Override
-            public void onRequestSuccess(BaseCommonResult<Object> entity) {
+            public void onRequestSuccess(BaseSasResult<Object> entity) {
                 if (entity == null) {
                     return;
                 }
-                if (entity.status == RequestConfig.REQUEST_CODE_SUCCESS) {
+                if (entity.isSuccess()) {
                     AircraftHelper.getInstance().setUpload(true);
                     LogUtils.i(TAG + "上传成功");
                 } else {
-                    LogUtils.w(TAG + entity.status);
+                    LogUtils.w(TAG + entity.getStatus());
                 }
             }
 
@@ -514,14 +526,14 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
 
-    private void requestUserInfo() {
-        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseCommonResult<UserInfo>>() {
+    private void requestUserInfo(String userId) {
+        ApiRepository.getInstance().requestUserInfo(userId).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseSasResult<SasUserInfo>>() {
             @Override
-            public void onRequestSuccess(BaseCommonResult<UserInfo> entity) {
+            public void onRequestSuccess(BaseSasResult<SasUserInfo> entity) {
                 if (entity == null) {
                     return;
                 }
-                if (entity.status == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
+                if (entity.getStatus() == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
                     AccountHelper.getInstance().setUserInfo(entity.data);
                 }
             }
@@ -570,4 +582,5 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         }
 
     }
+
 }
