@@ -14,6 +14,7 @@ import static com.tourcoo.constant.CommonConstant.APP_TYPE_SAS;
  */
 public class AppConfig {
     public static boolean DEBUG_BODE = false;
+    
     public static int APP_TYPE = APP_TYPE_SAS;
 
 }

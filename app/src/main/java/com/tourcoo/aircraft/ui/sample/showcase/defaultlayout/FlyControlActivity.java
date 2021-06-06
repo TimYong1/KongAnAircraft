@@ -402,6 +402,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         }
         hideNavigation();
         loadUiState();
+        LiveStreamHelper.getInstance().setLiveListener();
         mapWidget.onResume();
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(fpvWidgetSecond.getCameraName()
@@ -581,6 +582,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         if (PHONE_RING_UP == phoneState || PHONE_ON == phoneState) {
             phoneOff();
         }
+        LiveStreamHelper.getInstance().release();
         loadUiState();
         releaseSocketAndTimer();
         LocateHelper.getInstance().release();
@@ -758,7 +760,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         mFlightRealTimeData.setDroneId(ProductManager.getInstance().getDroneId());
         mFlightRealTimeData.setTenantId(AccountHelper.getInstance().getSasTenant());
         socketUploadEntity.setData(mFlightRealTimeData);
-
+        socketUploadEntity.setWebId(AccountHelper.getInstance().getSasTenant()+":"+ProductManager.getInstance().getDroneId());
         socketUploadEntity.setMsgType(SOCKET_TYPE_REAL_TIME_DATA_FLIGHT);
         String result = gson.toJson(socketUploadEntity);
         LogUtils.i(TAG + result);
@@ -1079,7 +1081,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
 
                     @Override
                     public void onFailure(DJIError djiError) {
-
+                       ToastUtil.showFailedDebug("未能获取到");
                     }
                 });
             }

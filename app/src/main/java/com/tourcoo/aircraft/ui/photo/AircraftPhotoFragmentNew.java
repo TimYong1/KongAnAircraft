@@ -512,8 +512,6 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     private void loadAdapter() {
         if (groupAdapter == null) {
             groupAdapter = new GroupImageAdapter(new ArrayList<>());
-            View footerView = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_view, null);
-            groupAdapter.addFooterView(footerView);
             int spanCount = 6;
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), spanCount);
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -525,8 +523,8 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                     return 1;
                 }
             });
-            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_view, null);
-            groupAdapter.setEmptyView(view);
+         /*   View view = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_view, null);
+            groupAdapter.setEmptyView(view);*/
             mCommonRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(5f), ContextCompat.getColor(getContext(), R.color.black), false));
             groupAdapter.bindToRecyclerView(mCommonRecyclerView);
             mCommonRecyclerView.setLayoutManager(gridLayoutManager);
