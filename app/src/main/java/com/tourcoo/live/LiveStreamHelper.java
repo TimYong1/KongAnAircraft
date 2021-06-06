@@ -42,6 +42,7 @@ public class LiveStreamHelper {
     public void startLiveShow(String liveShowUrl) {
         if (TextUtils.isEmpty(liveShowUrl)) {
             LogUtils.e(TAG + "推流地址有误");
+            ToastUtil.showWarning("推流地址有误");
             return;
         }
         if (!isLiveStreamManagerOn()) {

@@ -6,13 +6,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <dji.ux.beta.core.widget.fpv.FPVWidget
+  <!--  <dji.ux.beta.core.widget.fpv.FPVWidget
         android:id="@+id/widget_fpv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:uxsdk_onStateChange="@+id/widget_fpv_interaction" />
+        app:uxsdk_onStateChange="@+id/widget_fpv_interaction" />-->
+
+
+        <dji.ux.widget.FPVWidget
+            android:id="@+id/widget_fpv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+    <dji.ux.widget.FPVOverlayWidget
+        android:id="@+id/fpv_overlay_widget"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <View
         android:layout_width="0dp"
@@ -41,12 +60,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.2" />
 
-    <dji.ux.beta.cameracore.widget.fpvinteraction.FPVInteractionWidget
+   <!-- <dji.ux.beta.cameracore.widget.fpvinteraction.FPVInteractionWidget
         android:id="@+id/widget_fpv_interaction"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />-->
 
     <!--<dji.ux.beta.core.widget.radar.RadarWidget
         android:id="@+id/widget_radar"
@@ -58,7 +77,7 @@
         app:layout_constraintStart_toStartOf="parent"
        />-->
 
-    <dji.ux.beta.core.widget.fpv.FPVWidget
+    <dji.ux.beta.core.widget.fpv.FPVWidgetBeta
         android:id="@+id/widget_secondary_fpv"
         android:layout_width="@dimen/mini_map_width"
         android:layout_height="@dimen/mini_map_height"
@@ -338,10 +357,10 @@
         android:id="@+id/widget_return_to_home"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:padding="3dp"
+        android:layout_marginStart="@dimen/dp_12"
+        android:layout_marginTop="@dimen/dp_5"
+        android:layout_marginBottom="@dimen/dp_5"
+        android:padding="@dimen/dp_3"
         app:layout_constraintBottom_toTopOf="@+id/widget_flight_telemetry"
         app:layout_constraintDimensionRatio="@string/uxsdk_widget_default_ratio"
         app:layout_constraintHeight_percent="0.1"
@@ -357,7 +376,7 @@
         app:layout_constraintBottom_toTopOf="@id/widget_take_off"
         app:layout_constraintStart_toStartOf="@id/widget_take_off" />
 
-    <dji.ux.beta.accessory.widget.rtk.RTKWidget
+   <!-- <dji.ux.beta.accessory.widget.rtk.RTKWidget
         android:id="@+id/widget_rtk"
         android:layout_width="500dp"
         android:layout_height="0dp"
@@ -365,11 +384,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/panel_top_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/panel_top_bar" />-->
 
     <dji.ux.beta.training.widget.simulatorcontrol.SimulatorControlWidget
         android:id="@+id/widget_simulator_control"
-        android:layout_width="330dp"
+        android:layout_width="@dimen/dp_330"
         android:layout_height="0dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

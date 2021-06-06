@@ -59,8 +59,8 @@ import dji.ux.beta.core.ui.GridLineView
 import dji.ux.beta.core.util.DisplayUtil
 import dji.ux.beta.core.util.SettingDefinitions
 import dji.ux.beta.core.util.SettingDefinitions.CameraSide
-import dji.ux.beta.core.widget.fpv.FPVWidget.ModelState
-import dji.ux.beta.core.widget.fpv.FPVWidget.ModelState.*
+import dji.ux.beta.core.widget.fpv.FPVWidgetBeta.ModelState
+import dji.ux.beta.core.widget.fpv.FPVWidgetBeta.ModelState.*
 import java.util.*
 
 private const val TAG = "FPVWidget"
@@ -72,7 +72,7 @@ private const val LANDSCAPE_ROTATION_ANGLE = 0
 /**
  * This widget shows the video feed from the camera.
  */
-open class FPVWidget @JvmOverloads constructor(
+open class FPVWidgetBeta @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
@@ -97,7 +97,7 @@ open class FPVWidget @JvmOverloads constructor(
     private var mVideoDataListener: VideoDataListener? = null
     private val widgetModel by lazy {
         mVideoDataListener = VideoDataListener { videoBuffer: ByteArray?, size: Int ->
-            widgetStateDataProcessor.onNext(VideoFeedUpdated(videoBuffer, size))
+            widgetStateDataProcessor.onNext(ModelState.VideoFeedUpdated(videoBuffer, size))
             codecManager?.sendDataToDecoder(videoBuffer, size, videoFeed)
         }
 
@@ -335,7 +335,7 @@ open class FPVWidget @JvmOverloads constructor(
         addReaction(widgetModel.videoFeedSource
                 .observeOn(SchedulerProvider.ui())
                 .subscribe { videoFeed: DJICodecManager.VideoSource ->
-                    widgetStateDataProcessor.onNext(VideoFeedSourceUpdated(videoFeed))
+                    widgetStateDataProcessor.onNext(ModelState.VideoFeedSourceUpdated(videoFeed))
                     this.videoFeed = videoFeed
                     updateGridLineVisibility()
                     codecManager?.switchSource(videoFeed)

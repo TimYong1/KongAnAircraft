@@ -51,7 +51,8 @@ import dji.ux.beta.core.panel.systemstatus.SystemStatusListPanelWidget;
 import dji.ux.beta.core.panel.topbar.TopBarPanelWidget;
 import dji.ux.beta.core.util.DisplayUtil;
 import dji.ux.beta.core.util.SettingDefinitions;
-import dji.ux.beta.core.widget.fpv.FPVWidget;
+import dji.ux.beta.core.widget.fpv.FPVWidgetBeta;
+import dji.ux.beta.core.widget.fpv.FPVWidgetBeta;
 import dji.ux.beta.core.widget.gpssignal.GPSSignalWidget;
 import dji.ux.beta.core.widget.radar.RadarWidget;
 import dji.ux.beta.core.widget.simulator.SimulatorIndicatorWidget;
@@ -71,13 +72,13 @@ public class DefaultLayoutActivity extends AppCompatActivity {
     @BindView(R.id.widget_radar)
     protected RadarWidget radarWidget;
     @BindView(R.id.widget_fpv)
-    protected FPVWidget fpvWidget;
+    protected FPVWidgetBeta fpvWidget;
     @BindView(R.id.widget_fpv_interaction)
     protected FPVInteractionWidget fpvInteractionWidget;
     @BindView(R.id.widget_map)
     protected MapWidget mapWidget;
     @BindView(R.id.widget_secondary_fpv)
-    protected FPVWidget secondaryFPVWidget;
+    protected FPVWidgetBeta secondaryFPVWidget;
     @BindView(R.id.root_view)
     protected ConstraintLayout parentView;
     @BindView(R.id.widget_panel_system_status_list)
