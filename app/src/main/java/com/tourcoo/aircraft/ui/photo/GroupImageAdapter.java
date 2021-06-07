@@ -48,7 +48,7 @@ public class GroupImageAdapter extends BaseMultiItemQuickAdapter<MediaFileGroup,
       /*  if(isScrolling){
             return;
         }*/
-        LogUtils.i(TAG + "convert()=" + helper.getItemViewType());
+
         if (item == null) {
             return;
         }

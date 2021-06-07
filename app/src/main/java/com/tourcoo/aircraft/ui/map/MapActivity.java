@@ -46,6 +46,7 @@ import dji.common.model.LocationCoordinate2D;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.flightcontroller.FlyZoneManager;
 import dji.sdk.sdkmanager.DJISDKManager;
+import dji.sdk.useraccount.UserAccountManager;
 
 import static com.tourcoo.constant.LocateConstant.PREF_KEY_LAST_LOCATE_LANG;
 import static com.tourcoo.constant.LocateConstant.PREF_KEY_LAST_LOCATE_LAT;
@@ -318,6 +319,10 @@ public class MapActivity extends RxAppCompatActivity implements AMapLocationList
 
     private void updateFlyZone() {
         FlyZoneManager fzMgr = DJISDKManager.getInstance().getFlyZoneManager();
+        if(fzMgr ==null){
+            ToastUtil.showNormal(getString(R.string.tips_aircraft_no_connected));
+            return;
+        }
         fzMgr.getFlyZonesInSurroundingArea(new CommonCallbacks.CompletionCallbackWith<ArrayList<FlyZoneInformation>>() {
             @Override
             public void onSuccess(ArrayList<FlyZoneInformation> flyZoneInformationList) {

@@ -232,7 +232,7 @@ class PhotoPreviewActivity : RxAppCompatActivity() {
             mediaManager!!.exitMediaDownloading()
             camera.exitPlayback(object : CommonCallbacks.CompletionCallback<DJIError?> {
                 override fun onResult(djiError: DJIError?) {
-                    LogUtils.w(AircraftPhotoFragment.TAG + djiError)
+                    LogUtils.w(TAG + djiError)
                 }
 
             })
