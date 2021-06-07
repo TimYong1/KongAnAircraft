@@ -760,7 +760,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         mFlightRealTimeData.setDroneId(ProductManager.getInstance().getDroneId());
         mFlightRealTimeData.setTenantId(AccountHelper.getInstance().getSasTenant());
         socketUploadEntity.setData(mFlightRealTimeData);
-        socketUploadEntity.setWebId(AccountHelper.getInstance().getSasTenant()+":"+ProductManager.getInstance().getDroneId());
+        socketUploadEntity.setWebId(AccountHelper.getInstance().getSasTenant() + ":" + ProductManager.getInstance().getDroneId());
         socketUploadEntity.setMsgType(SOCKET_TYPE_REAL_TIME_DATA_FLIGHT);
         String result = gson.toJson(socketUploadEntity);
         LogUtils.i(TAG + result);
@@ -1050,6 +1050,35 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                     public void onSuccess(String s) {
                         System.out.println("getName  ：" + s);
                         deviceInfo.name = s;
+                        if (aircraft.getRemoteController() != null) {
+                            aircraft.getRemoteController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+                                @Override
+                                public void onSuccess(String s) {
+                                    doUploadAircraftInfo(deviceInfo,s);
+                                }
+
+                                @Override
+                                public void onFailure(DJIError djiError) {
+                                    ToastUtil.showFailedDebug("未能获取到");
+                                }
+                            });
+                        }else {
+                            if( aircraft.getFlightController() != null){
+                                aircraft.getFlightController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+                                    @Override
+                                    public void onSuccess(String s) {
+                                        doUploadAircraftInfo(deviceInfo,s);
+                                    }
+                                    @Override
+                                    public void onFailure(DJIError djiError) {
+                                        ToastUtil.showNormal("未获取到无人机信息请稍后再试");
+                                    }
+                                });
+                            }else {
+                                ToastUtil.showNormal("无人机未连接或设备繁忙");
+                            }
+
+                        }
                     }
 
                     @Override
@@ -1057,33 +1086,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                         ToastUtil.showWarning("未获取到设备信息 无法开启直播");
                     }
                 });
-                aircraft.getRemoteController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
-                    @Override
-                    public void onSuccess(String s) {
-                        deviceInfo.remoteSn = StringUtil.getNotNullValue(s);
-                        deviceInfo.id = StringUtil.getNotNullValue(s);
-                     /*   Map<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("droneId", deviceInfo.id);*/
-                        mDroneId = deviceInfo.id;
-                        ProductManager.getInstance().setDroneId(deviceInfo.id);
-                     /*   hashMap.put("userId", AccountHelper.getInstance().getUserId());
-                        hashMap.put("userLatitude", lastLat);
-                        hashMap.put("userLongitude", lastLang);*/
-                       /* if (mFlightRealTimeData != null && mFlightRealTimeData.getLocateData() != null) {
-                            hashMap.put("droneLatitude", mFlightRealTimeData.getLocateData().getLatitude());
-                            hashMap.put("droneLongitude", mFlightRealTimeData.getLocateData().getLongitude());
-                        } else {
-                            hashMap.put("droneLatitude", 0.0);
-                            hashMap.put("droneLongitude", 0.0);
-                        }*/
-                        requestStreamUrlAndUpload(deviceInfo.id);
-                    }
 
-                    @Override
-                    public void onFailure(DJIError djiError) {
-                       ToastUtil.showFailedDebug("未能获取到");
-                    }
-                });
             }
         });
 
@@ -1157,5 +1160,16 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                 }
             }
         });
+    }
+
+
+
+
+    private void doUploadAircraftInfo(DeviceInfo deviceInfo,String s){
+        deviceInfo.remoteSn = StringUtil.getNotNullValue(s);
+        deviceInfo.id = StringUtil.getNotNullValue(s);
+        mDroneId = deviceInfo.id;
+        ProductManager.getInstance().setDroneId(deviceInfo.id);
+        requestStreamUrlAndUpload(deviceInfo.id);
     }
 }
