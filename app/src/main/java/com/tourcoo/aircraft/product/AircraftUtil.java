@@ -76,6 +76,16 @@ public class AircraftUtil {
         }
         return false;
     }
+    public static boolean isMavicAir() {
+        BaseProduct baseProduct = ProductManager.getProductInstance();
+        if (baseProduct != null) {
+            LogUtils.d("设备型号=" + baseProduct.getModel());
+            return baseProduct.getModel() == Model.MAVIC_AIR;
+        }
+        return false;
+    }
+
+
 
     public static boolean isMatchModel(Model model) {
         BaseProduct baseProduct = ProductManager.getProductInstance();

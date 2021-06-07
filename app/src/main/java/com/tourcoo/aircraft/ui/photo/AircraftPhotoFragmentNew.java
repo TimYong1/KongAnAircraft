@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.tourcoo.aircraft.product.AircraftUtil;
 import com.tourcoo.aircraft.widget.camera.CameraHelper;
 import com.tourcoo.aircraft.widget.greendao.GreenDaoManager;
 import com.tourcoo.aircraftmanager.R;
@@ -148,44 +149,12 @@ public class AircraftPhotoFragmentNew extends RxFragment {
             ToastUtil.showWarning("当前相机不支持媒体下载模式");
             return;
         }
-        CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.StorageLocation> callbackWith = new CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.StorageLocation>() {
-            @Override
-            public void onSuccess(SettingsDefinitions.StorageLocation storageLocation) {
-                mediaType = storageLocation;
-            }
-
-            @Override
-            public void onFailure(DJIError djiError) {
-            }
-        };
-        mediaManager = camera.getMediaManager();
-        if (mediaManager == null) {
-            ToastUtil.showWarning("媒体管理器繁忙或无人机断开");
-            closeLoading();
-            return;
+        if(AircraftUtil.isMavicAir()){
+            doMediaDownloadMode(camera);
+        }else {
+            doEnterPlaybackMode(camera);
         }
-        completionCallbackWithList.add(callbackWith);
-        camera.getStorageLocation(callbackWith);
-        taskScheduler = mediaManager.getScheduler();
-        mediaManager.addUpdateFileListStateListener(mStateListener);
-        //进入媒体下载模式
-        mCompletionCallback = new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError djiError) {
-                if (djiError != null) {
-                    ToastUtil.showWarningCondition("媒体模式设置错误：" + djiError.getDescription(), "媒体模块繁忙或无人机已断开");
-                    return;
-                }
-                boolean busy = (MediaManager.FileListState.SYNCING == mFileListState) || (MediaManager.FileListState.DELETING == mFileListState) || (mediaType == null) || (mediaType == UNKNOWN);
-                if (busy) {
-                    ToastUtil.showWarning("媒体管理器繁忙");
-                    return;
-                }
-                ThreadManager.getDefault().execute(refreshListRunnable);
-            }
-        };
-        completionCallbackList.add(mCompletionCallback);
-        camera.enterPlayback(mCompletionCallback);
+
     }
 
 
@@ -758,5 +727,88 @@ public class AircraftPhotoFragmentNew extends RxFragment {
             tvPhotoCount.setText("共" + photoCount + "个作品");
             ViewExtensions.show(tvPhotoCount);
         }
+    }
+
+    private void doEnterPlaybackMode(Camera camera){
+        CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.StorageLocation> callbackWith = new CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.StorageLocation>() {
+            @Override
+            public void onSuccess(SettingsDefinitions.StorageLocation storageLocation) {
+                mediaType = storageLocation;
+            }
+
+            @Override
+            public void onFailure(DJIError djiError) {
+                ToastUtil.showWarning("当前相机不支持媒体下载模式");
+            }
+        };
+        mediaManager = camera.getMediaManager();
+        if (mediaManager == null) {
+            ToastUtil.showWarning("媒体管理器繁忙或无人机断开");
+            closeLoading();
+            return;
+        }
+        completionCallbackWithList.add(callbackWith);
+        camera.getStorageLocation(callbackWith);
+        taskScheduler = mediaManager.getScheduler();
+        mediaManager.addUpdateFileListStateListener(mStateListener);
+        //进入媒体下载模式
+        mCompletionCallback = new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if (djiError != null) {
+                    ToastUtil.showWarningCondition("媒体模式设置错误：" + djiError.getDescription(), "媒体模块繁忙或无人机已断开");
+                    return;
+                }
+                boolean busy = (MediaManager.FileListState.SYNCING == mFileListState) || (MediaManager.FileListState.DELETING == mFileListState) || (mediaType == null) || (mediaType == UNKNOWN);
+                if (busy) {
+                    ToastUtil.showWarning("媒体管理器繁忙");
+                    return;
+                }
+                ThreadManager.getDefault().execute(refreshListRunnable);
+            }
+        };
+        completionCallbackList.add(mCompletionCallback);
+        camera.enterPlayback(mCompletionCallback);
+    }
+
+
+    private void doMediaDownloadMode(Camera camera){
+        CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.StorageLocation> callbackWith = new CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.StorageLocation>() {
+            @Override
+            public void onSuccess(SettingsDefinitions.StorageLocation storageLocation) {
+                mediaType = storageLocation;
+            }
+
+            @Override
+            public void onFailure(DJIError djiError) {
+                ToastUtil.showWarning("当前相机不支持媒体下载模式");
+            }
+        };
+        mediaManager = camera.getMediaManager();
+        if (mediaManager == null) {
+            ToastUtil.showWarning("媒体管理器繁忙或无人机断开");
+            closeLoading();
+            return;
+        }
+        completionCallbackWithList.add(callbackWith);
+        camera.getStorageLocation(callbackWith);
+        taskScheduler = mediaManager.getScheduler();
+        mediaManager.addUpdateFileListStateListener(mStateListener);
+       camera.setMode(SettingsDefinitions.CameraMode.MEDIA_DOWNLOAD, new CommonCallbacks.CompletionCallback() {
+           @Override
+           public void onResult(DJIError djiError) {
+               if (djiError != null) {
+                   ToastUtil.showWarningCondition("媒体模式设置错误：" + djiError.getDescription(), "媒体模块繁忙或无人机已断开");
+                   return;
+               }
+               boolean busy = (MediaManager.FileListState.SYNCING == mFileListState) || (MediaManager.FileListState.DELETING == mFileListState) || (mediaType == null) || (mediaType == UNKNOWN);
+               if (busy) {
+                   ToastUtil.showWarning("媒体管理器繁忙");
+                   return;
+               }
+               ThreadManager.getDefault().execute(refreshListRunnable);
+           }
+       });
+
     }
 }
