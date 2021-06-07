@@ -37,7 +37,7 @@ import dji.ux.beta.core.widget.connection.ConnectionWidget;
 import dji.ux.beta.core.widget.distancehome.DistanceHomeWidget;
 import dji.ux.beta.core.widget.distancerc.DistanceRCWidget;
 import dji.ux.beta.core.widget.flightmode.FlightModeWidget;
-import dji.ux.beta.core.widget.fpv.FPVWidget;
+import dji.ux.beta.core.widget.fpv.FPVWidgetBeta;
 import dji.ux.beta.core.widget.gpssignal.GPSSignalWidget;
 import dji.ux.beta.core.widget.horizontalvelocity.HorizontalVelocityWidget;
 import dji.ux.beta.core.widget.remainingflighttime.RemainingFlightTimeWidget;
@@ -144,7 +144,7 @@ public class WidgetsActivity extends AppCompatActivity implements WidgetListFrag
         widgetListItems.add(new WidgetListItem(R.string.focus_mode_widget_title,
                 new WidgetViewHolder(FocusModeWidget.class, 35, 35)));
         widgetListItems.add(new WidgetListItem(R.string.fpv_widget_title,
-                new WidgetViewHolder(FPVWidget.class, 150, 100)));
+                new WidgetViewHolder(FPVWidgetBeta.class, 150, 100)));
         widgetListItems.add(new WidgetListItem(R.string.fpv_interaction_widget_title,
                 new WidgetViewHolder(FPVInteractionWidget.class, 150, 100)));
         widgetListItems.add(new WidgetListItem(R.string.gps_signal_widget_title,

@@ -57,7 +57,7 @@ import dji.ux.beta.core.util.SettingDefinitions;
 import dji.ux.beta.core.util.SettingDefinitions.CameraIndex;
 import dji.ux.beta.core.util.SettingDefinitions.ControlMode;
 import dji.ux.beta.core.util.SettingDefinitions.GimbalIndex;
-import dji.ux.beta.core.widget.fpv.FPVWidget;
+import dji.ux.beta.core.widget.fpv.FPVWidgetBeta;
 
 /**
 
@@ -77,7 +77,7 @@ import dji.ux.beta.core.widget.fpv.FPVWidget;
 
  */
 public class FPVInteractionWidget extends ConstraintLayoutWidget implements View.OnTouchListener,
-        FPVWidget.FPVStateChangeCallback {
+        FPVWidgetBeta.FPVStateChangeCallback {
 
     private static final String TAG = "FPVInteractionWidget";
     private static final int LONG_PRESS_TIME = 500; // Time in milliseconds
@@ -203,7 +203,7 @@ public class FPVInteractionWidget extends ConstraintLayoutWidget implements View
     }
 
     @Override
-    public void onFPVSizeChange(@Nullable FPVWidget.FPVSize fpvSize) {
+    public void onFPVSizeChange(@Nullable FPVWidgetBeta.FPVSize fpvSize) {
         if (fpvSize != null) {
             adjustAspectRatio(fpvSize.getWidth(), fpvSize.getHeight());
         }

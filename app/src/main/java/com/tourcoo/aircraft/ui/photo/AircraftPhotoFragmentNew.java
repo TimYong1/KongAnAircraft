@@ -3,7 +3,6 @@ package com.tourcoo.aircraft.ui.photo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -74,6 +74,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
      * 是否是顺序
      */
     private static boolean isDateOrder = true;
+    private TextView tvPhotoCount;
     public static final String TAG = "AircraftFragmentNew";
     private View contentView;
     private RecyclerView mCommonRecyclerView;
@@ -96,6 +97,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     private boolean isBackground = false;
     private GreenDaoManager daoManager;
     private ProgressBar pbLoading;
+    private int photoCount;
     private final MediaManager.FileListStateListener mStateListener = new MediaManager.FileListStateListener() {
         @Override
         public void onFileListStateChange(MediaManager.FileListState fileListState) {
@@ -224,6 +226,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                     }
                     List<MediaFileGroup> mediaGroupFileList = createMediaGroupFileList(groupMediaList(mediaEntityList));
                     liveMediaDataList.postValue(mediaFiles);
+                    photoCount = mediaFiles.size();
                     findLocalImageAssignmentAndShow(mediaGroupFileList);
                 }
             };
@@ -282,6 +285,9 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                 continue;
             }
             String key = DateUtil.parseDateString("yyyy-MM-dd", file.getMedia().getTimeCreated());
+            if (key.contains("1979")) {
+                continue;
+            }
             List<MediaEntity> mediaList;
             if (map.containsKey(key)) {
                 //map中存在以此id作为的key，将数据存放当前key的map中
@@ -517,15 +523,21 @@ public class AircraftPhotoFragmentNew extends RxFragment {
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
+                    if (groupAdapter.getItemViewType(position) == BaseQuickAdapter.FOOTER_VIEW) {
+                        return spanCount;
+                    }
                     if (groupAdapter.getItemViewType(position) == 0) {
                         return spanCount;
                     }
                     return 1;
                 }
             });
-         /*   View view = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_view, null);
-            groupAdapter.setEmptyView(view);*/
-            mCommonRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(5f), ContextCompat.getColor(getContext(), R.color.black), false));
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_footer_view, null);
+            tvPhotoCount = view.findViewById(R.id.tvPhotoCount);
+            ViewExtensions.hide(tvPhotoCount);
+            groupAdapter.addFooterView(view);
+//            mCommonRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(5f), ContextCompat.getColor(getContext(), R.color.black), false));
+//            mCommonRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(5f),SizeUtil.dp2px(114f), ContextCompat.getColor(getContext(), R.color.black)));
             groupAdapter.bindToRecyclerView(mCommonRecyclerView);
             mCommonRecyclerView.setLayoutManager(gridLayoutManager);
             mCommonRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -599,6 +611,7 @@ public class AircraftPhotoFragmentNew extends RxFragment {
     private void loadMediaImageByList(List<MediaFileGroup> groupList) {
         if (groupList.isEmpty()) {
             ToastUtil.showSuccessDebug("加载完成");
+            showPhotoCount(photoCount);
             return;
         }
         MediaFileGroup mediaFileGroup = groupList.get(0);
@@ -738,5 +751,12 @@ public class AircraftPhotoFragmentNew extends RxFragment {
                 loadMediaImageByList(groupList);
             }
         });
+    }
+
+    private void showPhotoCount(int photoCount) {
+        if (tvPhotoCount != null) {
+            tvPhotoCount.setText("共" + photoCount + "个作品");
+            ViewExtensions.show(tvPhotoCount);
+        }
     }
 }
