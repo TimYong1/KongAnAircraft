@@ -123,6 +123,7 @@
         <activity
             android:name="com.tourcoo.aircraft.ui.account.LoginNewActivity"
             android:screenOrientation="sensorLandscape"
+            android:launchMode="singleTask"
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name="com.tourcoo.aircraft.ui.account.UserInfoActivity"

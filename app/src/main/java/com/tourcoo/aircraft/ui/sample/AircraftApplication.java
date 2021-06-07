@@ -22,7 +22,6 @@ import com.tourcoo.control.ActivityControlImpl;
 import com.tourcoo.control.UiManager;
 import com.tourcoo.control.impl.AppImpl;
 import com.tourcoo.control.impl.HttpRequestControlImpl;
-import com.tourcoo.retrofit.RequestConfig;
 import com.tourcoo.retrofit.RetrofitHelper;
 import com.tourcoo.rongyun.RYunManager;
 import com.tourcoo.util.ToastUtil;
@@ -39,7 +38,6 @@ import static com.tourcoo.retrofit.RequestConfig.BASE_KONG_AN_URL;
 import static com.tourcoo.retrofit.RequestConfig.BASE_PRO_URL;
 import static com.tourcoo.retrofit.RequestConfig.BASE_SAS_URL;
 import static com.tourcoo.retrofit.RequestConfig.BASE_TEST_URL;
-import static com.tourcoo.retrofit.RequestConfig.SERVICE__SAS_IP;
 
 
 public class AircraftApplication extends Application {

@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.view.View
 import com.apkfuns.logutils.LogUtils
 import com.tourcoo.account.AccountHelper
-import com.tourcoo.account.UserInfo
+import com.tourcoo.account.SasUserInfo
 import com.tourcoo.aircraftmanager.R
 import com.tourcoo.dialog.TourCooDialog
-import com.tourcoo.entity.base.BaseCommonResult
+import com.tourcoo.entity.base.BaseSasResult
 import com.tourcoo.retrofit.BaseLoadingObserver
 import com.tourcoo.retrofit.BaseObserver
 import com.tourcoo.retrofit.RequestConfig
@@ -63,18 +63,18 @@ class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
             etGender.setText("-")
             etUserPhone.setText("-")
         } else {
-            etUserName.setText(StringUtil.getNotNullValueLine(user.username))
+            etUserName.setText(StringUtil.getNotNullValueLine(user.name))
             etGender.setText(StringUtil.getNotNullValueLine(""))
-            etPhone.setText(StringUtil.getNotNullValueLine(user.phone))
-            etGender.setText(StringUtil.getNotNullValueLine(user.gender))
+            etPhone.setText(StringUtil.getNotNullValueLine(user.mobile))
+            etGender.setText(StringUtil.getNotNullValueLine(user.sex.desc))
         }
 
     }
 
 
     private fun requestUserInfo() {
-        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseCommonResult<UserInfo?>?>() {
-            override fun onRequestSuccess(entity: BaseCommonResult<UserInfo?>?) {
+        ApiRepository.getInstance().requestUserInfo(AccountHelper.getInstance().userId).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseSasResult<SasUserInfo?>?>() {
+            override fun onRequestSuccess(entity: BaseSasResult<SasUserInfo?>?) {
                 if (entity == null) {
                     return
                 }
@@ -96,22 +96,24 @@ class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
     }
 
     private fun requestLogout() {
-        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseCommonResult<Any?>?>() {
-            override fun onRequestSuccess(entity: BaseCommonResult<Any?>?) {
+        ApiRepository.getInstance().requestLogout().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseSasResult<Any?>?>() {
+            override fun onRequestSuccess(entity: BaseSasResult<Any?>?) {
                 if (entity == null) {
                     return
                 }
-                if (entity.status == RequestConfig.RESPONSE_CODE_SUCCESS) {
+                if (entity.isSuccess) {
                     AccountHelper.getInstance().logoutAndSkipLogin()
                     LogUtils.w(TAG + "已退出登录")
                 } else {
                     ToastUtil.showNormal(entity.message)
+                    AccountHelper.getInstance().logoutAndSkipLogin()
                 }
             }
 
             override fun onRequestError(throwable: Throwable) {
                 super.onRequestError(throwable)
                 LogUtils.tag(TAG).i("onRequestError=$throwable")
+                AccountHelper.getInstance().logoutAndSkipLogin()
             }
         })
     }

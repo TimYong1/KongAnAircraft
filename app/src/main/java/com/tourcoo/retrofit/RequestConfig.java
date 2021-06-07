@@ -13,9 +13,9 @@ public class RequestConfig {
      */
     public static final int FIRST_PAGE = 1;
 
-    public static final int RESPONSE_CODE_SUCCESS = 200;
-    public static final int REQUEST_CODE_SUCCESS = 200;
-    public static final int REQUEST_CODE_TOKEN_INVALID = 401;
+    public static final int RESPONSE_CODE_SUCCESS = 0;
+    public static final int REQUEST_CODE_SUCCESS = 0;
+    public static final int REQUEST_CODE_TOKEN_INVALID = 40009;
     /**
      * 测试环境
      */
@@ -28,7 +28,7 @@ public class RequestConfig {
      */
     public static final String BASE_KONG_AN_URL = "https://dji.tklvyou.cn/";
     //    SERVICE_IP
-    public static final String SOCKET_KONG_AN_URL_IP = "wss://dji.tklvyou.cn/"+  "webapi/webSocket/android:";
+    public static final String SOCKET_KONG_AN_URL_IP = "wss://dji.tklvyou.cn/" + "webapi/webSocket/android:";
 
     /**
      * 检察院线上
@@ -40,13 +40,22 @@ public class RequestConfig {
     public static final String SOCKET_PRO_URL_IP = "ws://" + SERVICE_PRO_IP + SERVICE_PRO_PORT + "/webSocket/android:";
 
     /**
-     * SAS
+     * SAS线下
      */
-    public static final String SERVICE__SAS_IP = "192.168.0.224";
+  /*  public static final String SERVICE__SAS_IP = "192.168.0.224";
     //    SERVICE_IP
     public static final String SERVICE_SAS_PORT = ":8760";
+    public static final String SERVICE_SAS_SOCKET_PORT = ":8045";
     public static final String BASE_SAS_URL = "http://" + SERVICE__SAS_IP + SERVICE_SAS_PORT + "/";
-    public static final String SOCKET_SAS_URL_IP = "ws://" + SERVICE__SAS_IP + SERVICE_SAS_PORT + "/webSocket/android:";
-
+    public static final String SOCKET_SAS_URL_IP = "ws://" + SERVICE__SAS_IP + SERVICE_SAS_SOCKET_PORT + "/webSocket/android:";*/
+    /**
+     * SAS线上
+     */
+    private static final String SERVICE__SAS_IP = "www.xinkongan.com";
+    //    SERVICE_IP
+    private static final String SERVICE_SAS_PORT = ":8760";
+    private static final String SERVICE_SAS_SOCKET_PORT = ":8045";
+    public static final String BASE_SAS_URL =   "http://" +SERVICE__SAS_IP + SERVICE_SAS_PORT + "/";
+    public static final String SOCKET_SAS_URL_IP = "ws://" + SERVICE__SAS_IP + SERVICE_SAS_SOCKET_PORT + "/webSocket/android:";
 
 }

@@ -6,6 +6,9 @@ import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.threadpool.ThreadManager;
 import com.tourcoo.util.ToastUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.sdkmanager.LiveStreamManager;
 
@@ -21,6 +24,8 @@ public class LiveStreamHelper {
     //    private String liveShowUrl = "";
 //    private Context context = FlyApplication.getContext();
     private boolean isLiveShowOpen = false;
+    private List<LiveStreamManager.OnLiveChangeListener> onLiveChangeListenerList = new ArrayList<>();
+    private LiveStreamManager.OnLiveChangeListener onLiveChangeListener;
 
     public boolean isLiveStreamManagerOn() {
         if (DJISDKManager.getInstance().getLiveStreamManager() == null) {
@@ -60,12 +65,6 @@ public class LiveStreamHelper {
         ThreadManager.getDefault().execute(() -> {
             DJISDKManager.getInstance().getLiveStreamManager().setLiveUrl(liveShowUrl);
             int result = DJISDKManager.getInstance().getLiveStreamManager().startStream();
-            DJISDKManager.getInstance().getLiveStreamManager().registerListener(new LiveStreamManager.OnLiveChangeListener() {
-                @Override
-                public void onStatusChanged(int i) {
-
-                }
-            });
             DJISDKManager.getInstance().getLiveStreamManager().setAudioMuted(true);
             DJISDKManager.getInstance().getLiveStreamManager().setStartTime();
             LogUtils.d(TAG + "直播流开启结果=" + result +
@@ -127,5 +126,47 @@ public class LiveStreamHelper {
             return;
         }
         DJISDKManager.getInstance().getLiveStreamManager().setAudioMuted(false);
+    }
+
+    private void unRegister() {
+        if (DJISDKManager.getInstance().getLiveStreamManager() != null) {
+            LiveStreamManager.OnLiveChangeListener listener;
+            try {
+                for (int i = onLiveChangeListenerList.size() - 1; i >= 0; i--) {
+                    listener = onLiveChangeListenerList.get(i);
+                    DJISDKManager.getInstance().getLiveStreamManager().unregisterListener(listener);
+                    onLiveChangeListenerList.remove(listener);
+                    listener = null;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                LogUtils.e(TAG + e.toString());
+            }
+        }
+    }
+
+    public void setLiveListener() {
+        if (DJISDKManager.getInstance().getLiveStreamManager() == null) {
+            LogUtils.e(TAG + "监听已拦截");
+            return;
+        }
+        if (onLiveChangeListener != null) {
+            LogUtils.e(TAG + "监听已拦截");
+            return;
+        }
+        onLiveChangeListener = new LiveStreamManager.OnLiveChangeListener() {
+            @Override
+            public void onStatusChanged(int i) {
+                LogUtils.i(TAG + "直播状态：" + i);
+                ToastUtil.showSuccess("直播状态="+i);
+            }
+        };
+        onLiveChangeListenerList.add(onLiveChangeListener);
+        LogUtils.i(TAG + "监听已添加");
+        DJISDKManager.getInstance().getLiveStreamManager().registerListener(onLiveChangeListener);
+    }
+
+    public void release() {
+        unRegister();
     }
 }

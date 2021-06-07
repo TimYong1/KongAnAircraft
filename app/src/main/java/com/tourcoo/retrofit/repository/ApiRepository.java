@@ -2,9 +2,9 @@ package com.tourcoo.retrofit.repository;
 
 
 import com.apkfuns.logutils.LogUtils;
-import com.tourcoo.account.TokenInfo;
-import com.tourcoo.account.UserInfo;
-import com.tourcoo.entity.base.BaseCommonResult;
+import com.tourcoo.account.SasUserInfo;
+import com.tourcoo.entity.account.SasTokenBean;
+import com.tourcoo.entity.base.BaseSasResult;
 import com.tourcoo.entity.flight.FlightRecordEntity;
 import com.tourcoo.retrofit.ApiService;
 import com.tourcoo.retrofit.RetrofitHelper;
@@ -55,29 +55,35 @@ public class ApiRepository extends BaseRepository {
      *
      * @return
      */
-    public Observable<BaseCommonResult<TokenInfo>> requestAppLogin(String userName, String pass) {
+    public Observable<BaseSasResult<SasTokenBean>> requestAppLogin(String userName, String pass) {
         Map<String, Object> params = new HashMap<>(2);
-        params.put("username", userName);
+        params.put("account", userName);
         params.put("password", pass);
+        params.put("grantType","password");
         return ThreadTransformer.switchSchedulers(getApiService().requestAppLogin(params).retryWhen(new RetryWhen()));
     }
 
 
-    public Observable<BaseCommonResult<String>> requestStreamUrl(Map<String, Object> params) {
-        LogUtils.tag("提交到服务器的数据").i(params);
-        return ThreadTransformer.switchSchedulers(getApiService().requestStreamUrl(params).retryWhen(new RetryWhen()));
+    public Observable<BaseSasResult<String>> requestStreamUrl(String droneId) {
+        LogUtils.tag("提交到服务器的数据").i(droneId);
+        return ThreadTransformer.switchSchedulers(getApiService().requestStreamUrl(droneId).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseCommonResult<Object>> requestLogout() {
+    public Observable<BaseSasResult<Object>> requestLogout() {
         return ThreadTransformer.switchSchedulers(getApiService().requestLogout().retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseCommonResult<Object>> requestUploadDroneData(Map<String, Object> params) {
+    /**
+     * 新增无人机设备信息（上传无人机信息）
+     * @param params
+     * @return
+     */
+    public Observable<BaseSasResult<Object>> requestUploadDroneData(Map<String, Object> params) {
         LogUtils.tag("提交到服务器的数据").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestUploadDroneData(params).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseCommonResult<Object>> requestEditPass(String oldPass, String newPass) {
+    public Observable<BaseSasResult<Object>> requestEditPass(String oldPass, String newPass) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("oldPass", oldPass);
         params.put("newPass", newPass);
@@ -86,12 +92,12 @@ public class ApiRepository extends BaseRepository {
     }
 
 
-    public Observable<BaseCommonResult<UserInfo>> requestUserInfo() {
-        return ThreadTransformer.switchSchedulers(getApiService().requestUserInfo().retryWhen(new RetryWhen()));
+    public Observable<BaseSasResult<SasUserInfo>> requestUserInfo(String userId) {
+        return ThreadTransformer.switchSchedulers(getApiService().requestUserInfo(userId).retryWhen(new RetryWhen()));
     }
 
 
-    public Observable<BaseCommonResult<FlightRecordEntity>> requestFlyRecord(Map<String, Object> params) {
+    public Observable<BaseSasResult<FlightRecordEntity>> requestFlyRecord(Map<String, Object> params) {
         /*{
             "address": "",
                 "appUserId": 0,
@@ -105,5 +111,8 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestFlyRecord(params).retryWhen(new RetryWhen()));
     }
 
+    public Observable<BaseSasResult<String>> requestRongYunToken() {
+        return ThreadTransformer.switchSchedulers(getApiService().requestRongYunToken().retryWhen(new RetryWhen()));
+    }
 
 }
