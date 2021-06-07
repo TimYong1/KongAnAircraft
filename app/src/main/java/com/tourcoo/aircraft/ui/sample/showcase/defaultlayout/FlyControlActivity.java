@@ -86,7 +86,8 @@ import dji.ux.beta.core.base.widget.DJIKeyActionCallback;
 import dji.ux.beta.core.extension.ViewExtensions;
 import dji.ux.beta.core.panel.systemstatus.SystemStatusListPanelWidget;
 import dji.ux.beta.core.util.SettingDefinitions;
-import dji.ux.beta.core.widget.fpv.FPVWidget;
+import dji.ux.beta.core.widget.fpv.FPVWidgetBeta;
+import dji.ux.beta.core.widget.fpv.FPVWidgetBeta;
 import dji.ux.beta.flight.widget.takeoff.TakeOffWidget;
 import dji.ux.beta.flight.widget.takeoff.TakeOffListener;
 import dji.ux.beta.map.widget.map.MapWidget;
@@ -128,9 +129,9 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
     private FPVInteractionWidget fpvInteractionWidget;
     private MapWidget mapWidget;
     //主镜头视频组件
-    private FPVWidget fpvWidgetPrimary;
+    private FPVWidgetBeta fpvWidgetPrimary;
     //副镜头视频组件
-    private FPVWidget fpvWidgetSecond;
+    private FPVWidgetBeta fpvWidgetSecond;
     private RTKWidget rtkWidget;
     private boolean isMapMini = true;
     private int widgetHeight;
