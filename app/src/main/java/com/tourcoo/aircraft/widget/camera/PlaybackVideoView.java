@@ -50,6 +50,7 @@ import dji.ux.beta.core.extension.ViewExtensions;
  * @Email: 971613168@qq.com
  */
 public class PlaybackVideoView extends LinearLayout implements MediaManager.VideoPlaybackStateListener {
+    public static final String TIPS_DEVICE_ERROR = "设备繁忙或以断开";
     public ImageView ivPlayVideo, ivPlayPause, ivPreview;
     private BaseCameraView baseCameraView;
     private TextView tvCurrentVideoTime, tvTotalVideoTime;
@@ -212,7 +213,7 @@ public class PlaybackVideoView extends LinearLayout implements MediaManager.Vide
                             handler.sendMessageDelayed(handler.obtainMessage(FETCH_FILE_LIST, null),
                                     1000);*/
                         } else {
-                            ToastUtil.showWarning("访问相册失败");
+                            ToastUtil.showWarning(TIPS_DEVICE_ERROR);
                             hideProgressDialog();
                         }
                     }

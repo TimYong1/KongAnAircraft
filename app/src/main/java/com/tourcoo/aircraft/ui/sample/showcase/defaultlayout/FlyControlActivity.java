@@ -132,7 +132,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
     private FPVWidgetBeta fpvWidgetPrimary;
     //副镜头视频组件
     private FPVWidgetBeta fpvWidgetSecond;
-    private RTKWidget rtkWidget;
+//    private RTKWidget rtkWidget;
     private boolean isMapMini = true;
     private int widgetHeight;
     private int widgetWidth;
@@ -219,7 +219,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         systemStatusListPanelWidget = findViewById(R.id.widget_panel_system_status_list);
         simulatorControlWidget = findViewById(R.id.widget_simulator_control);
         fpvWidgetPrimary.setOnClickListener(this);
-        rtkWidget = findViewById(R.id.widget_rtk);
+//        rtkWidget = findViewById(R.id.widget_rtk);
         widgetHeight = (int) getResources().getDimension(R.dimen.mini_map_height);
         widgetWidth = (int) getResources().getDimension(R.dimen.mini_map_width);
         widgetMargin = (int) getResources().getDimension(R.dimen.mini_map_margin);
@@ -418,7 +418,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                     }
                 }));
 
-        compositeDisposable.add(rtkWidget.getUIStateUpdates()
+      /*  compositeDisposable.add(rtkWidget.getUIStateUpdates()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(uiState -> {
                     if (uiState instanceof RTKWidget.UIState.VisibilityUpdated) {
@@ -426,7 +426,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                             hideOtherPanels(rtkWidget);
                         }
                     }
-                }));
+                }));*/
         compositeDisposable.add(simulatorControlWidget.getUIStateUpdates()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(simulatorControlWidgetState -> {
@@ -453,7 +453,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
 
     private void hideOtherPanels(@Nullable View widget) {
         View[] panels = {
-                rtkWidget,
+//                rtkWidget,
                 simulatorControlWidget
         };
 
