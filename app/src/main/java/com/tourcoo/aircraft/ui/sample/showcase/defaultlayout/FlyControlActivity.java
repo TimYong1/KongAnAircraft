@@ -174,7 +174,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test_new);
+        setContentView(R.layout.activity_fly_control);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
