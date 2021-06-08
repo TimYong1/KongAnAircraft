@@ -89,7 +89,6 @@ import dji.ux.beta.flight.widget.takeoff.TakeOffWidget;
 import dji.ux.beta.flight.widget.takeoff.TakeOffListener;
 import dji.ux.beta.map.widget.map.MapWidget;
 import dji.ux.beta.training.widget.simulatorcontrol.SimulatorControlWidget;
-import dji.ux.widget.FPVWidget;
 import io.rong.calllib.IRongCallListener;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
@@ -124,10 +123,10 @@ import static com.tourcoo.entity.socket.SocketConstant.SOCKET_TYPE_REAL_TIME_DAT
 public class FlyControlActivity extends RxAppCompatActivity implements View.OnClickListener {
     public static final String TAG = "TestActivity";
     private ConstraintLayout rootView;
-//    private FPVInteractionWidget fpvInteractionWidget;
+    private FPVInteractionWidget fpvInteractionWidget;
     private MapWidget mapWidget;
     //主镜头视频组件
-    private FPVWidget fpvWidgetPrimary;
+    private FPVWidgetBeta fpvWidgetPrimary;
     //副镜头视频组件
     private FPVWidgetBeta fpvWidgetSecond;
 //    private RTKWidget rtkWidget;
@@ -172,7 +171,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test_new);
+        setContentView(R.layout.activity_fly_control);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
@@ -204,10 +203,10 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         rootView = findViewById(R.id.rootView);
         takeOffWidget = findViewById(R.id.widget_take_off);
         findViewById(R.id.statusView).setOnClickListener(this);
-//        fpvInteractionWidget = findViewById(R.id.widget_fpv_interaction);
+        fpvInteractionWidget = findViewById(R.id.widget_fpv_interaction);
         mapWidget = findViewById(R.id.widget_map);
         fpvWidgetPrimary = findViewById(R.id.widget_fpv);
-        fpvWidgetPrimary.setSourceCameraNameVisibility(false);
+        fpvWidgetPrimary.setCameraSourceNameVisible(false);
         ivLive = findViewById(R.id.ivLive);
         ivCall = findViewById(R.id.ivCall);
         ivCallClose = findViewById(R.id.ivCallClose);
@@ -269,7 +268,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                 //resize widgets
                 resizeViews(fpvWidgetPrimary, mapWidget);
                 //enable interaction on FPV
-//                fpvInteractionWidget.setInteractionEnabled(true);
+                fpvInteractionWidget.setInteractionEnabled(true);
                 //disable user login widget on map
 //            userAccountLoginWidget.setVisibility(View.GONE);
                 isMapMini = true;
@@ -280,7 +279,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                 //resize widgets
                 resizeViews(mapWidget, fpvWidgetPrimary);
                 //disable interaction on FPV
-//                fpvInteractionWidget.setInteractionEnabled(false);
+                fpvInteractionWidget.setInteractionEnabled(false);
                 //enable user login widget on map
 //            userAccountLoginWidget.setVisibility(View.VISIBLE);
                 isMapMini = false;
@@ -469,10 +468,10 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
     private void swapVideoSource() {
         if (fpvWidgetSecond.getVideoSource() == SettingDefinitions.VideoSource.SECONDARY) {
 //            fpvWidgetPrimary.setVideoSource(SettingDefinitions.VideoSource.SECONDARY);
-            fpvWidgetPrimary.setVideoSource(FPVWidget.VideoSource.SECONDARY);
+            fpvWidgetPrimary.setVideoSource(SettingDefinitions.VideoSource.SECONDARY);
             fpvWidgetSecond.setVideoSource(SettingDefinitions.VideoSource.PRIMARY);
         } else {
-            fpvWidgetPrimary.setVideoSource(FPVWidget.VideoSource.PRIMARY);
+            fpvWidgetPrimary.setVideoSource(SettingDefinitions.VideoSource.PRIMARY);
             fpvWidgetSecond.setVideoSource(SettingDefinitions.VideoSource.SECONDARY);
         }
     }

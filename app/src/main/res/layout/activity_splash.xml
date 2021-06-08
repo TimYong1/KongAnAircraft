@@ -11,7 +11,7 @@
         android:src="@drawable/ic_bg_splash" />
 
     <ImageView
-        android:src="@mipmap/ic_logo_splash"
+        android:src="@mipmap/ic_splash_pro"
         android:layout_width="wrap_content"
         android:layout_centerInParent="true"
         android:layout_height="wrap_content"/>

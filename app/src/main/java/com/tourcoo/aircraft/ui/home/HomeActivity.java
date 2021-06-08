@@ -33,6 +33,7 @@ import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivity;
 import com.tourcoo.aircraftmanager.R;
 
+import com.tourcoo.config.AppConfig;
 import com.tourcoo.entity.base.BaseCommonResult;
 import com.tourcoo.entity.event.CommonEvent;
 import com.tourcoo.entity.sn.DeviceInfo;
@@ -244,7 +245,10 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         } else {
             LogUtils.e(TAG + "未注册");
         }*/
-        doLoginDJAccount();
+        /*if(AppConfig.DEBUG_BODE){
+            doLoginDJAccount();
+        }*/
+
     }
 
     @SuppressLint("SourceLockedOrientationActivity")

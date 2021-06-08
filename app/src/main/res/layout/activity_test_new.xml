@@ -6,16 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-  <!--  <dji.ux.beta.core.widget.fpv.FPVWidget
+    <dji.ux.beta.core.widget.fpv.FPVWidget
         android:id="@+id/widget_fpv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:uxsdk_onStateChange="@+id/widget_fpv_interaction" />-->
+        app:uxsdk_onStateChange="@+id/widget_fpv_interaction" />
 
 
-        <dji.ux.widget.FPVWidget
+       <!-- <dji.ux.widget.FPVWidget
             android:id="@+id/widget_fpv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -23,7 +23,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            />-->
     <dji.ux.widget.FPVOverlayWidget
         android:id="@+id/fpv_overlay_widget"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -60,12 +60,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.2" />
 
-   <!-- <dji.ux.beta.cameracore.widget.fpvinteraction.FPVInteractionWidget
+    <dji.ux.beta.cameracore.widget.fpvinteraction.FPVInteractionWidget
         android:id="@+id/widget_fpv_interaction"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />-->
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!--<dji.ux.beta.core.widget.radar.RadarWidget
         android:id="@+id/widget_radar"

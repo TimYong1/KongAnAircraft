@@ -13,7 +13,8 @@ import static com.tourcoo.constant.CommonConstant.APP_TYPE_SAS;
  * @Email: 971613168@qq.com
  */
 public class AppConfig {
-    public static boolean DEBUG_BODE = true;
-    public static int APP_TYPE = APP_TYPE_KONG_AN;
+    public static boolean DEBUG_BODE = false;
+    
+    public static int APP_TYPE = APP_TYPE_PRO;
 
 }

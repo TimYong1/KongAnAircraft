@@ -27,12 +27,12 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="@dimen/dp_60"
+                android:layout_width="wrap_content"
                 android:layout_height="@dimen/dp_22"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/dp_15"
                 android:scaleType="centerInside"
-                android:src="@mipmap/ic_logo_login" />
+                android:src="@mipmap/ic_splash_pro" />
 
             <LinearLayout
                 android:id="@+id/llPhone"
