@@ -45,6 +45,7 @@ import com.tourcoo.entity.flight.FlightRecordEntity;
 import com.tourcoo.entity.flight.LocateData;
 import com.tourcoo.entity.sn.DeviceInfo;
 import com.tourcoo.entity.socket.BaseSocketResult;
+import com.tourcoo.live.LiveListener;
 import com.tourcoo.live.LiveStreamHelper;
 import com.tourcoo.retrofit.BaseLoadingObserver;
 import com.tourcoo.retrofit.RequestConfig;
@@ -92,6 +93,7 @@ import dji.ux.beta.flight.widget.takeoff.TakeOffWidget;
 import dji.ux.beta.flight.widget.takeoff.TakeOffListener;
 import dji.ux.beta.map.widget.map.MapWidget;
 import dji.ux.beta.training.widget.simulatorcontrol.SimulatorControlWidget;
+import dji.ux.widget.FPVWidget;
 import io.rong.calllib.IRongCallListener;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
@@ -114,6 +116,7 @@ import static com.tourcoo.constant.EventConstant.EVENT_PHONE_HANG_UP;
 import static com.tourcoo.constant.LocateConstant.PREF_KEY_LAST_LOCATE_LANG;
 import static com.tourcoo.constant.LocateConstant.PREF_KEY_LAST_LOCATE_LAT;
 import static com.tourcoo.entity.socket.SocketConstant.SOCKET_TYPE_REAL_TIME_DATA_FLIGHT;
+import static com.tourcoo.live.LiveStreamHelper.LIVE_OPEN_SUCCESS;
 
 
 /**
@@ -126,13 +129,13 @@ import static com.tourcoo.entity.socket.SocketConstant.SOCKET_TYPE_REAL_TIME_DAT
 public class FlyControlActivity extends RxAppCompatActivity implements View.OnClickListener {
     public static final String TAG = "FlyControlActivity";
     private ConstraintLayout rootView;
-    private FPVInteractionWidget fpvInteractionWidget;
+    //    private FPVInteractionWidget fpvInteractionWidget;
     private MapWidget mapWidget;
     //主镜头视频组件
-    private FPVWidgetBeta fpvWidgetPrimary;
+    private FPVWidget fpvWidgetPrimary;
     //副镜头视频组件
     private FPVWidgetBeta fpvWidgetSecond;
-//    private RTKWidget rtkWidget;
+    //    private RTKWidget rtkWidget;
     private boolean isMapMini = true;
     private int widgetHeight;
     private int widgetWidth;
@@ -205,10 +208,10 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         rootView = findViewById(R.id.rootView);
         takeOffWidget = findViewById(R.id.widget_take_off);
         findViewById(R.id.statusView).setOnClickListener(this);
-        fpvInteractionWidget = findViewById(R.id.widget_fpv_interaction);
+//        fpvInteractionWidget = findViewById(R.id.widget_fpv_interaction);
         mapWidget = findViewById(R.id.widget_map);
         fpvWidgetPrimary = findViewById(R.id.widget_fpv);
-        fpvWidgetPrimary.setCameraSourceNameVisible(false);
+        fpvWidgetPrimary.setSourceCameraNameVisibility(false);
         ivLive = findViewById(R.id.ivLive);
         ivCall = findViewById(R.id.ivCall);
         ivCallClose = findViewById(R.id.ivCallClose);
@@ -270,7 +273,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                 //resize widgets
                 resizeViews(fpvWidgetPrimary, mapWidget);
                 //enable interaction on FPV
-                fpvInteractionWidget.setInteractionEnabled(true);
+//                fpvInteractionWidget.setInteractionEnabled(true);
                 //disable user login widget on map
 //            userAccountLoginWidget.setVisibility(View.GONE);
                 isMapMini = true;
@@ -281,7 +284,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                 //resize widgets
                 resizeViews(mapWidget, fpvWidgetPrimary);
                 //disable interaction on FPV
-                fpvInteractionWidget.setInteractionEnabled(false);
+//                fpvInteractionWidget.setInteractionEnabled(false);
                 //enable user login widget on map
 //            userAccountLoginWidget.setVisibility(View.VISIBLE);
                 isMapMini = false;
@@ -403,7 +406,6 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         }
         hideNavigation();
         loadUiState();
-        LiveStreamHelper.getInstance().setLiveListener();
         mapWidget.onResume();
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(fpvWidgetSecond.getCameraName()
@@ -470,10 +472,10 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
      */
     private void swapVideoSource() {
         if (fpvWidgetSecond.getVideoSource() == SettingDefinitions.VideoSource.SECONDARY) {
-            fpvWidgetPrimary.setVideoSource(SettingDefinitions.VideoSource.SECONDARY);
+            fpvWidgetPrimary.setVideoSource(FPVWidget.VideoSource.SECONDARY);
             fpvWidgetSecond.setVideoSource(SettingDefinitions.VideoSource.PRIMARY);
         } else {
-            fpvWidgetPrimary.setVideoSource(SettingDefinitions.VideoSource.PRIMARY);
+            fpvWidgetPrimary.setVideoSource(FPVWidget.VideoSource.PRIMARY);
             fpvWidgetSecond.setVideoSource(SettingDefinitions.VideoSource.SECONDARY);
         }
     }
@@ -516,9 +518,24 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
 
     private void handleUploadStream(String url) {
         LogUtils.i(TAG + "获取到的直播地址：" + url);
+        LiveStreamHelper.getInstance().setLiveListener(new LiveListener() {
+            @Override
+            public void liveOpenResult(int resultCode) {
+                loadUiState();
+                if (LIVE_OPEN_SUCCESS == resultCode) {
+                    ToastUtil.showSuccess("直播开启成功");
+                } else {
+                    ToastUtil.showNormalCondition("直播开启失败：" + resultCode, "无人机繁忙或过热,请稍后再试");
+                }
+            }
+
+            @Override
+            public void liveStop() {
+                loadUiState();
+                ToastUtil.showNormal("直播已关闭");
+            }
+        });
         LiveStreamHelper.getInstance().startLiveShow(url);
-        loadUiState();
-//        ivLive.setImageResource(R.drawable.ic_live_stop);
         doHideNavigation();
     }
 
@@ -1055,7 +1072,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                             aircraft.getRemoteController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
                                 @Override
                                 public void onSuccess(String s) {
-                                    doUploadAircraftInfo(deviceInfo,s);
+                                    doUploadAircraftInfo(deviceInfo, s);
                                 }
 
                                 @Override
@@ -1063,19 +1080,20 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                                     ToastUtil.showFailedDebug("未能获取到");
                                 }
                             });
-                        }else {
-                            if( aircraft.getFlightController() != null){
+                        } else {
+                            if (aircraft.getFlightController() != null) {
                                 aircraft.getFlightController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
                                     @Override
                                     public void onSuccess(String s) {
-                                        doUploadAircraftInfo(deviceInfo,s);
+                                        doUploadAircraftInfo(deviceInfo, s);
                                     }
+
                                     @Override
                                     public void onFailure(DJIError djiError) {
                                         ToastUtil.showNormal("未获取到无人机信息请稍后再试");
                                     }
                                 });
-                            }else {
+                            } else {
                                 ToastUtil.showNormal("无人机未连接或设备繁忙");
                             }
 
@@ -1164,9 +1182,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
     }
 
 
-
-
-    private void doUploadAircraftInfo(DeviceInfo deviceInfo,String s){
+    private void doUploadAircraftInfo(DeviceInfo deviceInfo, String s) {
         deviceInfo.remoteSn = StringUtil.getNotNullValue(s);
         deviceInfo.id = StringUtil.getNotNullValue(s);
         mDroneId = deviceInfo.id;

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:custom="http://schemas.android.com/apk/res-auto">
+    <!-- Widget to see first person view (FPV) -->
+    <RelativeLayout
+        android:id="@+id/fpv_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <dji.ux.widget.FPVWidget
+            android:id="@+id/fpv_widget"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            custom:sourceCameraNameVisibility="false" />
+
+    </RelativeLayout>
+
+    <dji.ux.widget.FPVOverlayWidget
+        android:id="@+id/fpv_overlay_widget"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</RelativeLayout>

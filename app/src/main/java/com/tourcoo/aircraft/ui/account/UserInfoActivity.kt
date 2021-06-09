@@ -66,7 +66,12 @@ class UserInfoActivity : RxAppCompatActivity(), View.OnClickListener {
             etUserName.setText(StringUtil.getNotNullValueLine(user.name))
             etGender.setText(StringUtil.getNotNullValueLine(""))
             etPhone.setText(StringUtil.getNotNullValueLine(user.mobile))
-            etGender.setText(StringUtil.getNotNullValueLine(user.sex.desc))
+            if(user.sex != null){
+                etGender.setText(StringUtil.getNotNullValueLine(user.sex.desc))
+            }else{
+                etGender.setText(StringUtil.getNotNullValueLine(""))
+            }
+
         }
 
     }

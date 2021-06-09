@@ -15,14 +15,18 @@
           app:uxsdk_onStateChange="@+id/widget_fpv_interaction" />-->
 
 
-    <dji.ux.beta.core.widget.fpv.FPVWidgetBeta
+    <dji.ux.widget.FPVWidget
         android:id="@+id/widget_fpv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:uxsdk_onStateChange="@+id/widget_fpv_interaction"
+
         />
+
+
     <dji.ux.widget.FPVOverlayWidget
         android:id="@+id/fpv_overlay_widget"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -59,12 +63,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.2" />
 
-     <dji.ux.beta.cameracore.widget.fpvinteraction.FPVInteractionWidget
+    <!-- <dji.ux.beta.cameracore.widget.fpvinteraction.FPVInteractionWidget
          android:id="@+id/widget_fpv_interaction"
          android:layout_width="match_parent"
          android:layout_height="match_parent"
+         android:visibility="gone"
          app:layout_constraintBottom_toBottomOf="parent"
-         app:layout_constraintEnd_toEndOf="parent" />
+         app:layout_constraintEnd_toEndOf="parent" />-->
 
 
 

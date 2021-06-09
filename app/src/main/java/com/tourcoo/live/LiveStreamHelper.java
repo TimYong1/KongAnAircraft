@@ -24,8 +24,9 @@ public class LiveStreamHelper {
     //    private String liveShowUrl = "";
 //    private Context context = FlyApplication.getContext();
     private boolean isLiveShowOpen = false;
-    private List<LiveStreamManager.OnLiveChangeListener> onLiveChangeListenerList = new ArrayList<>();
-    private LiveStreamManager.OnLiveChangeListener onLiveChangeListener;
+    private LiveListener liveListener;
+    public static final int LIVE_OPEN_SUCCESS = 0;
+    private final List<LiveListener> liveListenerList = new ArrayList<>();
 
     public boolean isLiveStreamManagerOn() {
         if (DJISDKManager.getInstance().getLiveStreamManager() == null) {
@@ -50,18 +51,11 @@ public class LiveStreamHelper {
             ToastUtil.showWarning("推流地址有误");
             return;
         }
-        if (!isLiveStreamManagerOn()) {
+        if (isLiveShowOpen()) {
 //            Toast.makeText(context, "当前直播流已经开启", Toast.LENGTH_SHORT).show();
             ToastUtil.showWarning("当前直播流已经开启");
             return;
         }
-        if (DJISDKManager.getInstance().getLiveStreamManager().isStreaming()) {
-            LogUtils.i(TAG + "直播流已经开启");
-            isLiveShowOpen = true;
-            ToastUtil.showNormal("当前直播正在进行");
-            return;
-        }
-        isLiveShowOpen = true;
         ThreadManager.getDefault().execute(() -> {
             DJISDKManager.getInstance().getLiveStreamManager().setLiveUrl(liveShowUrl);
             int result = DJISDKManager.getInstance().getLiveStreamManager().startStream();
@@ -70,7 +64,14 @@ public class LiveStreamHelper {
             LogUtils.d(TAG + "直播流开启结果=" + result +
                     "\n isVideoStreamSpeedConfigurable:" + DJISDKManager.getInstance().getLiveStreamManager().isVideoStreamSpeedConfigurable() +
                     "\n isLiveAudioEnabled:" + DJISDKManager.getInstance().getLiveStreamManager().isLiveAudioEnabled());
-            ToastUtil.showNormal("直播已开启");
+            if (LIVE_OPEN_SUCCESS == result) {
+                isLiveShowOpen = true;
+            } else {
+                isLiveShowOpen = false;
+            }
+            if (liveListener != null) {
+                liveListener.liveOpenResult(result);
+            }
         });
 
     }
@@ -106,19 +107,19 @@ public class LiveStreamHelper {
     }
 
     public void stopLiveShow() {
-        if (!isLiveStreamManagerOn()) {
-            return;
-        }
         if (!isLiveShowOpen) {
+            isLiveShowOpen = false;
             return;
         }
         DJISDKManager.getInstance().getLiveStreamManager().stopStream();
+        if (liveListener != null) {
+            liveListener.liveStop();
+        }
         isLiveShowOpen = false;
-        ToastUtil.showNormal("直播已关闭");
     }
 
     public boolean isLiveShowOpen() {
-        return isLiveShowOpen;
+        return isLiveStreamManagerOn() && DJISDKManager.getInstance().getLiveStreamManager().isStreaming()&& isLiveShowOpen;
     }
 
     private void soundOff() {
@@ -130,12 +131,11 @@ public class LiveStreamHelper {
 
     private void unRegister() {
         if (DJISDKManager.getInstance().getLiveStreamManager() != null) {
-            LiveStreamManager.OnLiveChangeListener listener;
+            LiveListener listener;
             try {
-                for (int i = onLiveChangeListenerList.size() - 1; i >= 0; i--) {
-                    listener = onLiveChangeListenerList.get(i);
-                    DJISDKManager.getInstance().getLiveStreamManager().unregisterListener(listener);
-                    onLiveChangeListenerList.remove(listener);
+                for (int i = liveListenerList.size() - 1; i >= 0; i--) {
+                    listener = liveListenerList.get(i);
+                    liveListenerList.remove(listener);
                     listener = null;
                 }
             } catch (Exception e) {
@@ -145,25 +145,19 @@ public class LiveStreamHelper {
         }
     }
 
-    public void setLiveListener() {
+    public void setLiveListener(LiveListener liveListener) {
         if (DJISDKManager.getInstance().getLiveStreamManager() == null) {
             LogUtils.e(TAG + "监听已拦截");
             return;
         }
-        if (onLiveChangeListener != null) {
+        if (liveListener == null) {
             LogUtils.e(TAG + "监听已拦截");
             return;
         }
-        onLiveChangeListener = new LiveStreamManager.OnLiveChangeListener() {
-            @Override
-            public void onStatusChanged(int i) {
-                LogUtils.i(TAG + "直播状态：" + i);
-                ToastUtil.showSuccess("直播状态="+i);
-            }
-        };
-        onLiveChangeListenerList.add(onLiveChangeListener);
+        this.liveListener = liveListener;
+        liveListenerList.add(liveListener);
         LogUtils.i(TAG + "监听已添加");
-        DJISDKManager.getInstance().getLiveStreamManager().registerListener(onLiveChangeListener);
+
     }
 
     public void release() {

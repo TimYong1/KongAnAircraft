@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+    <com.tourcoo.aircraft.widget.camera.BaseCameraView
+        android:id="@+id/textureView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+         />
+
+    <ImageView
+        android:id="@+id/ivPreview"
+        android:scaleType="centerCrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:id="@+id/llPlayControl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom">
+
+        <View
+            android:layout_width="@dimen/dp_20"
+            android:layout_height="@dimen/dp_10"
+            android:layout_gravity="center_vertical" />
+
+        <ImageView
+            android:id="@+id/ivPlayVideo"
+            android:layout_width="@dimen/dp_45"
+            android:layout_height="@dimen/dp_45"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/click_play_selector" />
+
+        <ImageView
+            android:id="@+id/ivPlayPause"
+            android:layout_width="@dimen/dp_45"
+            android:layout_height="@dimen/dp_45"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/click_pause_selector"
+            android:visibility="gone" />
+
+        <SeekBar
+            android:id="@+id/bottomSeekProgress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="@null"
+            android:max="100"
+            android:maxHeight="@dimen/dp_1"
+            android:minHeight="@dimen/dp_1"
+            android:paddingLeft="@dimen/dp_12"
+            android:paddingTop="@dimen/dp_8"
+            android:paddingRight="@dimen/dp_12"
+            android:paddingBottom="@dimen/dp_8"
+            android:progressDrawable="@drawable/bottom_seek_progress"
+            android:thumb="@drawable/bottom_seek_thumb" />
+
+        <TextView
+            android:id="@+id/tvCurrentVideoTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="00:00"
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text=" / "
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:id="@+id/tvTotalVideoTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="@dimen/dp_20"
+            android:text="00:00"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+    <ProgressBar
+        android:id="@+id/pbLoading"
+        android:layout_width="@dimen/dp_45"
+        android:layout_height="@dimen/dp_62"
+        android:layout_centerInParent="true"
+        android:indeterminateDrawable="@drawable/loading"
+        android:visibility="visible" />
+</RelativeLayout>

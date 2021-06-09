@@ -31,7 +31,9 @@ import com.tourcoo.aircraft.ui.account.UserInfoActivity;
 import com.tourcoo.aircraft.ui.banner.BannerActivity;
 import com.tourcoo.aircraft.ui.map.MapActivity;
 import com.tourcoo.aircraft.ui.photo.FlyPhotoActivity;
+import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.CompleteWidgetActivity;
 import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivity;
+import com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivityTest;
 import com.tourcoo.aircraftmanager.R;
 
 import com.tourcoo.entity.account.SasTokenBean;

@@ -183,6 +183,18 @@
             android:screenOrientation="sensorLandscape"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustNothing" />
+
+        <activity
+            android:name="com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.FlyControlActivityTest"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
+            android:name="com.tourcoo.aircraft.ui.sample.showcase.defaultlayout.CompleteWidgetActivity"
+            android:label="Default Widgets"
+            android:launchMode = "singleTop"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
         <activity
             android:name="com.tourcoo.aircraft.ui.splash.SplashActivity"
             android:screenOrientation="landscape"
