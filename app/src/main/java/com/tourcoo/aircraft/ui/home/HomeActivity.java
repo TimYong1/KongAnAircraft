@@ -68,7 +68,9 @@ import dji.common.error.DJIError;
 import dji.common.useraccount.UserAccountState;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.products.Aircraft;
+import dji.sdk.remotecontroller.RemoteController;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
 import io.rong.imlib.RongIMClient;
@@ -194,6 +196,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             }
         });
     }
+
 
     private void requestHasUpload(DeviceInfo deviceInfo) {
         Map<String, Object> params = new HashMap<>(4);
@@ -543,46 +546,70 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
     private void doUpload(Aircraft aircraft, DeviceInfo deviceInfo) {
-        if (aircraft == null || aircraft.getRemoteController() == null) {
+        if (aircraft == null) {
             return;
         }
-        aircraft.getRemoteController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
-            @Override
-            public void onSuccess(String s) {
-//                System.out.println("遥控器序列号：" + s);
-                deviceInfo.remoteSn = s;
-                deviceInfo.id = s;
-                ProductManager.getInstance().setDroneId(s);
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        requestHasUpload(deviceInfo);
-                    }
-                }, 200);
-            }
-
-            @Override
-            public void onFailure(DJIError djiError) {
-                ToastUtil.showWarning("未获取到设备信息，请重新插拔连接线后再试");
-            }
-        });
-        if (aircraft.getFlightController() != null) {
-            aircraft.getFlightController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+        //遥控器
+        RemoteController remoteController = aircraft.getRemoteController();
+        FlightController flightController = aircraft.getFlightController();
+        if (remoteController != null) {
+            //说明当前有遥控器 直接把遥控器设备号作为设备id
+            remoteController.getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
                 @Override
                 public void onSuccess(String s) {
-                    System.out.println("飞控序列号：" + s);
-                    deviceInfo.productSn = s;
+//                System.out.println("遥控器序列号：" + s);
+                    uploadDeviceInfo(deviceInfo, s);
                 }
 
                 @Override
                 public void onFailure(DJIError djiError) {
+                    ToastUtil.showWarning("未获取到设备信息，请重新插拔连接线后再试");
                 }
             });
-
-
+        } else if (flightController != null) {
+            //此时说明 遥控器为空 无人机不为空 直接获取把无人机飞控号作为设备id
+            getFlightDeviceIdAndUpload(aircraft, deviceInfo);
         }
+
 
     }
 
+
+    private void getFlightDeviceIdAndUpload(Aircraft aircraft, DeviceInfo deviceInfo) {
+        FlightController flightController = aircraft.getFlightController();
+        if (flightController != null) {
+            aircraft.getFlightController().getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+                @Override
+                public void onSuccess(String s) {
+                    System.out.println("飞控序列号：" + s);
+                    uploadDeviceInfo(deviceInfo, s);
+                }
+
+                @Override
+                public void onFailure(DJIError djiError) {
+                    ToastUtil.showWarning("未获取到飞控序列号，请重新插拔连接线后再试");
+                }
+            });
+
+        }
+    }
+
+    /**
+     * 真正上传给服务器的地方
+     *
+     * @param deviceInfo
+     * @param s
+     */
+    private void uploadDeviceInfo(DeviceInfo deviceInfo, String s) {
+        deviceInfo.remoteSn = s;
+        deviceInfo.id = s;
+        ProductManager.getInstance().setDroneId(s);
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                requestHasUpload(deviceInfo);
+            }
+        }, 200);
+    }
 }

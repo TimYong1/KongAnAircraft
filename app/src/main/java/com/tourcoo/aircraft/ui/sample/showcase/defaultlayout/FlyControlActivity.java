@@ -37,6 +37,7 @@ import com.tourcoo.aircraft.ui.sample.AircraftApplication;
 import com.tourcoo.aircraft.widget.camera.CameraHelper;
 import com.tourcoo.aircraft.widget.gimble.GimHelper;
 import com.tourcoo.aircraftmanager.R;
+import com.tourcoo.config.AppConfig;
 import com.tourcoo.entity.base.BaseCommonResult;
 import com.tourcoo.entity.base.BaseSasResult;
 import com.tourcoo.entity.event.CommonEvent;
@@ -77,7 +78,9 @@ import dji.common.error.DJIError;
 import dji.common.util.CommonCallbacks;
 import dji.keysdk.DJIKey;
 import dji.keysdk.KeyManager;
+import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.products.Aircraft;
+import dji.sdk.remotecontroller.RemoteController;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.thirdparty.io.reactivex.android.schedulers.AndroidSchedulers;
 import dji.thirdparty.io.reactivex.disposables.CompositeDisposable;
@@ -406,6 +409,7 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         }
         hideNavigation();
         loadUiState();
+        getDeviceIdAndSave();
         mapWidget.onResume();
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(fpvWidgetSecond.getCameraName()
@@ -438,6 +442,8 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
                         }
                     }
                 }));
+
+
     }
 
     @Override
@@ -782,6 +788,11 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         socketUploadEntity.setMsgType(SOCKET_TYPE_REAL_TIME_DATA_FLIGHT);
         String result = gson.toJson(socketUploadEntity);
         LogUtils.i(TAG + result);
+        if (AppConfig.DEBUG_BODE) {
+            //实时数据每隔2秒发送给后台一次
+            String value = "电量:" + mFlightRealTimeData.getBatteryData().getRemainPercent() + "水平速度:" + mFlightRealTimeData.getAttitudeData().getHorizontalSpeed() + ",droneId=" + ProductManager.getInstance().getDroneId();
+            ToastUtil.showNormalDebug(value);
+        }
         webSocketManager.send(result);
 
     }
@@ -856,51 +867,61 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         BaseSocketResult result = gson.fromJson(command, BaseSocketResult.class);
         if (result == null) {
             LogUtils.e(TAG + "后台指令异常");
+            ToastUtil.showNormalDebug("后台指令异常");
             return;
         }
         switch (result.getMsgType()) {
             case COMMAND_CAMERA_MODE:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 CameraHelper.getInstance().setCameraModePhotoSingle(djiError -> {
-                    LogUtils.d(TAG + "执行了1=" + djiError);
                     doReplyRequest(djiError, result);
                 });
                 break;
             case COMMAND_RECORD_MODE:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 CameraHelper.getInstance().setCameraModeRecord(djiError -> {
                     LogUtils.d(TAG + "执行了2=" + djiError);
                     doReplyRequest(djiError, result);
                 });
                 break;
             case COMMAND_START_RECORD:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 CameraHelper.getInstance().startRecord(djiError -> {
                     LogUtils.d(TAG + "执行了3=" + djiError);
                     doReplyRequest(djiError, result);
                 });
                 break;
             case COMMAND_STOP_RECORD:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 CameraHelper.getInstance().stopRecord(djiError -> {
                     doReplyRequest(djiError, result);
                 });
                 break;
             case COMMAND_TAKE_PHOTO:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 CameraHelper.getInstance().takePhoto(djiError -> {
                     doReplyRequest(djiError, result);
                 });
                 break;
             case COMMAND_WEB_YUN_TAI_UP:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 GimHelper.getInstance().gimUp();
                 break;
             case COMMAND_WEB_YUN_TAI_DOWN:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 GimHelper.getInstance().gimDown();
                 break;
 
             case COMMAND_WEB_YUN_TAI_LEFT:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 GimHelper.getInstance().gimLeft();
                 break;
             case COMMAND_WEB_YUN_TAI_RIGHT:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 GimHelper.getInstance().gimRight();
                 break;
             case COMMAND_WEB_YUN_TAI_CENTER:
+                ToastUtil.showNormal(getString(R.string.tips_commanding));
                 GimHelper.getInstance().gimRoll();
                 break;
             default:
@@ -1188,5 +1209,47 @@ public class FlyControlActivity extends RxAppCompatActivity implements View.OnCl
         mDroneId = deviceInfo.id;
         ProductManager.getInstance().setDroneId(deviceInfo.id);
         requestStreamUrlAndUpload(deviceInfo.id);
+    }
+
+
+    private void getDeviceIdAndSave() {
+        if (!AircraftUtil.isAircraftConnected()) {
+            return;
+        }
+        Aircraft aircraft = (Aircraft) DJISDKManager.getInstance().getProduct();
+        //遥控器
+        RemoteController remoteController = aircraft.getRemoteController();
+        FlightController flightController = aircraft.getFlightController();
+        if (remoteController != null) {
+            //说明当前有遥控器 直接把遥控器设备号作为设备id
+            remoteController.getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+                @Override
+                public void onSuccess(String s) {
+//                System.out.println("遥控器序列号：" + s);
+                    //缓存到本地
+                    ProductManager.getInstance().setDroneId(s);
+                }
+
+                @Override
+                public void onFailure(DJIError djiError) {
+                }
+            });
+        } else if (flightController != null) {
+            //此时说明 遥控器为空 无人机不为空 直接获取把无人机飞控号作为设备id
+            flightController.getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {
+                @Override
+                public void onSuccess(String s) {
+                    //缓存到本地
+                    ProductManager.getInstance().setDroneId(s);
+                }
+
+                @Override
+                public void onFailure(DJIError djiError) {
+
+                }
+            });
+        }
+
+
     }
 }

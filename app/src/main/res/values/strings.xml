@@ -1,8 +1,9 @@
 
 <resources  xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">新空安</string>
-    <string name="no_product">No product connected</string>
+    <string name="no_product">未连接设备</string>
     <string name="wsbridge_ip">WSBridge IP</string>
+    <string name="tips_commanding">指挥端正在控制云台中</string>
     <string name="sdk_version">Version: %1$s</string>
     <string name="tips_aircraft_no_connected">当前无人机未连接或设备繁忙</string>
     <string name="product_name">Product Name: %1$s</string>
